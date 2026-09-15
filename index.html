@@ -330,8 +330,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 // ── CONFIG ────────────────────────────────────────────
 const SHEET       = '1Tmrr6lxD7n0wp3x87wUdy-vP-tuDGU8DCvMmIh9UciI';
 const TICKETS_URL = 'https://chamico-tickets.vercel.app';
-// Vercel proxy — same origin as the page, no CORS, 2-min cache
-const API_EVENTOS = '/api/eventos';
+// Static JSON pushed by Apps Script — same origin, no CORS, no proxy needed
+const API_EVENTOS = '/events.json';
 const CENTER     = [-34.2455, -59.4743];
 
 // Coordinates from OSM via Overpass — updated from diagnosticarVenuesAreco log
