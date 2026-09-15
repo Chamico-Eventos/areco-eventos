@@ -404,20 +404,26 @@ function coords(lugar){
     if(k.includes(key)||key.includes(k))return val;
   return null;
 }
+function isDM(ev){ return String(ev.es_datamanIAcs).toLowerCase()==='true'; }
 function catMeta(ev){
-  if(ev.es_datamanIAcs==='TRUE')return{cls:'c-dm',icon:'★'};
+  if(isDM(ev))return{cls:'c-dm',icon:'★'};
   return CAT[ev.categoria]||{cls:'c-evento',icon:'●'};
 }
 function priceInfo(p){
   if(!p||p==='Consultar')return{cls:'p-ask',lbl:'Consultar'};
   if(p==='Gratis')return{cls:'p-free',lbl:'Gratis'};
+  // Handle raw numbers (e.g. "10000") → format as Argentine price
+  const num=parseFloat(p.replace(/[^0-9.]/g,''));
+  if(!isNaN(num)&&!p.includes('$')){
+    return{cls:'p-paid',lbl:'$'+num.toLocaleString('es-AR')};
+  }
   return{cls:'p-paid',lbl:p};
 }
 
 // ── BOTTOM SHEET ──────────────────────────────────────
 function openSheet(ev){
   const d=parseD(ev.fecha);
-  const isDM=ev.es_datamanIAcs==='TRUE';
+  const dm=isDM(ev);
 
   // Image
   const imgEl=document.getElementById('sheetImg');
@@ -501,10 +507,11 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();});
 function filtered(){
   const{start,end}=wRange(wOff);
   return evs.filter(ev=>{
-    if(ev.activo==='FALSE')return false;
+    // Handle both uppercase and lowercase boolean strings
+    if(String(ev.activo).toLowerCase()==='false')return false;
     const d=parseD(ev.fecha);if(!d)return false;
     if(d<start||d>end)return false;
-    if(activeFilter==='DM')return ev.es_datamanIAcs==='TRUE';
+    if(activeFilter==='DM')return String(ev.es_datamanIAcs).toLowerCase()==='true';
     if(activeFilter!=='all'&&ev.categoria!==activeFilter)return false;
     return true;
   }).sort((a,b)=>{
@@ -527,12 +534,12 @@ function renderList(list){
     if(ds!==lastD){html+=`<div class="date-div">${ds}</div>`;lastD=ds;}
     const{cls}=catMeta(ev);
     const{cls:pc,lbl:pl}=priceInfo(ev.precio);
-    const isDM=ev.es_datamanIAcs==='TRUE';
+    const dm=isDM(ev);
     const hc=!!coords(ev.lugar);
-    html+=`<div class="ecard${activeId===ev.id?' active':''}${isDM?' dm':''}" data-id="${ev.id}" onclick="selEv('${ev.id}')">
+    html+=`<div class="ecard${activeId===ev.id?' active':''}${dm?' dm':''}" data-id="${ev.id}" onclick="selEv('${ev.id}')">
       <div class="ecard-top">
         <div class="ecard-name">${ev.nombre||'Evento'}</div>
-        <span class="badge ${cls}">${isDM?'DataManIAcs':ev.categoria||'Evento'}</span>
+        <span class="badge ${cls}">${dm?'DataManIAcs':ev.categoria||'Evento'}</span>
       </div>
       <div class="ecard-meta">
         ${ev.lugar?`<div class="mrow"><span style="opacity:.5">${hc?'📍':'📌'}</span>${ev.lugar}</div>`:''}
@@ -540,8 +547,8 @@ function renderList(list){
       </div>
       <div class="ecard-ft">
         <span class="ptag ${pc}">${pl}</span>
-        ${isDM&&ev.preventa_disponible==='TRUE'?`<span class="pvtag">🎟 Preventa</span>`:''}
-        ${!isDM&&ev.link_accion?`<a class="slink" href="${ev.link_accion}" target="_blank" onclick="event.stopPropagation()">Ver más →</a>`:''}
+        ${dm&&String(ev.preventa_disponible).toLowerCase()==='true'?`<span class="pvtag">🎟 Preventa</span>`:''}
+        ${!dm&&ev.link_accion?`<a class="slink" href="${ev.link_accion}" target="_blank" onclick="event.stopPropagation()">Ver más →</a>`:''}
       </div>
     </div>`;
   });
@@ -560,10 +567,10 @@ function renderMap(list){
   });
   Object.values(byKey).forEach(({c,evs:g})=>{
     g.forEach((ev,i)=>{
-      const isDM=ev.es_datamanIAcs==='TRUE';
+      const dm=isDM(ev);
       const{icon}=catMeta(ev);
-      const col=isDM?'#e8c97a':'#c9a84c';
-      const pulse=isDM?'animation:pulse 2s ease-in-out infinite;':'';
+      const col=dm?'#e8c97a':'#c9a84c';
+      const pulse=dm?'animation:pulse 2s ease-in-out infinite;':'';
       const off=g.length>1?[c[0]+(i-(g.length-1)/2)*0.00009,c[1]+(i-(g.length-1)/2)*0.00012]:c;
 
       const li=L.divIcon({
@@ -572,7 +579,7 @@ function renderMap(list){
       });
 
       let m;
-      if(isDM){
+      if(dm){
         // DataManIAcs → no Leaflet popup, opens bottom sheet
         m=L.marker(off,{icon:li}).addTo(map);
         m.on('click',()=>{
@@ -582,7 +589,7 @@ function renderMap(list){
       } else {
         // Regular event → standard Leaflet popup
         const d=parseD(ev.fecha);
-        const pop=`<div style="min-width:200px;max-width:260px;font-family:'Inter',sans-serif">
+      const pop=`<div style="min-width:200px;max-width:260px;font-family:'Inter',sans-serif">
           <div class="pname">${ev.nombre||'Evento'}</div>
           <div class="pbody">
             ${ev.lugar?`📍 ${ev.lugar}<br>`:''}
@@ -593,7 +600,7 @@ function renderMap(list){
           </div>
           ${ev.link_accion?`<a class="plink" href="${ev.link_accion}" target="_blank">Ver más →</a>`:''}
         </div>`;
-        m=L.marker(off,{icon:li}).bindPopup(pop,{maxWidth:280}).addTo(map);
+      m=L.marker(off,{icon:li}).bindPopup(pop,{maxWidth:280}).addTo(map);
         m.on('click',()=>selById(ev.id,false));
       }
       mkrs[ev.id]=m;
@@ -605,7 +612,7 @@ function renderMap(list){
 function selEv(id){
   const ev=evs.find(e=>e.id===id);
   selById(id,true);
-  if(ev&&ev.es_datamanIAcs==='TRUE'){
+  if(ev&&isDM(ev)){
     openSheet(ev);
   } else if(mkrs[id]){
     map.setView(mkrs[id].getLatLng(),16,{animate:true});
