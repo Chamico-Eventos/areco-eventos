@@ -253,11 +253,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 .past-div{opacity:.4}
 .past-tag{display:inline-block;margin-left:8px;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:rgba(107,97,80,0.2);border-radius:999px;padding:1px 6px;vertical-align:middle}
 /* ── MAP BRANDING ─────────────────────────────────── */
-.map-brand{position:absolute;top:14px;right:14px;z-index:999;background:rgba(14,13,11,0.82);backdrop-filter:blur(10px);border:1px solid rgba(201,168,76,0.18);border-radius:12px;padding:10px 16px;display:flex;flex-direction:column;align-items:flex-end;gap:5px;pointer-events:none}
+.map-brand-wrapper{position:absolute;top:14px;right:14px;z-index:999;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.map-brand{background:rgba(14,13,11,0.82);backdrop-filter:blur(10px);border:1px solid rgba(201,168,76,0.18);border-radius:12px;padding:10px 16px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;pointer-events:none}
 .map-brand img{height:34px;object-fit:contain;mix-blend-mode:luminosity;opacity:.88}
 .map-brand-tagline{font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 /* ── ADD EVENT BUTTON ─────────────────────────────── */
-.add-ev-btn{position:absolute;bottom:60px;right:14px;z-index:998;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0e0d0b;border:none;border-radius:999px;padding:11px 20px;font-family:Inter,sans-serif;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.35);transition:filter .2s,transform .15s;display:flex;align-items:center;gap:6px}
+.add-ev-btn{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0e0d0b;border:none;border-radius:999px;padding:11px 20px;font-family:Inter,sans-serif;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.35);transition:filter .2s,transform .15s;display:flex;align-items:center;gap:6px;white-space:nowrap}
 .add-ev-btn:hover{filter:brightness(1.08);transform:translateY(-2px)}
 /* ── SUBMISSION MODAL ─────────────────────────────── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(6px);z-index:3000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;padding:16px}
@@ -293,9 +294,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
   .sidebar{width:100%;height:50vh;border-right:none;border-bottom:1px solid var(--border)}
   #map{height:50vh}
   .dm-sheet{max-height:92vh}
-  .map-brand{top:8px;right:8px;padding:7px 12px}
+  .map-brand-wrapper{top:8px;right:8px}
+  .map-brand{padding:7px 12px}
   .map-brand img{height:26px}
-  .add-ev-btn{bottom:56px;right:8px;padding:9px 14px;font-size:11px}
+  .add-ev-btn{padding:9px 14px;font-size:11px}
 }
 </style>
 </head>
@@ -496,16 +498,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
     </div>
   </aside>
   <div id="map">
-    <!-- Brand overlay top-right -->
-    <div class="map-brand">
-      <img src="/images/logo-datamaniacs.png" alt="DataManIAcs"
-           onerror="this.style.display='none'">
-      <div class="map-brand-tagline">Powered by DataManIAcs</div>
+    <!-- Brand + button wrapper top-right -->
+    <div class="map-brand-wrapper">
+      <div class="map-brand">
+        <div class="map-brand-tagline">Powered by</div>
+        <img src="/images/logo-datamaniacs.png" alt="DataManIAcs"
+             onerror="this.style.display='none'">
+      </div>
+      <button class="add-ev-btn" onclick="openSubModal()">
+        ✦ Agregá tu evento gratis
+      </button>
     </div>
-    <!-- Add event button -->
-    <button class="add-ev-btn" onclick="openSubModal()">
-      ✦ Agregá tu evento gratis
-    </button>
   </div>
 </div>
 
@@ -676,6 +679,12 @@ function openSheet(ev){
   if(ev.hora&&ev.hora!=='Todo el día') chips.push(`<div class="sheet-meta-chip">🕐 ${ev.hora} hs</div>`);
   if(ev.lugar) chips.push(`<div class="sheet-meta-chip">📍 ${ev.lugar}</div>`);
   if(ev.categoria) chips.push(`<div class="sheet-meta-chip badge ${catMeta(ev).cls}">${ev.categoria}</div>`);
+  // Directions link
+  const c3=coords(ev.lugar);
+  if(c3){
+    const gmDir=`https://www.google.com/maps/dir/?api=1&destination=${c3[0]},${c3[1]}`;
+    chips.push(`<a class="sheet-meta-chip" href="${gmDir}" target="_blank" style="color:var(--gold);text-decoration:none;pointer-events:auto">🗺 Cómo llegar</a>`);
+  }
   document.getElementById('sheetMeta').innerHTML=chips.join('');
 
   // Description
@@ -906,6 +915,8 @@ function renderMap(list, future=[], past=[]){
           className:'',iconSize:[34,34],iconAnchor:[17,34],popupAnchor:[1,-38]
         });
         const d=parseD(ev.fecha);
+        const c2=coords(ev.lugar);
+        const gmDir=c2?`https://www.google.com/maps/dir/?api=1&destination=${c2[0]},${c2[1]}`:'';
         const pop=`<div style="min-width:200px;max-width:260px;font-family:'Inter',sans-serif">
           <div class="pname">${ev.nombre||'Evento'}</div>
           <div class="pbody">
@@ -915,7 +926,10 @@ function renderMap(list, future=[], past=[]){
             ${ev.precio&&ev.precio!=='Consultar'?`<br><span class="pgold">${ev.precio}</span>`:''}
             ${ev.descripcion?`<br><br><span style="font-size:11px;color:#6b6150;line-height:1.6">${ev.descripcion.slice(0,120)}…</span>`:''}
           </div>
-          ${ev.link_accion?`<a class="plink" href="${ev.link_accion}" target="_blank">Ver más →</a>`:''}
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
+            ${ev.link_accion?`<a class="plink" href="${ev.link_accion}" target="_blank">Ver más →</a>`:''}
+            ${gmDir?`<a class="plink" href="${gmDir}" target="_blank" style="color:var(--ink2)">🗺 Cómo llegar</a>`:''}
+          </div>
         </div>`;
         m=L.marker(off,{icon:li}).bindPopup(pop,{maxWidth:280}).addTo(map);
         m.on('click',()=>selById(ev.id,false));
@@ -975,6 +989,46 @@ function render(){
   const list=filtered();
   renderList(list);
   renderMap(list, futureEvents(), pastEvents());
+  // Auto-zoom to fit visible active events
+  fitMapToEvents();
+}
+
+// Zoom map to show all active markers
+function fitMapToEvents(){
+  const active=Object.values(mkrs);
+  if(active.length===0){
+    map.setView(CENTER,14,{animate:true});return;
+  }
+  if(active.length===1){
+    map.setView(active[0].getLatLng(),15,{animate:true});return;
+  }
+  try{
+    const group=L.featureGroup(active);
+    if(group.getBounds().isValid()){
+      map.fitBounds(group.getBounds(),{padding:[70,70],maxZoom:16,animate:true});
+    }
+  }catch(e){}
+}
+
+// ── YOU ARE HERE ──────────────────────────────────────
+let userMarker=null;
+function initGeolocation(){
+  if(!navigator.geolocation)return;
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const lat=pos.coords.latitude, lon=pos.coords.longitude;
+    if(userMarker)map.removeLayer(userMarker);
+    // Blue pulsing dot
+    const html=`<div style="
+      width:16px;height:16px;border-radius:50%;
+      background:#4285f4;border:2px solid #fff;
+      box-shadow:0 0 0 4px rgba(66,133,244,0.25);
+      animation:pulse 2s ease-in-out infinite;
+    "></div>`;
+    const li=L.divIcon({html,className:'',iconSize:[16,16],iconAnchor:[8,8]});
+    userMarker=L.marker([lat,lon],{icon:li,zIndexOffset:1000})
+      .bindPopup('<div style="font-size:12px;color:var(--ink)">📍 Estás aquí</div>')
+      .addTo(map);
+  },null,{timeout:8000,enableHighAccuracy:false});
 }
 
 // ── CATEGORY PILLS ────────────────────────────────────
@@ -1093,6 +1147,7 @@ async function init(){
     console.log('Events loaded: ' + evs.length);
     buildPills();
     render();
+    initGeolocation(); // blue dot for user location
   }catch(e){
     console.error('Load failed:', e);
     document.getElementById('list').innerHTML=
