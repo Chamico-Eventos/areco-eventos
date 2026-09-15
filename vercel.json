@@ -5,7 +5,6 @@ const AS_URL = 'https://script.google.com/macros/s/AKfycbyq687XCjn2YbtAjLHvrWE0R
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 's-maxage=120, stale-while-revalidate=60');
-
   try {
     const response = await fetch(AS_URL, {
       redirect: 'follow',
