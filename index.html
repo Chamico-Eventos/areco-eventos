@@ -330,9 +330,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 // ── CONFIG ────────────────────────────────────────────
 const SHEET       = '1Tmrr6lxD7n0wp3x87wUdy-vP-tuDGU8DCvMmIh9UciI';
 const TICKETS_URL = 'https://chamico-tickets.vercel.app';
-// Apps Script JSON API — no CORS issues, no sheet publishing needed
-const AS_URL      = 'https://script.google.com/macros/s/AKfycbyq687XCjn2YbtAjLHvrWE0RZ5u-Tyijhoa_5nWHkJorE62_G1xYLEvEmx3dTA9Zs9k/exec';
-const API_EVENTOS = AS_URL + '?action=eventos';
+// Vercel proxy — same origin as the page, no CORS, 2-min cache
+const API_EVENTOS = '/api/eventos';
 const CENTER     = [-34.2455, -59.4743];
 
 // Coordinates from OSM via Overpass — updated from diagnosticarVenuesAreco log
@@ -688,32 +687,14 @@ document.getElementById('wPrev').onclick=()=>{wOff--;render();};
 document.getElementById('wNext').onclick=()=>{wOff++;render();};
 
 // ── DATA LOAD ─────────────────────────────────────────
-// JSONP loader — bypasses CORS on Apps Script's googleusercontent redirect
-function fetchJSONP(url){
-  return new Promise((resolve,reject)=>{
-    const cb      = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-    const script  = document.createElement('script');
-    const timeout = setTimeout(()=>{ cleanup(); reject(new Error('JSONP timeout')); }, 20000);
-
-    function cleanup(){
-      clearTimeout(timeout);
-      delete window[cb];
-      if(script.parentNode) script.parentNode.removeChild(script);
-    }
-
-    window[cb] = data => { cleanup(); resolve(data); };
-    script.onerror = ()=>{ cleanup(); reject(new Error('JSONP load error')); };
-    script.src = url + '&callback=' + cb;
-    document.head.appendChild(script);
-  });
-}
-
 async function init(){
   try{
-    const data = await fetchJSONP(API_EVENTOS);
+    const r    = await fetch(API_EVENTOS);
+    if(!r.ok) throw new Error('API returned ' + r.status);
+    const data = await r.json();
     if(data && data.error) throw new Error(data.error);
     evs = Array.isArray(data) ? data : [];
-    console.log(`Events loaded: ${evs.length}`);
+    console.log('Events loaded: ' + evs.length);
     buildPills();
     render();
   }catch(e){
