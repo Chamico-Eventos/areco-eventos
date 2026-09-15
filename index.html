@@ -402,7 +402,18 @@ const CAT = {
 };
 
 // ── STATE ─────────────────────────────────────────────
-let evs=[],vmap={...FALLBACK},activeFilter='all',wOff=0,mkrs={},activeId=null;
+let evs=[],vmap={...FALLBACK},activeFilter='all',wOff=0,mkrs={},ghostMkrs={},activeId=null;
+
+// Navigate to the week containing a given MM/DD/YYYY date
+function goToEventWeek(fecha){
+  const d=parseD(fecha);if(!d)return;
+  const now=new Date();now.setHours(0,0,0,0);
+  const day=now.getDay();
+  const thisMonday=new Date(now);
+  thisMonday.setDate(now.getDate()-(day===0?6:day-1));
+  const diff=Math.floor((d-thisMonday)/(7*24*60*60*1000));
+  wOff=diff;render();
+}
 
 // ── MAP ───────────────────────────────────────────────
 const map=L.map('map',{center:CENTER,zoom:15,zoomControl:false});
@@ -513,7 +524,8 @@ function openSheet(ev){
   const eventParam=encodeURIComponent(ev.id||ev.nombre||'');
   const targetUrl=ev.link_accion||`${TICKETS_URL}/?event=${eventParam}`;
   btn.href=targetUrl;
-  btn.textContent=ev.preventa_disponible==='TRUE'?'🎟 Comprar entrada':'Ver más →';
+  const hasPreventa = String(ev.preventa_disponible).toLowerCase()==='true';
+  btn.textContent = hasPreventa ? 'Comprá tus anticipadas →' : 'Ver más →';
 
   // Source link (Instagram or original source)
   const srcLink=document.getElementById('sheetSourceLink');
@@ -593,8 +605,41 @@ function renderList(list){
 }
 
 // ── RENDER MAP ────────────────────────────────────────
-function renderMap(list){
+function renderMap(list, future=[]){
   Object.values(mkrs).forEach(m=>map.removeLayer(m));mkrs={};
+  Object.values(ghostMkrs).forEach(m=>map.removeLayer(m));ghostMkrs={};
+
+  // ── Ghost markers for future events ───────────────────
+  future.forEach(ev=>{
+    const c=coords(ev.lugar);if(!c)return;
+    const dm=isDM(ev);
+    const ghostHtml=`<div style="
+      width:22px;height:22px;
+      background:${dm?'rgba(232,201,122,0.22)':'rgba(180,160,100,0.18)'};
+      border-radius:50% 50% 50% 0;
+      transform:rotate(-45deg);
+      border:1px solid ${dm?'rgba(232,201,122,0.45)':'rgba(180,160,100,0.3)'};
+      display:flex;align-items:center;justify-content:center;
+    "><span style="transform:rotate(45deg);font-size:9px;opacity:.55">${dm?'★':'●'}</span></div>`;
+
+    const li=L.divIcon({html:ghostHtml,className:'',iconSize:[22,22],iconAnchor:[11,22],popupAnchor:[0,-24]});
+    const d=parseD(ev.fecha);
+    const pop=`<div style="font-family:'Inter',sans-serif;font-size:12px;max-width:220px">
+      <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px">${ev.nombre||'Evento'}</div>
+      <div style="color:var(--ink2);line-height:1.7">
+        ${d?`📅 ${prettyD(d)}<br>`:''}
+        ${ev.hora&&ev.hora!=='Todo el día'?`🕐 ${ev.hora} hs<br>`:''}
+        ${ev.lugar?`📍 ${ev.lugar}<br>`:''}
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--muted);cursor:pointer"
+           onclick="goToEventWeek('${ev.fecha}')">Ver esta semana →</div>
+    </div>`;
+
+    const m=L.marker(c,{icon:li,opacity:0.7}).bindPopup(pop,{maxWidth:240}).addTo(map);
+    ghostMkrs[ev.id]=m;
+  });
+
+  // ── Active markers for current week ───────────────────
   const byKey={};
   list.forEach(ev=>{
     const c=coords(ev.lugar);if(!c)return;
@@ -664,10 +709,24 @@ function selById(id,pan){
   if(pan&&mkrs[id])map.setView(mkrs[id].getLatLng(),16,{animate:true});
 }
 
+// ── FUTURE EVENTS (ghost markers on map) ──────────────
+function futureEvents(){
+  const{end}=wRange(wOff);
+  const cutoff=new Date(end);
+  cutoff.setDate(cutoff.getDate()+90); // show up to 90 days ahead
+  return evs.filter(ev=>{
+    if(String(ev.activo).toLowerCase()==='false')return false;
+    const d=parseD(ev.fecha);if(!d)return false;
+    return d>end && d<=cutoff;
+  });
+}
+
 // ── FULL RENDER ───────────────────────────────────────
 function render(){
   document.getElementById('wLabel').textContent=wLabel(wRange(wOff));
-  const list=filtered();renderList(list);renderMap(list);
+  const list=filtered();
+  renderList(list);
+  renderMap(list, futureEvents());
 }
 
 // ── CATEGORY PILLS ────────────────────────────────────
