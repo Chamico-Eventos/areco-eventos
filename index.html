@@ -247,12 +247,55 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
   filter:invert(100%) hue-rotate(180deg) brightness(92%) contrast(88%) saturate(0.85);
 }
 
+/* ── PAST EVENT CARDS ─────────────────────────────── */
+.past-card{opacity:.32;border-color:transparent!important;background:var(--bg)!important}
+.past-name{text-decoration:line-through;color:var(--muted)!important}
+.past-div{opacity:.4}
+.past-tag{display:inline-block;margin-left:8px;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:rgba(107,97,80,0.2);border-radius:999px;padding:1px 6px;vertical-align:middle}
+/* ── MAP BRANDING ─────────────────────────────────── */
+.map-brand{position:absolute;top:14px;right:14px;z-index:999;background:rgba(14,13,11,0.82);backdrop-filter:blur(10px);border:1px solid rgba(201,168,76,0.18);border-radius:12px;padding:10px 16px;display:flex;flex-direction:column;align-items:flex-end;gap:5px;pointer-events:none}
+.map-brand img{height:34px;object-fit:contain;mix-blend-mode:luminosity;opacity:.88}
+.map-brand-tagline{font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+/* ── ADD EVENT BUTTON ─────────────────────────────── */
+.add-ev-btn{position:absolute;bottom:60px;right:14px;z-index:998;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0e0d0b;border:none;border-radius:999px;padding:11px 20px;font-family:Inter,sans-serif;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.35);transition:filter .2s,transform .15s;display:flex;align-items:center;gap:6px}
+.add-ev-btn:hover{filter:brightness(1.08);transform:translateY(-2px)}
+/* ── SUBMISSION MODAL ─────────────────────────────── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(6px);z-index:3000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;padding:16px}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal-box{background:var(--s1);border:1px solid var(--border);border-radius:18px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.8)}
+.modal-box::-webkit-scrollbar{width:3px}.modal-box::-webkit-scrollbar-thumb{background:var(--border)}
+.modal-head{padding:22px 24px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;background:linear-gradient(180deg,rgba(201,168,76,0.07) 0%,transparent 100%);position:sticky;top:0;z-index:1;border-radius:18px 18px 0 0}
+.modal-title{font-family:Playfair Display,serif;font-size:21px;font-weight:700;color:var(--ink);line-height:1.2}
+.modal-subtitle{font-size:12px;color:var(--muted);margin-top:4px}
+.modal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0 4px;line-height:1}
+.modal-close:hover{color:var(--ink)}
+.modal-body{padding:20px 24px 28px;display:flex;flex-direction:column;gap:14px}
+.form-row{display:flex;gap:12px}
+.form-group{display:flex;flex-direction:column;gap:5px;flex:1}
+.form-label{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.form-label span{color:var(--gold);margin-left:2px}
+.form-input,.form-select,.form-textarea{background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:10px 12px;color:var(--ink);font-family:Inter,sans-serif;font-size:13px;transition:border-color .15s;outline:none;width:100%}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:rgba(201,168,76,0.4)}
+.form-select option{background:var(--s2)}
+.form-textarea{resize:vertical;min-height:70px}
+.form-hint{font-size:10px;color:var(--muted);line-height:1.5;margin-top:2px}
+.form-section{font-size:10px;font-weight:600;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;padding-top:6px;border-top:1px solid var(--b2)}
+.form-submit{width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0e0d0b;border:none;border-radius:10px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px;transition:filter .2s}
+.form-submit:hover{filter:brightness(1.07)}
+.form-submit:disabled{opacity:.5;cursor:not-allowed}
+.form-success{text-align:center;padding:40px 20px}
+.form-success-icon{font-size:52px;margin-bottom:14px}
+.form-success h3{font-family:Playfair Display,serif;font-size:22px;color:var(--gold);margin-bottom:10px}
+.form-success p{font-size:13px;color:var(--ink2);line-height:1.7}
 /* ── MOBILE ───────────────────────────────────────── */
 @media(max-width:680px){
   .shell{flex-direction:column}
   .sidebar{width:100%;height:50vh;border-right:none;border-bottom:1px solid var(--border)}
   #map{height:50vh}
   .dm-sheet{max-height:92vh}
+  .map-brand{top:8px;right:8px;padding:7px 12px}
+  .map-brand img{height:26px}
+  .add-ev-btn{bottom:56px;right:8px;padding:9px 14px;font-size:11px}
 }
 </style>
 </head>
@@ -267,6 +310,123 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 
 <!-- Bottom sheet overlay -->
 <div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()"></div>
+
+<!-- Submission modal -->
+<div class="modal-overlay" id="subOverlay" onclick="if(event.target===this)closeSubModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">Agregá tu evento</div>
+        <div class="modal-subtitle">Gratis · Aparece en el mapa en menos de 24hs tras revisión</div>
+      </div>
+      <button class="modal-close" onclick="closeSubModal()">✕</button>
+    </div>
+    <div class="modal-body" id="subForm">
+
+      <div class="form-section">Datos del evento</div>
+
+      <div class="form-group">
+        <label class="form-label">Nombre del evento <span>*</span></label>
+        <input class="form-input" id="f-nombre" placeholder="Ej: Jazz en La Blanqueada" maxlength="120">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Fecha <span>*</span></label>
+          <input class="form-input" id="f-fecha" type="date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hora</label>
+          <input class="form-input" id="f-hora" type="time" placeholder="20:30">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Lugar / Venue <span>*</span></label>
+          <input class="form-input" id="f-lugar" placeholder="Ej: Galpón Chamico">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Categoría <span>*</span></label>
+          <select class="form-select" id="f-cat">
+            <option value="">Seleccioná...</option>
+            <option>Música</option><option>Arte</option><option>Tradición</option>
+            <option>Cultural</option><option>Gastronomía</option>
+            <option>Deportes</option><option>Feria</option><option>Infantil</option>
+            <option>Evento</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Descripción breve</label>
+        <textarea class="form-textarea" id="f-desc" placeholder="Contanos de qué se trata tu evento (máx. 300 caracteres)" maxlength="300"></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Precio</label>
+          <input class="form-input" id="f-precio" placeholder="Gratis · $5.000 · Consultar">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Link de más info</label>
+          <input class="form-input" id="f-link" type="url" placeholder="Instagram, Facebook...">
+        </div>
+      </div>
+
+      <div class="form-section">Flyer del evento</div>
+
+      <div class="form-group">
+        <label class="form-label">Link del flyer (imagen)</label>
+        <input class="form-input" id="f-imagen" type="url" placeholder="Link de Instagram, Google Drive, etc.">
+        <div class="form-hint">
+          📌 Formatos aceptados: JPG o PNG · Máximo 2MB<br>
+          📌 Puede ser un link de Instagram, Google Drive (público) o Dropbox<br>
+          📌 Si no tenés link, podés enviarlo por WhatsApp al finalizar
+        </div>
+      </div>
+
+      <div class="form-section">Tus datos</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Tu nombre <span>*</span></label>
+          <input class="form-input" id="f-contacto" placeholder="Nombre del organizador">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email <span>*</span></label>
+          <input class="form-input" id="f-email" type="email" placeholder="tu@email.com">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">WhatsApp / Teléfono</label>
+        <input class="form-input" id="f-tel" placeholder="2326-xxxxxx">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="f-tickets" style="accent-color:var(--gold)">
+          <span style="font-size:12px;color:var(--ink2);text-transform:none;letter-spacing:0">
+            Me interesa vender entradas online con DataManIAcs
+          </span>
+        </label>
+      </div>
+
+      <div id="subError" style="font-size:12px;color:#c05a4a;display:none"></div>
+
+      <button class="form-submit" id="subSubmit" onclick="submitEvent()">
+        Enviar mi evento →
+      </button>
+
+      <div style="font-size:10px;color:var(--muted);text-align:center;line-height:1.5">
+        Tu evento se revisa y se publica en el mapa en menos de 24 horas.<br>
+        El listado es gratuito. 🎉
+      </div>
+
+    </div>
+  </div>
+</div>
 
 <!-- DataManIAcs premium bottom sheet -->
 <div class="dm-sheet" id="dmSheet">
@@ -335,7 +495,18 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
            onerror="this.style.display='none'">
     </div>
   </aside>
-  <div id="map"></div>
+  <div id="map">
+    <!-- Brand overlay top-right -->
+    <div class="map-brand">
+      <img src="/images/logo-datamaniacs.png" alt="DataManIAcs"
+           onerror="this.style.display='none'">
+      <div class="map-brand-tagline">Powered by DataManIAcs</div>
+    </div>
+    <!-- Add event button -->
+    <button class="add-ev-btn" onclick="openSubModal()">
+      ✦ Agregá tu evento gratis
+    </button>
+  </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -587,6 +758,7 @@ function filtered(){
 
 // ── RENDER SIDEBAR ────────────────────────────────────
 function renderList(list){
+  const TODAY=new Date();TODAY.setHours(0,0,0,0);
   const el=document.getElementById('list');
   if(!list.length){
     el.innerHTML=`<div class="empty"><strong>Sin eventos esta semana</strong>Probá otra semana o quitá el filtro.</div>`;return;
@@ -595,25 +767,26 @@ function renderList(list){
   let lastD=null;
   list.forEach(ev=>{
     const d=parseD(ev.fecha),ds=prettyD(d);
-    if(ds!==lastD){html+=`<div class="date-div">${ds}</div>`;lastD=ds;}
+    const isPast=d&&d<TODAY;
+    if(ds!==lastD){html+=`<div class="date-div${isPast?' past-div':''}">${ds}${isPast?'<span class="past-tag">pasado</span>':''}</div>`;lastD=ds;}
     const{cls}=catMeta(ev);
     const{cls:pc,lbl:pl}=priceInfo(ev.precio);
     const dm=isDM(ev);
     const hc=!!coords(ev.lugar);
-    html+=`<div class="ecard${activeId===ev.id?' active':''}${dm?' dm':''}" data-id="${ev.id}" onclick="selEv('${ev.id}')">
+    html+=`<div class="ecard${activeId===ev.id?' active':''}${dm?' dm':''}${isPast?' past-card':''}" data-id="${ev.id}" onclick="selEv('${ev.id}')">
       <div class="ecard-top">
-        <div class="ecard-name">${ev.nombre||'Evento'}</div>
-        <span class="badge ${cls}">${dm?'DataManIAcs':ev.categoria||'Evento'}</span>
+        <div class="ecard-name${isPast?' past-name':''}">${ev.nombre||'Evento'}</div>
+        <span class="badge ${isPast?'c-evento':cls}" style="${isPast?'opacity:.45':''}">${isPast?'Pasado':dm?'DataManIAcs':ev.categoria||'Evento'}</span>
       </div>
-      <div class="ecard-meta">
+      <div class="ecard-meta" style="${isPast?'opacity:.4':''}">
         ${ev.lugar?`<div class="mrow"><span style="opacity:.5">${hc?'📍':'📌'}</span>${ev.lugar}</div>`:''}
         ${ev.hora&&ev.hora!=='Todo el día'?`<div class="mrow"><span style="opacity:.5">🕐</span>${ev.hora} hs</div>`:`<div class="mrow" style="color:var(--muted)">Todo el día</div>`}
       </div>
-      <div class="ecard-ft">
+      ${!isPast?`<div class="ecard-ft">
         <span class="ptag ${pc}">${pl}</span>
         ${dm&&String(ev.preventa_disponible).toLowerCase()==='true'?`<span class="pvtag">🎟 Preventa</span>`:''}
         ${!dm&&ev.link_accion?`<a class="slink" href="${ev.link_accion}" target="_blank" onclick="event.stopPropagation()">Ver más →</a>`:''}
-      </div>
+      </div>`:''}
     </div>`;
   });
   el.innerHTML=html;
@@ -821,7 +994,95 @@ document.getElementById('wPrev').onclick=()=>{wOff--;render();};
 document.getElementById('wNext').onclick=()=>{wOff++;render();};
 
 // ── DATA LOAD ─────────────────────────────────────────
-async function init(){
+// ── SUBMISSION MODAL ──────────────────────────────────
+const AS_SUBMIT = 'https://script.google.com/macros/s/AKfycbyq687XCjn2YbtAjLHvrWE0RZ5u-Tyijhoa_5nWHkJorE62_G1xYLEvEmx3dTA9Zs9k/exec';
+
+function openSubModal(){
+  document.getElementById('subOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeSubModal(){
+  document.getElementById('subOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeSheet();closeSubModal();}
+});
+
+async function submitEvent(){
+  const btn=document.getElementById('subSubmit');
+  const errEl=document.getElementById('subError');
+  errEl.style.display='none';
+
+  // Validate required fields
+  const nombre  = document.getElementById('f-nombre').value.trim();
+  const fecha   = document.getElementById('f-fecha').value;
+  const lugar   = document.getElementById('f-lugar').value.trim();
+  const cat     = document.getElementById('f-cat').value;
+  const contacto= document.getElementById('f-contacto').value.trim();
+  const email   = document.getElementById('f-email').value.trim();
+
+  if(!nombre||!fecha||!lugar||!cat||!contacto||!email){
+    errEl.textContent='Por favor completá los campos obligatorios (*)';
+    errEl.style.display='block';return;
+  }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    errEl.textContent='El email no parece válido';
+    errEl.style.display='block';return;
+  }
+
+  btn.disabled=true;btn.textContent='Enviando…';
+
+  // Format date from YYYY-MM-DD to MM/DD/YYYY
+  const [y,m,d]=fecha.split('-');
+  const fechaFmt=`${m}/${d}/${y}`;
+
+  const hora=document.getElementById('f-hora').value||'';
+  const horaFmt=hora?hora.slice(0,5)+' hs':'Todo el día';
+
+  const payload={
+    source:      'event_submission',
+    nombre,
+    fecha:       fechaFmt,
+    hora:        horaFmt,
+    lugar,
+    categoria:   cat,
+    descripcion: document.getElementById('f-desc').value.trim().slice(0,300),
+    precio:      document.getElementById('f-precio').value.trim()||'Consultar',
+    link_fuente: document.getElementById('f-link').value.trim(),
+    imagen_url:  document.getElementById('f-imagen').value.trim(),
+    contacto_nombre: contacto,
+    contacto_email:  email,
+    contacto_tel:    document.getElementById('f-tel').value.trim(),
+    interes_tickets: document.getElementById('f-tickets').checked?'Sí':'No',
+    fecha_envio: new Date().toLocaleDateString('es-AR'),
+  };
+
+  try{
+    await fetch(AS_SUBMIT,{
+      method:'POST',
+      body:JSON.stringify(payload),
+      headers:{'Content-Type':'application/json'},
+      mode:'no-cors', // submission doesn't need response body
+    });
+    // Show success (no-cors means we can't read response, assume success)
+    document.getElementById('subForm').innerHTML=`
+      <div class="form-success">
+        <div class="form-success-icon">🎉</div>
+        <h3>¡Evento recibido!</h3>
+        <p>Revisamos tu evento y lo publicamos en el mapa en menos de 24 horas.<br><br>
+        Te avisamos a <strong>${email}</strong> cuando esté activo.<br><br>
+        ${document.getElementById('f-tickets').checked?'<strong>¡Nos contactamos sobre la venta de entradas!</strong>':''}</p>
+        <button class="form-submit" style="margin-top:20px;max-width:200px;margin-left:auto;margin-right:auto" onclick="closeSubModal()">Cerrar</button>
+      </div>`;
+  }catch(e){
+    btn.disabled=false;btn.textContent='Enviar mi evento →';
+    errEl.textContent='Error al enviar. Intentá de nuevo.';
+    errEl.style.display='block';
+  }
+}
+
+// ── INIT ──────────────────────────────────────────────
   try{
     const r    = await fetch(API_EVENTOS);
     if(!r.ok) throw new Error('API returned ' + r.status);
