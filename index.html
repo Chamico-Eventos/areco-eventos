@@ -326,14 +326,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
 <script>
 // ── CONFIG ────────────────────────────────────────────
 const SHEET       = '1Tmrr6lxD7n0wp3x87wUdy-vP-tuDGU8DCvMmIh9UciI';
 const TICKETS_URL = 'https://chamico-tickets.vercel.app';
-// pub?output=csv&gid= is the reliable format — gid from the tab URL
-const CSV_EV      = `https://docs.google.com/spreadsheets/d/${SHEET}/pub?output=csv&gid=306349646`;
-const CSV_VN      = `https://docs.google.com/spreadsheets/d/${SHEET}/pub?output=csv&gid=venues_areco`; // update gid when tab exists
+// Apps Script JSON API — no CORS issues, no sheet publishing needed
+const AS_URL      = 'https://script.google.com/macros/s/AKfycbyq687XCjn2YbtAjLHvrWE0RZ5u-Tyijhoa_5nWHkJorE62_G1xYLEvEmx3dTA9Zs9k/exec';
+const API_EVENTOS = AS_URL + '?action=eventos';
 const CENTER     = [-34.2455, -59.4743];
 
 const FALLBACK = {
@@ -646,24 +645,23 @@ document.getElementById('wNext').onclick=()=>{wOff++;render();};
 // ── DATA LOAD ─────────────────────────────────────────
 async function init(){
   try{
-    try{
-      const r=await fetch(CSV_VN);
-      if(r.ok){
-        Papa.parse(await r.text(),{header:true,skipEmptyLines:true}).data.forEach(row=>{
-          const n=(row['Nombre']||'').toLowerCase().trim();
-          const lat=parseFloat(row['Latitud']||'');
-          const lon=parseFloat(row['Longitud']||'');
-          if(n&&!isNaN(lat)&&!isNaN(lon))vmap[n]=[lat,lon];
-        });
-      }
-    }catch(e){console.log('Using hardcoded coords');}
+    // Single API call returns all events as JSON — no CSV, no CORS issues
+    const r    = await fetch(API_EVENTOS);
+    if(!r.ok) throw new Error(`API returned ${r.status}`);
+    const data = await r.json();
 
-    const r=await fetch(CSV_EV);
-    evs=Papa.parse(await r.text(),{header:true,skipEmptyLines:true}).data;
-    buildPills();render();
+    // Handle error response from Apps Script
+    if(data.error) throw new Error(data.error);
+
+    evs = Array.isArray(data) ? data : [];
+    console.log(`Events loaded: ${evs.length}`);
+
+    buildPills();
+    render();
   }catch(e){
-    console.error(e);
-    document.getElementById('list').innerHTML=`<div class="empty"><strong>Error al cargar</strong>Verificá que el Sheet esté publicado como CSV.</div>`;
+    console.error('Load failed:', e);
+    document.getElementById('list').innerHTML=
+      `<div class="empty"><strong>Error al cargar</strong>${e.message}</div>`;
   }
   document.getElementById('loading').style.display='none';
 }
