@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Areco Eventos · DataManIAcs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+:root{
+  --bg:#0e0d0b;--s1:#171510;--s2:#1e1b16;--s3:#252118;
+  --gold:#c9a84c;--gold2:#e8c97a;--ink:#f2ead8;--ink2:#c4b89a;
+  --muted:#6b6150;--border:rgba(201,168,76,0.14);--b2:rgba(255,255,255,0.05);
+  --green:#2a7a50;--danger:#c05a4a;--r:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;font-size:14px}
+.shell{display:flex;height:100vh;width:100vw}
+
+/* ── SIDEBAR ─────────────────────────────────────── */
+.sidebar{width:340px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow:hidden;z-index:1000}
+.sb-head{padding:18px 18px 14px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(201,168,76,0.07) 0%,transparent 100%);flex-shrink:0}
+.brand-text h1{font-family:'Playfair Display',serif;font-size:19px;font-weight:900;letter-spacing:-.02em;color:var(--ink);line-height:1;margin-bottom:14px}
+.brand-text h1 em{color:var(--gold);font-style:normal}
+.brand-text small{font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;display:block;margin-top:3px}
+.week-nav{display:flex;align-items:center;gap:6px}
+.wn-btn{background:none;border:1px solid var(--border);color:var(--gold);cursor:pointer;padding:6px 11px;border-radius:6px;font-size:15px;transition:background .15s;line-height:1}
+.wn-btn:hover{background:rgba(201,168,76,0.1)}
+.wn-label{flex:1;text-align:center;font-size:12px;font-weight:600;color:var(--ink2)}
+.sb-filters{padding:12px 18px;border-bottom:1px solid var(--b2);flex-shrink:0}
+.filter-hd{font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:7px}
+.pills{display:flex;flex-wrap:wrap;gap:4px}
+.pill{padding:4px 10px;border-radius:999px;border:1px solid var(--b2);background:var(--s2);color:var(--muted);font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+.pill:hover{border-color:rgba(201,168,76,0.35);color:var(--ink2)}
+.pill.on{background:rgba(201,168,76,0.14);border-color:var(--gold);color:var(--gold2);font-weight:600}
+.sb-list{flex:1;overflow-y:auto;padding:10px 12px 16px}
+.sb-list::-webkit-scrollbar{width:3px}
+.sb-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.ev-count{font-size:10px;color:var(--muted);padding:2px 4px 8px}
+.date-div{font-size:10px;font-weight:600;color:var(--gold);letter-spacing:.08em;padding:10px 4px 5px;border-bottom:1px solid rgba(201,168,76,0.15);margin-bottom:5px;text-transform:capitalize}
+.ecard{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);padding:11px 12px;margin-bottom:6px;cursor:pointer;transition:border-color .15s,background .15s}
+.ecard:hover{border-color:rgba(201,168,76,0.3);background:var(--s3)}
+.ecard.active{border-color:var(--gold);background:rgba(201,168,76,0.07)}
+.ecard.dm{border-left:2px solid var(--gold)}
+.ecard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:5px}
+.ecard-name{font-family:'Playfair Display',serif;font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.3;flex:1}
+.badge{font-size:9px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:999px;flex-shrink:0;white-space:nowrap}
+.ecard-meta{font-size:11px;color:var(--ink2);display:flex;flex-direction:column;gap:2px}
+.mrow{display:flex;align-items:center;gap:4px}
+.ecard-ft{display:flex;align-items:center;gap:7px;margin-top:7px;flex-wrap:wrap}
+.ptag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.p-free{background:rgba(42,122,80,0.16);color:#4ca87a;border:1px solid rgba(42,122,80,0.25)}
+.p-paid{background:rgba(201,168,76,0.12);color:var(--gold);border:1px solid var(--border)}
+.p-ask{background:rgba(107,97,80,0.18);color:var(--muted);border:1px solid rgba(107,97,80,0.2)}
+.slink{font-size:10px;color:var(--gold);text-decoration:none;opacity:.75}
+.slink:hover{opacity:1}
+.pvtag{font-size:10px;color:var(--gold2);font-weight:600}
+.empty{text-align:center;padding:40px 16px;color:var(--muted);font-size:12px;line-height:1.8}
+.empty strong{display:block;font-family:'Playfair Display',serif;font-size:16px;color:var(--ink2);margin-bottom:6px}
+
+/* ── MAP ──────────────────────────────────────────── */
+#map{flex:1;height:100vh}
+.leaflet-popup-content-wrapper{background:var(--s1) !important;border:1px solid var(--border) !important;border-radius:10px !important;color:var(--ink) !important;box-shadow:0 12px 40px rgba(0,0,0,.7) !important}
+.leaflet-popup-tip{background:var(--s1) !important}
+.leaflet-popup-close-button{color:var(--muted) !important;top:8px !important;right:8px !important}
+.pname{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--ink);margin-bottom:8px;line-height:1.3}
+.pbody{font-size:12px;color:var(--ink2);line-height:1.7}
+.pgold{color:var(--gold);font-weight:600}
+.plink{color:var(--gold);font-size:11px;text-decoration:none;display:inline-block;margin-top:8px}
+.plink:hover{text-decoration:underline}
+
+/* ── BOTTOM SHEET (DataManIAcs events) ────────────── */
+.sheet-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.72);
+  backdrop-filter:blur(5px);
+  z-index:2000;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s;
+}
+.sheet-overlay.open{opacity:1;pointer-events:auto}
+
+.dm-sheet{
+  position:fixed;
+  bottom:0;left:0;right:0;
+  background:var(--s1);
+  border-top:1px solid var(--gold);
+  border-radius:22px 22px 0 0;
+  z-index:2001;
+  transform:translateY(102%);
+  transition:transform .38s cubic-bezier(.32,1,.22,1);
+  max-height:88vh;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.dm-sheet.open{transform:translateY(0)}
+
+/* drag handle */
+.sheet-handle{
+  width:40px;height:4px;
+  background:rgba(201,168,76,0.3);
+  border-radius:2px;
+  margin:12px auto 0;flex-shrink:0;
+}
+
+.sheet-scroll{overflow-y:auto;flex:1}
+.sheet-scroll::-webkit-scrollbar{width:3px}
+.sheet-scroll::-webkit-scrollbar-thumb{background:var(--border)}
+
+/* event image */
+.sheet-img{
+  width:100%;
+  height:220px;
+  object-fit:cover;
+  display:block;
+}
+.sheet-img-placeholder{
+  width:100%;height:180px;
+  background:linear-gradient(135deg,rgba(201,168,76,0.15),rgba(201,168,76,0.05));
+  display:flex;align-items:center;justify-content:center;
+  font-size:48px;
+}
+
+/* content */
+.sheet-body{padding:20px 22px 28px}
+
+.sheet-dm-eyebrow{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gold2);margin-bottom:10px;
+}
+.sheet-eyebrow-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--gold2);
+  animation:pulse 2s ease-in-out infinite;
+}
+
+.sheet-name{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(22px,5vw,30px);font-weight:900;
+  letter-spacing:-.03em;line-height:1.1;
+  color:var(--ink);margin-bottom:14px;
+}
+
+.sheet-meta{
+  display:flex;flex-wrap:wrap;gap:8px;
+  margin-bottom:14px;
+}
+.sheet-meta-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--s2);border:1px solid var(--b2);
+  border-radius:999px;padding:5px 12px;
+  font-size:12px;color:var(--ink2);
+}
+
+.sheet-desc{
+  font-size:13.5px;color:var(--ink2);line-height:1.65;
+  margin-bottom:20px;
+}
+
+/* price + CTA */
+.sheet-cta-area{
+  background:var(--s2);border-radius:14px;
+  border:1px solid var(--border);
+  padding:16px 18px;
+}
+.sheet-price-row{
+  display:flex;align-items:baseline;gap:8px;
+  margin-bottom:14px;
+}
+.sheet-price{
+  font-family:'Playfair Display',serif;
+  font-size:32px;font-weight:700;
+  color:var(--gold2);letter-spacing:-.04em;
+}
+.sheet-price-label{font-size:11px;color:var(--muted)}
+
+.sheet-avail{
+  font-size:11px;font-weight:600;
+  margin-bottom:12px;
+  min-height:14px;
+  display:flex;align-items:center;gap:5px;
+}
+.avail-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+.avail-dot.warn{background:#e07a3a}
+.avail-dot.sold{background:var(--danger)}
+
+.sheet-buy-btn{
+  display:block;width:100%;
+  padding:17px;
+  border-radius:12px;border:none;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#0e0d0b;font-family:'Inter',sans-serif;
+  font-size:15px;font-weight:700;
+  cursor:pointer;text-decoration:none;
+  text-align:center;letter-spacing:.02em;
+  transition:filter .2s,transform .15s;
+}
+.sheet-buy-btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.sheet-buy-btn:active{transform:scale(0.98)}
+
+.sheet-source-row{
+  display:flex;justify-content:center;margin-top:10px;
+}
+.sheet-source-link{
+  font-size:11px;color:var(--muted);text-decoration:none;
+  display:inline-flex;align-items:center;gap:4px;
+}
+.sheet-source-link:hover{color:var(--ink2)}
+
+/* close button */
+.sheet-close{
+  position:absolute;top:14px;right:16px;
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(255,255,255,0.07);border:none;
+  color:var(--muted);font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s,color .15s;z-index:10;
+}
+.sheet-close:hover{background:rgba(255,255,255,0.13);color:var(--ink)}
+
+/* ── LOADING ──────────────────────────────────────── */
+#loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:14px}
+.ld-title{font-family:'Playfair Display',serif;font-size:30px;font-weight:900;color:var(--gold);letter-spacing:-.03em}
+.ld-sub{font-size:11px;color:var(--muted);letter-spacing:.05em}
+.spinner{width:32px;height:32px;border:2px solid rgba(201,168,76,0.15);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(232,201,122,.5)}50%{box-shadow:0 0 0 8px rgba(232,201,122,0)}}
+
+/* ── CAT COLOURS ──────────────────────────────────── */
+.c-musica{background:rgba(124,58,237,.16);color:#a78bfa;border:1px solid rgba(124,58,237,.3)}
+.c-tradicion{background:rgba(201,168,76,.14);color:var(--gold);border:1px solid var(--border)}
+.c-arte{background:rgba(219,39,119,.12);color:#f472b6;border:1px solid rgba(219,39,119,.25)}
+.c-deportes{background:rgba(37,99,235,.12);color:#60a5fa;border:1px solid rgba(37,99,235,.25)}
+.c-gastro{background:rgba(245,158,11,.12);color:#fbbf24;border:1px solid rgba(245,158,11,.25)}
+.c-infantil{background:rgba(16,185,129,.12);color:#34d399;border:1px solid rgba(16,185,129,.25)}
+.c-cultural{background:rgba(20,184,166,.12);color:#2dd4bf;border:1px solid rgba(20,184,166,.25)}
+.c-feria{background:rgba(249,115,22,.12);color:#fb923c;border:1px solid rgba(249,115,22,.25)}
+.c-evento{background:rgba(107,97,80,.18);color:var(--muted);border:1px solid rgba(107,97,80,.2)}
+.c-dm{background:rgba(232,201,122,.18);color:var(--gold2);border:1px solid var(--gold)}
+
+/* ── MOBILE ───────────────────────────────────────── */
+@media(max-width:680px){
+  .shell{flex-direction:column}
+  .sidebar{width:100%;height:50vh;border-right:none;border-bottom:1px solid var(--border)}
+  #map{height:50vh}
+  .dm-sheet{max-height:92vh}
+}
+</style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="loading">
+  <div class="ld-title">Areco Eventos</div>
+  <div class="spinner"></div>
+  <div class="ld-sub">Cargando agenda…</div>
+</div>
+
+<!-- Bottom sheet overlay -->
+<div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()"></div>
+
+<!-- DataManIAcs premium bottom sheet -->
+<div class="dm-sheet" id="dmSheet">
+  <div class="sheet-handle"></div>
+  <button class="sheet-close" onclick="closeSheet()">✕</button>
+  <div class="sheet-scroll">
+    <div id="sheetImg"></div>
+    <div class="sheet-body">
+      <div class="sheet-dm-eyebrow">
+        <div class="sheet-eyebrow-dot"></div>
+        Evento DataManIAcs
+      </div>
+      <div class="sheet-name" id="sheetName"></div>
+      <div class="sheet-meta" id="sheetMeta"></div>
+      <div class="sheet-desc" id="sheetDesc"></div>
+      <div class="sheet-cta-area">
+        <div class="sheet-price-row">
+          <div class="sheet-price" id="sheetPrice"></div>
+          <div class="sheet-price-label" id="sheetPriceLabel"></div>
+        </div>
+        <div class="sheet-avail" id="sheetAvail"></div>
+        <a class="sheet-buy-btn" id="sheetBuyBtn" href="#" target="_blank">
+          🎟 Comprar entrada
+        </a>
+        <div class="sheet-source-row">
+          <a class="sheet-source-link" id="sheetSourceLink" href="#" target="_blank">
+            Ver en Instagram →
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sb-head">
+      <div class="brand-text">
+        <h1><em>Areco</em> Eventos</h1>
+        <small>by DataManIAcs · San Antonio de Areco</small>
+      </div>
+      <div class="week-nav">
+        <button class="wn-btn" id="wPrev">‹</button>
+        <div class="wn-label" id="wLabel">–</div>
+        <button class="wn-btn" id="wNext">›</button>
+      </div>
+    </div>
+    <div class="sb-filters">
+      <div class="filter-hd">Categoría</div>
+      <div class="pills" id="pills"></div>
+    </div>
+    <div class="sb-list" id="list">
+      <div class="empty"><strong>Cargando…</strong></div>
+    </div>
+  </aside>
+  <div id="map"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+<script>
+// ── CONFIG ────────────────────────────────────────────
+const SHEET      = '1Tmrr6lxD7n0wp3x87wUdy-vP-tuDGU8DCvMmIh9UciI';
+const TICKETS_URL = 'https://chamico-tickets.vercel.app';
+const CSV_EV     = `https://docs.google.com/spreadsheets/d/${SHEET}/gviz/tq?tqx=out:csv&sheet=Areco_Eventos`;
+const CSV_VN     = `https://docs.google.com/spreadsheets/d/${SHEET}/gviz/tq?tqx=out:csv&sheet=Venues_Areco`;
+const CENTER     = [-34.2455, -59.4743];
+
+const FALLBACK = {
+  'parque criollo r. güiraldes':[-34.2400,-59.4630],
+  'parque criollo':[-34.2400,-59.4630],
+  'plaza ruiz de arellano':[-34.2455,-59.4742],
+  'la matera':[-34.2460,-59.4756],
+  'salón guerrico':[-34.2453,-59.4748],
+  'pulpería la blanqueada':[-34.2396,-59.4628],
+  'costanera':[-34.2440,-59.4800],
+  'galpón chamico':[-34.2478,-59.4751],
+  'el tokio':[-34.2462,-59.4742],
+  'bar el tokio':[-34.2462,-59.4742],
+  'la cava del tokio':[-34.2462,-59.4741],
+  'restaurante histórico lacarra':[-34.2450,-59.4738],
+  'museo gauchesco':[-34.2400,-59.4632],
+  'museo gauchesco ricardo güiraldes':[-34.2400,-59.4632],
+};
+
+const CAT = {
+  'Música':{cls:'c-musica',icon:'♪'},
+  'Tradición':{cls:'c-tradicion',icon:'✦'},
+  'Arte':{cls:'c-arte',icon:'◈'},
+  'Deportes':{cls:'c-deportes',icon:'◎'},
+  'Gastronomía':{cls:'c-gastro',icon:'◇'},
+  'Infantil':{cls:'c-infantil',icon:'◉'},
+  'Cultural':{cls:'c-cultural',icon:'▲'},
+  'Feria':{cls:'c-feria',icon:'◆'},
+  'Evento':{cls:'c-evento',icon:'●'},
+};
+
+// ── STATE ─────────────────────────────────────────────
+let evs=[],vmap={...FALLBACK},activeFilter='all',wOff=0,mkrs={},activeId=null;
+
+// ── MAP ───────────────────────────────────────────────
+const map=L.map('map',{center:CENTER,zoom:15,zoomControl:false});
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+  attribution:'© <a href="https://osm.org">OpenStreetMap</a> © <a href="https://carto.com">CARTO</a>',
+  subdomains:'abcd',maxZoom:19
+}).addTo(map);
+L.control.zoom({position:'bottomright'}).addTo(map);
+
+// ── HELPERS ───────────────────────────────────────────
+function wRange(off=0){
+  const n=new Date(),d=n.getDay(),m=new Date(n);
+  m.setDate(n.getDate()-(d===0?6:d-1)+off*7);m.setHours(0,0,0,0);
+  const s=new Date(m);s.setDate(m.getDate()+6);s.setHours(23,59,59,999);
+  return{start:m,end:s};
+}
+function wLabel(r){
+  const f=d=>d.toLocaleDateString('es-AR',{day:'numeric',month:'short'});
+  return`${f(r.start)} — ${f(r.end)}`;
+}
+function parseD(s){
+  if(!s)return null;
+  const m=s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if(m)return new Date(+m[3],+m[1]-1,+m[2]);return null;
+}
+function prettyD(d){
+  if(!d)return'';
+  return d.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
+}
+function coords(lugar){
+  if(!lugar)return null;
+  const k=lugar.toLowerCase().trim();
+  if(vmap[k])return vmap[k];
+  for(const[key,val]of Object.entries(vmap))
+    if(k.includes(key)||key.includes(k))return val;
+  return null;
+}
+function catMeta(ev){
+  if(ev.es_datamanIAcs==='TRUE')return{cls:'c-dm',icon:'★'};
+  return CAT[ev.categoria]||{cls:'c-evento',icon:'●'};
+}
+function priceInfo(p){
+  if(!p||p==='Consultar')return{cls:'p-ask',lbl:'Consultar'};
+  if(p==='Gratis')return{cls:'p-free',lbl:'Gratis'};
+  return{cls:'p-paid',lbl:p};
+}
+
+// ── BOTTOM SHEET ──────────────────────────────────────
+function openSheet(ev){
+  const d=parseD(ev.fecha);
+  const isDM=ev.es_datamanIAcs==='TRUE';
+
+  // Image
+  const imgEl=document.getElementById('sheetImg');
+  if(ev.imagen_url&&ev.imagen_url.trim()){
+    imgEl.innerHTML=`<img class="sheet-img" src="${ev.imagen_url}" alt="${ev.nombre}" onerror="this.parentElement.innerHTML='<div class=sheet-img-placeholder>★</div>'">`;
+  } else {
+    imgEl.innerHTML=`<div class="sheet-img-placeholder">${CAT[ev.categoria]?.icon||'★'}</div>`;
+  }
+
+  // Name
+  document.getElementById('sheetName').textContent=ev.nombre||'Evento';
+
+  // Meta chips
+  const chips=[];
+  if(d) chips.push(`<div class="sheet-meta-chip">📅 ${prettyD(d)}</div>`);
+  if(ev.hora&&ev.hora!=='Todo el día') chips.push(`<div class="sheet-meta-chip">🕐 ${ev.hora} hs</div>`);
+  if(ev.lugar) chips.push(`<div class="sheet-meta-chip">📍 ${ev.lugar}</div>`);
+  if(ev.categoria) chips.push(`<div class="sheet-meta-chip badge ${catMeta(ev).cls}">${ev.categoria}</div>`);
+  document.getElementById('sheetMeta').innerHTML=chips.join('');
+
+  // Description
+  document.getElementById('sheetDesc').textContent=ev.descripcion||'';
+
+  // Price
+  const prEl=document.getElementById('sheetPrice');
+  const prLb=document.getElementById('sheetPriceLabel');
+  if(!ev.precio||ev.precio==='Consultar'){
+    prEl.textContent='Consultar';prEl.style.color='var(--muted)';
+    prLb.textContent='';
+  } else if(ev.precio==='Gratis'){
+    prEl.textContent='Gratis';prEl.style.color='#4ca87a';
+    prLb.textContent='';
+  } else {
+    prEl.textContent=ev.precio;prEl.style.color='var(--gold2)';
+    prLb.textContent='por persona';
+  }
+
+  // Availability
+  const avEl=document.getElementById('sheetAvail');
+  if(ev.preventa_disponible==='TRUE'){
+    avEl.innerHTML=`<div class="avail-dot"></div> Preventa disponible`;
+    avEl.style.color='#4ca87a';
+  } else {
+    avEl.innerHTML='';
+  }
+
+  // Buy button
+  const btn=document.getElementById('sheetBuyBtn');
+  // Build chamico-tickets URL with event ID param (stripped hash for clean ID)
+  const eventParam=encodeURIComponent(ev.id||ev.nombre||'');
+  const targetUrl=ev.link_accion||`${TICKETS_URL}/?event=${eventParam}`;
+  btn.href=targetUrl;
+  btn.textContent=ev.preventa_disponible==='TRUE'?'🎟 Comprar entrada':'Ver más →';
+
+  // Source link (Instagram or original source)
+  const srcLink=document.getElementById('sheetSourceLink');
+  if(ev.fuente_url&&ev.fuente_url!==ev.link_accion){
+    srcLink.href=ev.fuente_url;
+    srcLink.textContent=`Ver en ${ev.fuente_nombre||'fuente'} →`;
+    srcLink.style.display='inline-flex';
+  } else {
+    srcLink.style.display='none';
+  }
+
+  // Open
+  document.getElementById('sheetOverlay').classList.add('open');
+  document.getElementById('dmSheet').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeSheet(){
+  document.getElementById('sheetOverlay').classList.remove('open');
+  document.getElementById('dmSheet').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// Close sheet on Esc
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();});
+
+// ── FILTER ────────────────────────────────────────────
+function filtered(){
+  const{start,end}=wRange(wOff);
+  return evs.filter(ev=>{
+    if(ev.activo==='FALSE')return false;
+    const d=parseD(ev.fecha);if(!d)return false;
+    if(d<start||d>end)return false;
+    if(activeFilter==='DM')return ev.es_datamanIAcs==='TRUE';
+    if(activeFilter!=='all'&&ev.categoria!==activeFilter)return false;
+    return true;
+  }).sort((a,b)=>{
+    const da=parseD(a.fecha)||new Date(0),db=parseD(b.fecha)||new Date(0);
+    if(da-db)return da-db;
+    return(a.hora||'').localeCompare(b.hora||'');
+  });
+}
+
+// ── RENDER SIDEBAR ────────────────────────────────────
+function renderList(list){
+  const el=document.getElementById('list');
+  if(!list.length){
+    el.innerHTML=`<div class="empty"><strong>Sin eventos esta semana</strong>Probá otra semana o quitá el filtro.</div>`;return;
+  }
+  let html=`<div class="ev-count">${list.length} evento${list.length!==1?'s':''}</div>`;
+  let lastD=null;
+  list.forEach(ev=>{
+    const d=parseD(ev.fecha),ds=prettyD(d);
+    if(ds!==lastD){html+=`<div class="date-div">${ds}</div>`;lastD=ds;}
+    const{cls}=catMeta(ev);
+    const{cls:pc,lbl:pl}=priceInfo(ev.precio);
+    const isDM=ev.es_datamanIAcs==='TRUE';
+    const hc=!!coords(ev.lugar);
+    html+=`<div class="ecard${activeId===ev.id?' active':''}${isDM?' dm':''}" data-id="${ev.id}" onclick="selEv('${ev.id}')">
+      <div class="ecard-top">
+        <div class="ecard-name">${ev.nombre||'Evento'}</div>
+        <span class="badge ${cls}">${isDM?'DataManIAcs':ev.categoria||'Evento'}</span>
+      </div>
+      <div class="ecard-meta">
+        ${ev.lugar?`<div class="mrow"><span style="opacity:.5">${hc?'📍':'📌'}</span>${ev.lugar}</div>`:''}
+        ${ev.hora&&ev.hora!=='Todo el día'?`<div class="mrow"><span style="opacity:.5">🕐</span>${ev.hora} hs</div>`:`<div class="mrow" style="color:var(--muted)">Todo el día</div>`}
+      </div>
+      <div class="ecard-ft">
+        <span class="ptag ${pc}">${pl}</span>
+        ${isDM&&ev.preventa_disponible==='TRUE'?`<span class="pvtag">🎟 Preventa</span>`:''}
+        ${!isDM&&ev.link_accion?`<a class="slink" href="${ev.link_accion}" target="_blank" onclick="event.stopPropagation()">Ver más →</a>`:''}
+      </div>
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+
+// ── RENDER MAP ────────────────────────────────────────
+function renderMap(list){
+  Object.values(mkrs).forEach(m=>map.removeLayer(m));mkrs={};
+  const byKey={};
+  list.forEach(ev=>{
+    const c=coords(ev.lugar);if(!c)return;
+    const k=c.join(',');
+    if(!byKey[k])byKey[k]={c,evs:[]};
+    byKey[k].evs.push(ev);
+  });
+  Object.values(byKey).forEach(({c,evs:g})=>{
+    g.forEach((ev,i)=>{
+      const isDM=ev.es_datamanIAcs==='TRUE';
+      const{icon}=catMeta(ev);
+      const col=isDM?'#e8c97a':'#c9a84c';
+      const pulse=isDM?'animation:pulse 2s ease-in-out infinite;':'';
+      const off=g.length>1?[c[0]+(i-(g.length-1)/2)*0.00009,c[1]+(i-(g.length-1)/2)*0.00012]:c;
+
+      const li=L.divIcon({
+        html:`<div style="width:34px;height:34px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #0e0d0b;box-shadow:0 3px 12px rgba(0,0,0,0.65),0 0 0 0 rgba(232,201,122,0.5);display:flex;align-items:center;justify-content:center;${pulse}"><span style="transform:rotate(45deg);font-size:13px;line-height:1">${icon}</span></div>`,
+        className:'',iconSize:[34,34],iconAnchor:[17,34],popupAnchor:[1,-38]
+      });
+
+      let m;
+      if(isDM){
+        // DataManIAcs → no Leaflet popup, opens bottom sheet
+        m=L.marker(off,{icon:li}).addTo(map);
+        m.on('click',()=>{
+          selById(ev.id,false);
+          openSheet(ev);
+        });
+      } else {
+        // Regular event → standard Leaflet popup
+        const d=parseD(ev.fecha);
+        const pop=`<div style="min-width:200px;max-width:260px;font-family:'Inter',sans-serif">
+          <div class="pname">${ev.nombre||'Evento'}</div>
+          <div class="pbody">
+            ${ev.lugar?`📍 ${ev.lugar}<br>`:''}
+            ${d?`📅 ${prettyD(d)}<br>`:''}
+            ${ev.hora&&ev.hora!=='Todo el día'?`🕐 ${ev.hora} hs<br>`:''}
+            ${ev.precio&&ev.precio!=='Consultar'?`<br><span class="pgold">${ev.precio}</span>`:''}
+            ${ev.descripcion?`<br><br><span style="font-size:11px;color:#6b6150;line-height:1.6">${ev.descripcion.slice(0,120)}…</span>`:''}
+          </div>
+          ${ev.link_accion?`<a class="plink" href="${ev.link_accion}" target="_blank">Ver más →</a>`:''}
+        </div>`;
+        m=L.marker(off,{icon:li}).bindPopup(pop,{maxWidth:280}).addTo(map);
+        m.on('click',()=>selById(ev.id,false));
+      }
+      mkrs[ev.id]=m;
+    });
+  });
+}
+
+// ── SELECT ────────────────────────────────────────────
+function selEv(id){
+  const ev=evs.find(e=>e.id===id);
+  selById(id,true);
+  if(ev&&ev.es_datamanIAcs==='TRUE'){
+    openSheet(ev);
+  } else if(mkrs[id]){
+    map.setView(mkrs[id].getLatLng(),16,{animate:true});
+    mkrs[id].openPopup();
+  }
+}
+function selById(id,pan){
+  activeId=id;
+  document.querySelectorAll('.ecard').forEach(c=>c.classList.remove('active'));
+  const c=document.querySelector(`.ecard[data-id="${id}"]`);
+  if(c){c.classList.add('active');c.scrollIntoView({behavior:'smooth',block:'nearest'});}
+  if(pan&&mkrs[id])map.setView(mkrs[id].getLatLng(),16,{animate:true});
+}
+
+// ── FULL RENDER ───────────────────────────────────────
+function render(){
+  document.getElementById('wLabel').textContent=wLabel(wRange(wOff));
+  const list=filtered();renderList(list);renderMap(list);
+}
+
+// ── CATEGORY PILLS ────────────────────────────────────
+function buildPills(){
+  const cats=[...new Set(evs.map(e=>e.categoria).filter(Boolean))].sort();
+  const hasDM=evs.some(e=>e.es_datamanIAcs==='TRUE');
+  let h=`<div class="pill on" onclick="setF('all',this)">Todos</div>`;
+  cats.forEach(c=>h+=`<div class="pill" onclick="setF('${c}',this)">${c}</div>`);
+  if(hasDM)h+=`<div class="pill" onclick="setF('DM',this)">★ DataManIAcs</div>`;
+  document.getElementById('pills').innerHTML=h;
+}
+function setF(f,el){
+  activeFilter=f;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));el.classList.add('on');render();
+}
+
+document.getElementById('wPrev').onclick=()=>{wOff--;render();};
+document.getElementById('wNext').onclick=()=>{wOff++;render();};
+
+// ── DATA LOAD ─────────────────────────────────────────
+async function init(){
+  try{
+    try{
+      const r=await fetch(CSV_VN);
+      if(r.ok){
+        Papa.parse(await r.text(),{header:true,skipEmptyLines:true}).data.forEach(row=>{
+          const n=(row['Nombre']||'').toLowerCase().trim();
+          const lat=parseFloat(row['Latitud']||'');
+          const lon=parseFloat(row['Longitud']||'');
+          if(n&&!isNaN(lat)&&!isNaN(lon))vmap[n]=[lat,lon];
+        });
+      }
+    }catch(e){console.log('Using hardcoded coords');}
+
+    const r=await fetch(CSV_EV);
+    evs=Papa.parse(await r.text(),{header:true,skipEmptyLines:true}).data;
+    buildPills();render();
+  }catch(e){
+    console.error(e);
+    document.getElementById('list').innerHTML=`<div class="empty"><strong>Error al cargar</strong>Verificá que el Sheet esté publicado como CSV.</div>`;
+  }
+  document.getElementById('loading').style.display='none';
+}
+
+init();
+</script>
+</body>
+</html>
