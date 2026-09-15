@@ -476,9 +476,11 @@ function openSheet(ev){
   // Image
   const imgEl=document.getElementById('sheetImg');
   if(ev.imagen_url&&ev.imagen_url.trim()){
-    imgEl.innerHTML=`<img class="sheet-img" src="${ev.imagen_url}" alt="${ev.nombre}" onerror="this.parentElement.innerHTML='<div class=sheet-img-placeholder>★</div>'">`;
+    imgEl.innerHTML=`<img class="sheet-img" src="${ev.imagen_url}" alt="${ev.nombre}"
+      onerror="this.parentElement.innerHTML='<div class=sheet-img-placeholder style=height:120px>★</div>'">`;
   } else {
-    imgEl.innerHTML=`<div class="sheet-img-placeholder">${CAT[ev.categoria]?.icon||'★'}</div>`;
+    const icon=CAT[ev.categoria]?.icon||'★';
+    imgEl.innerHTML=`<div class="sheet-img-placeholder">${icon}</div>`;
   }
 
   // Name
@@ -605,9 +607,34 @@ function renderList(list){
 }
 
 // ── RENDER MAP ────────────────────────────────────────
-function renderMap(list, future=[]){
+function renderMap(list, future=[], past=[]){
   Object.values(mkrs).forEach(m=>map.removeLayer(m));mkrs={};
   Object.values(ghostMkrs).forEach(m=>map.removeLayer(m));ghostMkrs={};
+
+  // ── Past event markers (last 60 days) — very faded dark gray ──
+  past.forEach(ev=>{
+    const c=coords(ev.lugar);if(!c)return;
+    const pastHtml=`<div style="
+      width:16px;height:16px;
+      background:rgba(80,70,55,0.35);
+      border-radius:50% 50% 50% 0;
+      transform:rotate(-45deg);
+      border:1px solid rgba(120,110,90,0.25);
+      display:flex;align-items:center;justify-content:center;
+    "><span style="transform:rotate(45deg);font-size:7px;opacity:.4;color:#a89880">✓</span></div>`;
+    const li=L.divIcon({html:pastHtml,className:'',iconSize:[16,16],iconAnchor:[8,16],popupAnchor:[0,-18]});
+    const d=parseD(ev.fecha);
+    const pop=`<div style="font-family:'Inter',sans-serif;font-size:11px;max-width:200px;color:var(--muted)">
+      <div style="font-family:'Playfair Display',serif;font-size:13px;color:var(--ink2);margin-bottom:4px">${ev.nombre||'Evento'}</div>
+      <div style="line-height:1.6">
+        ${d?`📅 ${prettyD(d)}<br>`:''}
+        ${ev.lugar?`📍 ${ev.lugar}`:''}
+      </div>
+      <div style="margin-top:6px;font-size:10px;color:var(--muted);font-style:italic">Evento pasado</div>
+    </div>`;
+    const m=L.marker(c,{icon:li,opacity:0.45}).bindPopup(pop,{maxWidth:210}).addTo(map);
+    ghostMkrs['past_'+ev.id]=m;
+  });
 
   // ── Ghost markers for future events ───────────────────
   future.forEach(ev=>{
@@ -721,12 +748,24 @@ function futureEvents(){
   });
 }
 
+// ── PAST EVENTS (faded markers — last 60 days) ────────
+function pastEvents(){
+  const{start}=wRange(wOff);
+  const floor=new Date(start);
+  floor.setDate(floor.getDate()-60); // show last 60 days
+  return evs.filter(ev=>{
+    if(String(ev.activo).toLowerCase()==='false')return false;
+    const d=parseD(ev.fecha);if(!d)return false;
+    return d<start && d>=floor;
+  });
+}
+
 // ── FULL RENDER ───────────────────────────────────────
 function render(){
   document.getElementById('wLabel').textContent=wLabel(wRange(wOff));
   const list=filtered();
   renderList(list);
-  renderMap(list, futureEvents());
+  renderMap(list, futureEvents(), pastEvents());
 }
 
 // ── CATEGORY PILLS ────────────────────────────────────
