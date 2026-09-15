@@ -1083,6 +1083,7 @@ async function submitEvent(){
 }
 
 // ── INIT ──────────────────────────────────────────────
+async function init(){
   try{
     const r    = await fetch(API_EVENTOS);
     if(!r.ok) throw new Error('API returned ' + r.status);
