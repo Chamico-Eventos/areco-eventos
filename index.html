@@ -688,19 +688,32 @@ document.getElementById('wPrev').onclick=()=>{wOff--;render();};
 document.getElementById('wNext').onclick=()=>{wOff++;render();};
 
 // ── DATA LOAD ─────────────────────────────────────────
+// JSONP loader — bypasses CORS on Apps Script's googleusercontent redirect
+function fetchJSONP(url){
+  return new Promise((resolve,reject)=>{
+    const cb      = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    const script  = document.createElement('script');
+    const timeout = setTimeout(()=>{ cleanup(); reject(new Error('JSONP timeout')); }, 20000);
+
+    function cleanup(){
+      clearTimeout(timeout);
+      delete window[cb];
+      if(script.parentNode) script.parentNode.removeChild(script);
+    }
+
+    window[cb] = data => { cleanup(); resolve(data); };
+    script.onerror = ()=>{ cleanup(); reject(new Error('JSONP load error')); };
+    script.src = url + '&callback=' + cb;
+    document.head.appendChild(script);
+  });
+}
+
 async function init(){
   try{
-    // Single API call returns all events as JSON — no CSV, no CORS issues
-    const r    = await fetch(API_EVENTOS);
-    if(!r.ok) throw new Error(`API returned ${r.status}`);
-    const data = await r.json();
-
-    // Handle error response from Apps Script
-    if(data.error) throw new Error(data.error);
-
+    const data = await fetchJSONP(API_EVENTOS);
+    if(data && data.error) throw new Error(data.error);
     evs = Array.isArray(data) ? data : [];
     console.log(`Events loaded: ${evs.length}`);
-
     buildPills();
     render();
   }catch(e){
