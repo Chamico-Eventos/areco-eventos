@@ -240,6 +240,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 .c-evento{background:rgba(107,97,80,.18);color:var(--muted);border:1px solid rgba(107,97,80,.2)}
 .c-dm{background:rgba(232,201,122,.18);color:var(--gold2);border:1px solid var(--gold)}
 
+/* ── DARK TILE INVERSION ──────────────────────────── */
+/* Inverts OSM tiles to dark. Markers/popups are in separate
+   Leaflet panes so they are NOT affected by this filter. */
+.leaflet-tile-pane{
+  filter:invert(100%) hue-rotate(180deg) brightness(92%) contrast(88%) saturate(0.85);
+}
+
 /* ── MOBILE ───────────────────────────────────────── */
 @media(max-width:680px){
   .shell{flex-direction:column}
@@ -322,10 +329,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
 <script>
 // ── CONFIG ────────────────────────────────────────────
-const SHEET      = '1Tmrr6lxD7n0wp3x87wUdy-vP-tuDGU8DCvMmIh9UciI';
+const SHEET       = '1Tmrr6lxD7n0wp3x87wUdy-vP-tuDGU8DCvMmIh9UciI';
 const TICKETS_URL = 'https://chamico-tickets.vercel.app';
-const CSV_EV     = `https://docs.google.com/spreadsheets/d/${SHEET}/gviz/tq?tqx=out:csv&sheet=Areco_Eventos`;
-const CSV_VN     = `https://docs.google.com/spreadsheets/d/${SHEET}/gviz/tq?tqx=out:csv&sheet=Venues_Areco`;
+// pub?output=csv&gid= is the reliable format — gid from the tab URL
+const CSV_EV      = `https://docs.google.com/spreadsheets/d/${SHEET}/pub?output=csv&gid=306349646`;
+const CSV_VN      = `https://docs.google.com/spreadsheets/d/${SHEET}/pub?output=csv&gid=venues_areco`; // update gid when tab exists
 const CENTER     = [-34.2455, -59.4743];
 
 const FALLBACK = {
@@ -362,9 +370,10 @@ let evs=[],vmap={...FALLBACK},activeFilter='all',wOff=0,mkrs={},activeId=null;
 
 // ── MAP ───────────────────────────────────────────────
 const map=L.map('map',{center:CENTER,zoom:15,zoomControl:false});
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
-  attribution:'© <a href="https://osm.org">OpenStreetMap</a> © <a href="https://carto.com">CARTO</a>',
-  subdomains:'abcd',maxZoom:19
+// OSM tiles + CSS inversion = free dark map, no API key ever needed
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  attribution:'© <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
+  maxZoom:19
 }).addTo(map);
 L.control.zoom({position:'bottomright'}).addTo(map);
 
