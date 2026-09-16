@@ -449,12 +449,22 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
       <div class="form-section">Flyer del evento</div>
 
       <div class="form-group">
-        <label class="form-label">Link del flyer (imagen)</label>
-        <input class="form-input" id="f-imagen" type="url" placeholder="Link de Instagram, Google Drive, etc.">
+        <label class="form-label">Link del post de Instagram</label>
+        <input class="form-input" id="f-link" type="url" placeholder="https://www.instagram.com/p/...">
+        <div class="form-hint">Si ya publicaste el evento en Instagram, pegá el link acá.</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nombre sugerido para tu flyer</label>
+        <div id="flyer-name-preview" style="
+          background:var(--s2);border:1px solid var(--border);border-radius:8px;
+          padding:10px 12px;font-size:12px;font-family:'Courier New',monospace;
+          color:var(--gold2);letter-spacing:.02em;min-height:38px;word-break:break-all;
+        ">Completá fecha, lugar y nombre del evento para ver el nombre sugerido.</div>
         <div class="form-hint">
-          📌 Formatos aceptados: JPG o PNG · Máximo 2MB<br>
-          📌 Puede ser un link de Instagram, Google Drive (público) o Dropbox<br>
-          📌 Si no tenés link, podés enviarlo por WhatsApp al finalizar
+          📌 Guardá tu flyer con este nombre exacto antes de enviarlo.<br>
+          📐 Tamaño recomendado: <strong style="color:var(--ink2)">1080 × 1080 px</strong> (cuadrado) · JPG o PNG · máx. 2MB<br>
+          📩 Envialo por WhatsApp o email al finalizar este formulario.
         </div>
       </div>
 
@@ -473,7 +483,16 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 
       <div class="form-group">
         <label class="form-label">WhatsApp / Teléfono</label>
-        <input class="form-input" id="f-tel" placeholder="2326-xxxxxx">
+        <div style="display:flex;align-items:center;gap:0;background:var(--s2);border:1px solid var(--b2);border-radius:8px;overflow:hidden;transition:border-color .15s" id="tel-wrap">
+          <span style="padding:10px 10px;font-size:13px;color:var(--muted);border-right:1px solid var(--b2);white-space:nowrap;flex-shrink:0">📱 +549</span>
+          <input id="f-tel" type="tel" inputmode="numeric" maxlength="10"
+            placeholder="11 1234 5678"
+            style="background:none;border:none;outline:none;padding:10px 12px;color:var(--ink);font-size:13px;width:100%;font-family:Inter,sans-serif"
+            oninput="this.value=this.value.replace(/[^0-9]/g,'');validateTelForm()"
+            onblur="validateTelForm()"
+            onfocus="document.getElementById('tel-wrap').style.borderColor='rgba(201,168,76,0.4)'">
+        </div>
+        <div id="tel-hint" style="font-size:10px;color:var(--muted);margin-top:3px;min-height:14px;font-style:italic"></div>
       </div>
 
       <div class="form-group">
@@ -1135,6 +1154,64 @@ function autoOpenMobile(){
 // ── SUBMISSION MODAL ──────────────────────────────────
 const AS_SUBMIT = 'https://script.google.com/macros/s/AKfycbyq687XCjn2YbtAjLHvrWE0RZ5u-Tyijhoa_5nWHkJorE62_G1xYLEvEmx3dTA9Zs9k/exec';
 
+// Phone validation — Argentine format +549 + 10 digits
+function validateTelForm(){
+  const input = document.getElementById('f-tel');
+  const hint  = document.getElementById('tel-hint');
+  const wrap  = document.getElementById('tel-wrap');
+  if(!input||!hint) return;
+  const val = input.value.replace(/[^0-9]/g,'');
+  input.value = val;
+  if(val.length===0){
+    hint.textContent=''; wrap.style.borderColor='';
+  } else if(val.length<10){
+    hint.textContent=val.length+' de 10 dígitos — número incompleto';
+    hint.style.color='var(--danger)'; wrap.style.borderColor='var(--danger)';
+  } else {
+    hint.textContent='✓ Número completo';
+    hint.style.color='#2a7a50'; wrap.style.borderColor='#2a7a50';
+  }
+}
+
+// Flyer filename generator — updates live as user fills form
+function updateFlyerName(){
+  const fecha  = document.getElementById('f-fecha').value;   // YYYY-MM-DD
+  const lugar  = document.getElementById('f-lugar').value.trim();
+  const nombre = document.getElementById('f-nombre').value.trim();
+  const preview= document.getElementById('flyer-name-preview');
+  if(!preview) return;
+
+  if(!fecha||!lugar||!nombre){
+    preview.textContent='Completá fecha, lugar y nombre del evento para ver el nombre sugerido.';
+    preview.style.color='var(--muted)';
+    return;
+  }
+
+  // Slugify: lowercase, remove accents, replace spaces/special with -
+  const slug = (str) => str.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,'-')
+    .replace(/^-+|-+$/g,'');
+
+  const venueParts = lugar.split(' ');
+  const venueSlug  = slug(venueParts.length>2 ? venueParts.slice(-2).join(' ') : lugar);
+  const eventSlug  = slug(nombre).slice(0,30);
+  const filename   = fecha+'_'+venueSlug+'_'+eventSlug+'.jpg';
+
+  preview.textContent = filename;
+  preview.style.color = 'var(--gold2)';
+  // Store for use in submission
+  preview.dataset.filename = filename;
+}
+
+// Wire up live updates to flyer name
+document.addEventListener('DOMContentLoaded',()=>{
+  ['f-fecha','f-lugar','f-nombre'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('input',updateFlyerName);
+  });
+});
+
 function openSubModal(){
   document.getElementById('subOverlay').classList.add('open');
   document.body.style.overflow='hidden';
@@ -1178,6 +1255,9 @@ async function submitEvent(){
   const hora=document.getElementById('f-hora').value||'';
   const horaFmt=hora?hora.slice(0,5)+' hs':'Todo el día';
 
+  const tel=document.getElementById('f-tel').value.trim();
+  const flyerName=document.getElementById('flyer-name-preview')?.dataset?.filename||'';
+
   const payload={
     source:      'event_submission',
     nombre,
@@ -1188,12 +1268,16 @@ async function submitEvent(){
     descripcion: document.getElementById('f-desc').value.trim().slice(0,300),
     precio:      document.getElementById('f-precio').value.trim()||'Consultar',
     link_fuente: document.getElementById('f-link').value.trim(),
-    imagen_url:  document.getElementById('f-imagen').value.trim(),
+    imagen_url:  flyerName ? '/images/'+flyerName : '',
     contacto_nombre: contacto,
     contacto_email:  email,
-    contacto_tel:    document.getElementById('f-tel').value.trim(),
+    contacto_tel:    tel ? '+549'+tel : '',
     interes_tickets: document.getElementById('f-tickets').checked?'Sí':'No',
+    flyer_nombre_sugerido: flyerName,
     fecha_envio: new Date().toLocaleDateString('es-AR'),
+    validacion:  'Pendiente',
+    activo:      'FALSE',
+    tipo_fuente: 'Manual',
   };
 
   try{
@@ -1209,8 +1293,11 @@ async function submitEvent(){
         <div class="form-success-icon">🎉</div>
         <h3>¡Evento recibido!</h3>
         <p>Revisamos tu evento y lo publicamos en el mapa en menos de 24 horas.<br><br>
-        Te avisamos a <strong>${email}</strong> cuando esté activo.<br><br>
-        ${document.getElementById('f-tickets').checked?'<strong>¡Nos contactamos sobre la venta de entradas!</strong>':''}</p>
+        Te avisamos a <strong>${email}</strong> cuando esté activo.
+        ${flyerName?`<br><br>📎 <strong>Envianos tu flyer</strong> con el nombre exacto:<br>
+        <code style="background:rgba(201,168,76,0.1);padding:4px 8px;border-radius:4px;color:var(--gold2);font-size:11px;word-break:break-all">${flyerName}</code><br>
+        <span style="font-size:11px;color:var(--muted)">1080×1080px · JPG o PNG · por WhatsApp o email</span>`:''}
+        ${document.getElementById('f-tickets').checked?'<br><br>⭐ <strong>¡Nos contactamos sobre la venta de entradas!</strong>':''}</p>
         <button class="form-submit" style="margin-top:20px;max-width:200px;margin-left:auto;margin-right:auto" onclick="closeSubModal()">Cerrar</button>
       </div>`;
   }catch(e){
