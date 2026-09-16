@@ -287,7 +287,7 @@
     "categoria": "Música",
     "lugar": "Parque Criollo R. Güiraldes",
     "descripcion": "Te esperamos el día sábado, al finalizar la primer etapa de la clasificatoria a Jesús María 2027 en la “Pulpería la Blanqueada”, para disfrutar una noche de",
-    "precio": "$10.000",
+    "precio": "$10",
     "es_datamanIAcs": "false",
     "preventa_disponible": "false",
     "link_accion": "https://www.sanantoniodeareco.com/eventos/pena-al-fogon",
@@ -297,7 +297,7 @@
     "activo": "true",
     "fecha_scrape": "09/09/2026",
     "tipo_fuente": "Scrape",
-    "ultima_actualizacion": "09/14/2026"
+    "ultima_actualizacion": "09/16/2026"
   },
   {
     "id": "manual_fogonerosduo_sep18",
@@ -438,5 +438,25 @@
     "fecha_scrape": "09/15/2026",
     "tipo_fuente": "Manual",
     "ultima_actualizacion": "09/15/2026"
+  },
+  {
+    "id": "bbf4eb567747",
+    "fecha": "Ver fuente",
+    "hora": "17:00",
+    "nombre": "87° Fiesta de la Tradición 2026",
+    "categoria": "Música",
+    "lugar": "Plaza Ruiz de Arellano",
+    "descripcion": "La Fiesta de la Tradición 2026 se realizará los días viernes 13, sábado 14 y domingo 15 de noviembre en San Antonio de Areco.",
+    "precio": "Gratis",
+    "es_datamanIAcs": "false",
+    "preventa_disponible": "false",
+    "link_accion": "https://www.sanantoniodeareco.com/eventos/87-fiesta-de-la-tradicion-2026",
+    "fuente_nombre": "SanAntoniodeAreco.com",
+    "fuente_url": "https://www.sanantoniodeareco.com/eventos/87-fiesta-de-la-tradicion-2026",
+    "imagen_url": "https://www.sanantoniodeareco.com/wp-content/uploads/2026/09/captura-de-pantalla-2026-09-15-185336.png",
+    "activo": "true",
+    "fecha_scrape": "09/16/2026",
+    "tipo_fuente": "Scrape",
+    "ultima_actualizacion": "09/16/2026"
   }
 ]
