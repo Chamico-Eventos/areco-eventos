@@ -307,30 +307,67 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 .form-success-icon{font-size:52px;margin-bottom:14px}
 .form-success h3{font-family:Playfair Display,serif;font-size:22px;color:var(--gold);margin-bottom:10px}
 .form-success p{font-size:13px;color:var(--ink2);line-height:1.7}
-/* ── MOBILE — bottom sheet ────────────────────────── */
+/* ── MOBILE — stacked layout (header → map → list) ── */
 @media(max-width:680px){
-  .shell{display:block;height:100vh;overflow:hidden}
-  #map{position:fixed;inset:0;height:100vh;width:100vw;z-index:0}
-  .sidebar{
-    position:fixed;z-index:1002;
-    bottom:0;left:0;right:0;
-    width:100%;height:auto;max-height:82vh;
-    border-right:none;
-    border-top:1px solid rgba(201,168,76,0.25);
-    border-radius:20px 20px 0 0;
-    background:rgba(23,21,16,0.96);
-    backdrop-filter:blur(14px);
-    transform:translateY(calc(100% - 148px));
-    transition:transform .38s cubic-bezier(.32,1,.22,1);
+  .shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+  /* Sidebar dissolves into flex — children become direct shell items */
+  .sidebar{display:contents}
+
+  /* 1 — Compact header with week nav */
+  .sb-head{
+    order:1;flex-shrink:0;
+    background:var(--s1);
+    border-bottom:1px solid var(--border);
+    border-right:none;border-radius:0;
+    padding:10px 14px;cursor:default;
   }
-  .sidebar.mob-open{transform:translateY(0)}
-  .sb-head{cursor:pointer;padding-top:0}
-  .mob-handle{width:38px;height:4px;background:rgba(201,168,76,0.3);border-radius:2px;margin:10px auto 12px}
-  .map-brand-wrapper{top:10px;right:10px;min-width:160px}
-  .map-brand{padding:7px 12px}
-  .map-brand img{max-height:26px}
-  .add-ev-btn{padding:9px 14px;font-size:11px}
-  .dm-sheet{max-height:92vh}
+  .mob-handle{display:none}
+  .brand-text h1{font-size:16px;margin-bottom:8px}
+  .wn-sub{display:none}
+  .wn-btn{padding:9px 12px}
+  .wn-label{font-size:12px}
+
+  /* 2 — Category filters */
+  .sb-filters{
+    order:2;flex-shrink:0;
+    background:var(--s1);
+    padding:8px 14px;
+    border-bottom:1px solid var(--b2);
+  }
+
+  /* 3 — Map ~30% height */
+  #map{
+    order:3;
+    height:30vh;
+    flex-shrink:0;
+    width:100%;
+    position:relative;z-index:5;
+  }
+
+  /* 4 — Event list fills remaining space */
+  .sb-list{
+    order:4;
+    flex:1;overflow-y:auto;
+    background:var(--s1);
+    border-top:1px solid var(--border);
+    padding-bottom:20px;
+  }
+
+  /* Compact brand overlay on small map */
+  .map-brand-wrapper{top:6px;right:6px;min-width:130px;gap:5px}
+  .map-brand{padding:5px 10px;gap:4px}
+  .map-brand img{max-height:20px}
+  .map-brand-tagline{font-size:7px}
+
+  /* Move add-event button inside the map, bottom-left */
+  .add-ev-btn{
+    position:absolute;bottom:8px;left:8px;
+    padding:8px 12px;font-size:11px;
+    box-shadow:0 2px 10px rgba(201,168,76,0.35);
+  }
+
+  .dm-sheet{max-height:94vh}
 }
 </style>
 </head>
@@ -644,10 +681,6 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
   attribution:'© <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
   maxZoom:19
 }).addTo(map);
-map.on('click',()=>{
-  if(window.innerWidth<=680)
-    document.getElementById('sidebar').classList.remove('mob-open');
-});
 
 // ── HELPERS ───────────────────────────────────────────
 function wRange(off=0){
@@ -1092,14 +1125,10 @@ document.getElementById('wNext').onclick=(e)=>{e.stopPropagation();wOff++;render
 
 // ── MOBILE SIDEBAR TOGGLE ─────────────────────────────
 function toggleMobileSidebar(){
-  if(window.innerWidth>680)return;
-  document.getElementById('sidebar').classList.toggle('mob-open');
+  // Stack layout on mobile — no toggle needed
 }
-// Auto-open sidebar on mobile when events load
 function autoOpenMobile(){
-  if(window.innerWidth<=680){
-    setTimeout(()=>document.getElementById('sidebar').classList.add('mob-open'),800);
-  }
+  // Stack layout shows list by default — no action needed
 }
 
 // ── DATA LOAD ─────────────────────────────────────────
