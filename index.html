@@ -267,8 +267,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 }
 /* Remove tile seam artifacts from invert filter */
 .leaflet-container{background:#0e0d0b}
-.leaflet-tile{border:0 !important;outline:none !important;margin:0 !important}
-.leaflet-tile-container img{border:0 !important}
+/* Scale each tile 1% so neighbours overlap — hides inversion seams completely */
+img.leaflet-tile{border:0 !important;outline:none !important;transform:scale(1.01);transform-origin:center center}
 
 /* ── PAST EVENT CARDS ─────────────────────────────── */
 .past-card{opacity:.32;border-color:transparent!important;background:var(--bg)!important}
@@ -459,16 +459,30 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
       </div>
 
       <div class="form-group">
-        <label class="form-label">Nombre sugerido para tu flyer</label>
+        <label class="form-label">Adjuntá tu flyer</label>
+        <label id="flyer-drop" style="
+          display:flex;flex-direction:column;align-items:center;justify-content:center;
+          background:var(--s2);border:1.5px dashed rgba(201,168,76,0.3);border-radius:10px;
+          padding:20px;cursor:pointer;text-align:center;gap:6px;transition:border-color .2s;
+        " onmouseenter="this.style.borderColor='rgba(201,168,76,0.6)'"
+           onmouseleave="this.style.borderColor='rgba(201,168,76,0.3)'">
+          <div id="flyer-placeholder">
+            <div style="font-size:28px;margin-bottom:4px">🖼</div>
+            <div style="font-size:12px;font-weight:600;color:var(--ink2)">Tocá para seleccionar tu flyer</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px">JPG o PNG · máx. 2MB</div>
+          </div>
+          <img id="flyer-preview" src="" alt="" style="display:none;max-width:100%;max-height:200px;border-radius:8px;object-fit:contain">
+          <input type="file" id="f-flyer" accept="image/jpeg,image/png" style="display:none" onchange="onFlyerSelected(this)">
+        </label>
         <div id="flyer-name-preview" style="
+          display:none;margin-top:8px;
           background:var(--s2);border:1px solid var(--border);border-radius:8px;
-          padding:10px 12px;font-size:12px;font-family:'Courier New',monospace;
-          color:var(--gold2);letter-spacing:.02em;min-height:38px;word-break:break-all;
-        ">Completá fecha, lugar y nombre del evento para ver el nombre sugerido.</div>
-        <div class="form-hint">
-          📌 Guardá tu flyer con este nombre exacto antes de enviarlo.<br>
-          📐 Tamaño recomendado: <strong style="color:var(--ink2)">1080 × 1080 px</strong> (cuadrado) · JPG o PNG · máx. 2MB<br>
-          📩 Envialo por WhatsApp o email al finalizar este formulario.
+          padding:8px 12px;font-size:11px;font-family:'Courier New',monospace;
+          color:var(--gold2);word-break:break-all;
+        "></div>
+        <div class="form-hint" style="margin-top:6px">
+          📐 Tamaño recomendado: <strong style="color:var(--ink2)">1080 × 1080 px</strong> (cuadrado)<br>
+          📩 El archivo nos llega por WhatsApp o email — te indicamos cómo al finalizar.
         </div>
       </div>
 
@@ -1185,42 +1199,57 @@ function validateTelForm(){
   }
 }
 
-// Flyer filename generator — updates live as user fills form
-function updateFlyerName(){
-  const fecha  = document.getElementById('f-fecha').value;   // YYYY-MM-DD
-  const lugar  = document.getElementById('f-lugar').value.trim();
-  const nombre = document.getElementById('f-nombre').value.trim();
-  const preview= document.getElementById('flyer-name-preview');
-  if(!preview) return;
-
-  if(!fecha||!lugar||!nombre){
-    preview.textContent='Completá fecha, lugar y nombre del evento para ver el nombre sugerido.';
-    preview.style.color='var(--muted)';
-    return;
-  }
-
-  // Slugify: lowercase, remove accents, replace spaces/special with -
-  const slug = (str) => str.toLowerCase()
+// Slugify helper
+function slugify(str){
+  return str.toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .replace(/[^a-z0-9]+/g,'-')
-    .replace(/^-+|-+$/g,'');
-
-  const venueParts = lugar.split(' ');
-  const venueSlug  = slug(venueParts.length>2 ? venueParts.slice(-2).join(' ') : lugar);
-  const eventSlug  = slug(nombre).slice(0,30);
-  const filename   = fecha+'_'+venueSlug+'_'+eventSlug+'.jpg';
-
-  preview.textContent = filename;
-  preview.style.color = 'var(--gold2)';
-  // Store for use in submission
-  preview.dataset.filename = filename;
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
 }
 
-// Wire up live updates to flyer name
+// Generate standardized flyer filename
+function getFlyerName(ext){
+  const fecha=document.getElementById('f-fecha').value;
+  const lugar=document.getElementById('f-lugar').value.trim();
+  const nombre=document.getElementById('f-nombre').value.trim();
+  if(!fecha||!lugar||!nombre) return null;
+  const vp=lugar.split(' ');
+  const vs=slugify(vp.length>2?vp.slice(-2).join(' '):lugar);
+  return fecha+'_'+vs+'_'+slugify(nombre).slice(0,30)+(ext||'.jpg');
+}
+
+// Update flyer filename preview (called when form fields change)
+function updateFlyerName(){
+  const name=getFlyerName();
+  const preview=document.getElementById('flyer-name-preview');
+  if(!preview) return;
+  if(name){ preview.style.display='block'; preview.textContent=name; preview.dataset.filename=name; }
+  else { preview.style.display='none'; }
+}
+
+// Handle flyer file selection — show preview + standardized filename
+function onFlyerSelected(input){
+  const file=input.files[0];
+  if(!file) return;
+  if(file.size>2*1024*1024){ alert('El flyer es demasiado grande. Máximo 2MB.'); input.value=''; return; }
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=document.getElementById('flyer-preview');
+    const ph=document.getElementById('flyer-placeholder');
+    if(img){ img.src=e.target.result; img.style.display='block'; }
+    if(ph) ph.style.display='none';
+  };
+  reader.readAsDataURL(file);
+  const ext=file.name.toLowerCase().endsWith('.png')?'.png':'.jpg';
+  const name=getFlyerName(ext)||file.name;
+  const preview=document.getElementById('flyer-name-preview');
+  if(preview){ preview.style.display='block'; preview.textContent=name; preview.dataset.filename=name; }
+}
+
+// Wire up live filename updates
 document.addEventListener('DOMContentLoaded',()=>{
   ['f-fecha','f-lugar','f-nombre'].forEach(id=>{
     const el=document.getElementById(id);
-    if(el) el.addEventListener('input',updateFlyerName);
+    if(el) el.addEventListener('input',()=>{updateFlyerName();});
   });
 });
 
