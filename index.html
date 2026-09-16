@@ -664,8 +664,6 @@ function catMeta(ev){
   if(isDM(ev))return{cls:'c-dm',icon:I+'icon-datamaniacs.png'};
   return CAT[ev.categoria]||{cls:'c-evento',icon:I+'icon-evento.png'};
 }
-  return CAT[ev.categoria]||{cls:'c-evento',icon:'●'};
-}
 function priceInfo(p){
   if(!p||p==='Consultar')return{cls:'p-ask',lbl:'Consultar'};
   if(p==='Gratis')return{cls:'p-free',lbl:'Gratis'};
