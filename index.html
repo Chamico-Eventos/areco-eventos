@@ -250,6 +250,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 .c-musica{background:rgba(124,58,237,.16);color:#a78bfa;border:1px solid rgba(124,58,237,.3)}
 .c-tradicion{background:rgba(201,168,76,.14);color:var(--gold);border:1px solid var(--border)}
 .c-arte{background:rgba(219,39,119,.12);color:#f472b6;border:1px solid rgba(219,39,119,.25)}
+.c-teatro{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25)}
 .c-deportes{background:rgba(37,99,235,.12);color:#60a5fa;border:1px solid rgba(37,99,235,.25)}
 .c-gastro{background:rgba(245,158,11,.12);color:#fbbf24;border:1px solid rgba(245,158,11,.25)}
 .c-infantil{background:rgba(16,185,129,.12);color:#34d399;border:1px solid rgba(16,185,129,.25)}
@@ -273,7 +274,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 /* ── MAP BRANDING ─────────────────────────────────── */
 .map-brand-wrapper{position:absolute;top:14px;right:14px;z-index:999;display:flex;flex-direction:column;gap:8px;min-width:200px}
 .map-brand{background:rgba(14,13,11,0.82);backdrop-filter:blur(10px);border:1px solid rgba(201,168,76,0.18);border-radius:12px;padding:10px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;width:100%}
-.map-brand img{width:100%;max-height:36px;object-fit:contain;mix-blend-mode:luminosity;opacity:.9}
+.map-brand img{width:100%;max-height:56px;object-fit:contain;mix-blend-mode:luminosity;opacity:1}
 .map-brand-tagline{font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);align-self:flex-start}
 /* ── ADD EVENT BUTTON ─────────────────────────────── */
 .add-ev-btn{width:100%;justify-content:center;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0e0d0b;border:none;border-radius:999px;padding:11px 16px;font-family:Inter,sans-serif;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.35);transition:filter .2s,transform .15s;display:flex;align-items:center;gap:6px;white-space:nowrap;box-sizing:border-box}
@@ -593,16 +594,18 @@ const FALLBACK = {
   'salón guerrico':                    [-34.2453000, -59.4748000],
 };
 
+const I = '/images/'; // icon base path
 const CAT = {
-  'Música':{cls:'c-musica',icon:'♪'},
-  'Tradición':{cls:'c-tradicion',icon:'✦'},
-  'Arte':{cls:'c-arte',icon:'◈'},
-  'Deportes':{cls:'c-deportes',icon:'◎'},
-  'Gastronomía':{cls:'c-gastro',icon:'◇'},
-  'Infantil':{cls:'c-infantil',icon:'◉'},
-  'Cultural':{cls:'c-cultural',icon:'▲'},
-  'Feria':{cls:'c-feria',icon:'◆'},
-  'Evento':{cls:'c-evento',icon:'●'},
+  'Música':      {cls:'c-musica',    icon:I+'icon-musica.png'},
+  'Tradición':   {cls:'c-tradicion', icon:I+'icon-tradicion.png'},
+  'Arte':        {cls:'c-arte',      icon:I+'icon-arte.png'},
+  'Teatro':      {cls:'c-teatro',    icon:I+'icon-teatro.png'},
+  'Deportes':    {cls:'c-deportes',  icon:I+'icon-deportes.png'},
+  'Gastronomía': {cls:'c-gastro',    icon:I+'icon-gastronomia.png'},
+  'Infantil':    {cls:'c-infantil',  icon:I+'icon-infantil.png'},
+  'Cultural':    {cls:'c-cultural',  icon:I+'icon-cultural.png'},
+  'Feria':       {cls:'c-feria',     icon:I+'icon-feria.png'},
+  'Evento':      {cls:'c-evento',    icon:I+'icon-evento.png'},
 };
 
 // ── STATE ─────────────────────────────────────────────
@@ -658,7 +661,9 @@ function coords(lugar){
 }
 function isDM(ev){ return String(ev.es_datamanIAcs).toLowerCase()==='true'; }
 function catMeta(ev){
-  if(isDM(ev))return{cls:'c-dm',icon:'★'};
+  if(isDM(ev))return{cls:'c-dm',icon:I+'icon-datamaniacs.png'};
+  return CAT[ev.categoria]||{cls:'c-evento',icon:I+'icon-evento.png'};
+}
   return CAT[ev.categoria]||{cls:'c-evento',icon:'●'};
 }
 function priceInfo(p){
@@ -683,8 +688,8 @@ function openSheet(ev){
     imgEl.innerHTML=`<img class="sheet-img" src="${ev.imagen_url}" alt="${ev.nombre}"
       onerror="this.parentElement.innerHTML='<div class=sheet-img-placeholder style=height:120px>★</div>'">`;
   } else {
-    const icon=CAT[ev.categoria]?.icon||'★';
-    imgEl.innerHTML=`<div class="sheet-img-placeholder">${icon}</div>`;
+    const iconPath=catMeta(ev).icon;
+    imgEl.innerHTML=`<div class="sheet-img-placeholder"><img src="${iconPath}" style="width:80px;height:80px;object-fit:contain;opacity:.25;mix-blend-mode:luminosity"></div>`;
   }
 
   // Name
@@ -919,7 +924,7 @@ function renderMap(list, future=[], past=[]){
         const col='#e8c97a';
         const pulse='animation:pulse 2s ease-in-out infinite;';
         li=L.divIcon({
-          html:`<div style="width:34px;height:34px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #0e0d0b;box-shadow:0 3px 12px rgba(0,0,0,0.65);display:flex;align-items:center;justify-content:center;${pulse}"><span style="transform:rotate(45deg);font-size:13px;line-height:1">${icon}</span></div>`,
+          html:`<div style="width:36px;height:36px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #0e0d0b;box-shadow:0 3px 12px rgba(0,0,0,0.65);display:flex;align-items:center;justify-content:center;${pulse}"><img src="${icon}" style="width:21px;height:21px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.outerHTML='<span style=transform:rotate(45deg);font-size:12px>★</span>'"></div>`,
           className:'',iconSize:[34,34],iconAnchor:[17,34],popupAnchor:[1,-38]
         });
         m=L.marker(off,{icon:li}).addTo(map);
@@ -928,7 +933,7 @@ function renderMap(list, future=[], past=[]){
       } else {
         const col='#c9a84c';
         li=L.divIcon({
-          html:`<div style="width:34px;height:34px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #0e0d0b;box-shadow:0 3px 12px rgba(0,0,0,0.65);display:flex;align-items:center;justify-content:center;"><span style="transform:rotate(45deg);font-size:13px;line-height:1">${icon}</span></div>`,
+          html:`<div style="width:36px;height:36px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #0e0d0b;box-shadow:0 3px 12px rgba(0,0,0,0.65);display:flex;align-items:center;justify-content:center;"><img src="${icon}" style="width:21px;height:21px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.outerHTML='<span style=transform:rotate(45deg);font-size:12px>●</span>'"></div>`,
           className:'',iconSize:[34,34],iconAnchor:[17,34],popupAnchor:[1,-38]
         });
         const d=parseD(ev.fecha);
