@@ -307,16 +307,30 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 .form-success-icon{font-size:52px;margin-bottom:14px}
 .form-success h3{font-family:Playfair Display,serif;font-size:22px;color:var(--gold);margin-bottom:10px}
 .form-success p{font-size:13px;color:var(--ink2);line-height:1.7}
-/* ── MOBILE ───────────────────────────────────────── */
+/* ── MOBILE — bottom sheet ────────────────────────── */
 @media(max-width:680px){
-  .shell{flex-direction:column}
-  .sidebar{width:100%;height:50vh;border-right:none;border-bottom:1px solid var(--border)}
-  #map{height:50vh}
-  .dm-sheet{max-height:92vh}
-  .map-brand-wrapper{top:8px;right:8px}
+  .shell{display:block;height:100vh;overflow:hidden}
+  #map{position:fixed;inset:0;height:100vh;width:100vw;z-index:0}
+  .sidebar{
+    position:fixed;z-index:1002;
+    bottom:0;left:0;right:0;
+    width:100%;height:auto;max-height:82vh;
+    border-right:none;
+    border-top:1px solid rgba(201,168,76,0.25);
+    border-radius:20px 20px 0 0;
+    background:rgba(23,21,16,0.96);
+    backdrop-filter:blur(14px);
+    transform:translateY(calc(100% - 148px));
+    transition:transform .38s cubic-bezier(.32,1,.22,1);
+  }
+  .sidebar.mob-open{transform:translateY(0)}
+  .sb-head{cursor:pointer;padding-top:0}
+  .mob-handle{width:38px;height:4px;background:rgba(201,168,76,0.3);border-radius:2px;margin:10px auto 12px}
+  .map-brand-wrapper{top:10px;right:10px;min-width:160px}
   .map-brand{padding:7px 12px}
-  .map-brand img{height:26px}
+  .map-brand img{max-height:26px}
   .add-ev-btn{padding:9px 14px;font-size:11px}
+  .dm-sheet{max-height:92vh}
 }
 </style>
 </head>
@@ -483,8 +497,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 </div>
 
 <div class="shell">
-  <aside class="sidebar">
-    <div class="sb-head">
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-head" onclick="toggleMobileSidebar()">
+      <div class="mob-handle"></div>
       <div class="brand-text" style="margin-bottom:14px">
         <h1><em>Areco</em> Eventos</h1>
         <small>by DataManIAcs · San Antonio de Areco</small>
@@ -629,7 +644,10 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
   attribution:'© <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
   maxZoom:19
 }).addTo(map);
-L.control.zoom({position:'bottomright'}).addTo(map);
+map.on('click',()=>{
+  if(window.innerWidth<=680)
+    document.getElementById('sidebar').classList.remove('mob-open');
+});
 
 // ── HELPERS ───────────────────────────────────────────
 function wRange(off=0){
@@ -661,8 +679,9 @@ function coords(lugar){
 }
 function isDM(ev){ return String(ev.es_datamanIAcs).toLowerCase()==='true'; }
 function catMeta(ev){
-  if(isDM(ev))return{cls:'c-dm',icon:I+'icon-datamaniacs.png'};
-  return CAT[ev.categoria]||{cls:'c-evento',icon:I+'icon-evento.png'};
+  const base = CAT[ev.categoria]||{cls:'c-evento',icon:I+'icon-evento.png'};
+  if(isDM(ev)) return {cls:'c-dm', icon:base.icon}; // category icon + DM gold style
+  return base;
 }
 function priceInfo(p){
   if(!p||p==='Consultar')return{cls:'p-ask',lbl:'Consultar'};
@@ -804,7 +823,7 @@ function renderList(list){
     const hc=!!coords(ev.lugar);
     html+=`<div class="ecard${activeId===ev.id?' active':''}${dm?' dm':''}${isPast?' past-card':''}" data-id="${ev.id}" onclick="selEv('${ev.id}')">
       <div class="ecard-top">
-        <div class="ecard-name${isPast?' past-name':''}">${ev.nombre||'Evento'}</div>
+        <div class="ecard-name${isPast?' past-name':''}">${dm&&!isPast?`<img src="/images/logo-datamaniacs.png" style="height:12px;opacity:.65;mix-blend-mode:multiply;vertical-align:middle;margin-right:4px" onerror="this.style.display='none'">`:''}${ev.nombre||'Evento'}</div>
         <span class="badge ${isPast?'c-evento':cls}" style="${isPast?'opacity:.45':''}">${isPast?'Pasado':dm?'DataManIAcs':ev.categoria||'Evento'}</span>
       </div>
       <div class="ecard-meta" style="${isPast?'opacity:.4':''}">
@@ -1068,8 +1087,20 @@ function setF(f,el){
   activeFilter=f;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));el.classList.add('on');render();
 }
 
-document.getElementById('wPrev').onclick=()=>{wOff--;render();};
-document.getElementById('wNext').onclick=()=>{wOff++;render();};
+document.getElementById('wPrev').onclick=(e)=>{e.stopPropagation();wOff--;render();};
+document.getElementById('wNext').onclick=(e)=>{e.stopPropagation();wOff++;render();};
+
+// ── MOBILE SIDEBAR TOGGLE ─────────────────────────────
+function toggleMobileSidebar(){
+  if(window.innerWidth>680)return;
+  document.getElementById('sidebar').classList.toggle('mob-open');
+}
+// Auto-open sidebar on mobile when events load
+function autoOpenMobile(){
+  if(window.innerWidth<=680){
+    setTimeout(()=>document.getElementById('sidebar').classList.add('mob-open'),800);
+  }
+}
 
 // ── DATA LOAD ─────────────────────────────────────────
 // ── SUBMISSION MODAL ──────────────────────────────────
@@ -1171,7 +1202,8 @@ async function init(){
     console.log('Events loaded: ' + evs.length);
     buildPills();
     render();
-    initGeolocation(); // blue dot for user location
+    initGeolocation();
+    autoOpenMobile();
   }catch(e){
     console.error('Load failed:', e);
     document.getElementById('list').innerHTML=
