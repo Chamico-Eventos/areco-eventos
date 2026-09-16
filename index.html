@@ -265,6 +265,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 .leaflet-tile-pane{
   filter:invert(100%) hue-rotate(180deg) brightness(92%) contrast(88%) saturate(0.85);
 }
+/* Remove tile seam artifacts from invert filter */
+.leaflet-container{background:#0e0d0b}
+.leaflet-tile{border:0 !important;outline:none !important;margin:0 !important}
+.leaflet-tile-container img{border:0 !important}
 
 /* ── PAST EVENT CARDS ─────────────────────────────── */
 .past-card{opacity:.32;border-color:transparent!important;background:var(--bg)!important}
@@ -409,7 +413,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
         </div>
         <div class="form-group">
           <label class="form-label">Hora</label>
-          <input class="form-input" id="f-hora" type="time" placeholder="20:30">
+          <input class="form-input" id="f-hora" type="text" placeholder="21:30" maxlength="5" oninput="autoFormatTime(this)">
         </div>
       </div>
 
@@ -1153,6 +1157,14 @@ function autoOpenMobile(){
 // ── DATA LOAD ─────────────────────────────────────────
 // ── SUBMISSION MODAL ──────────────────────────────────
 const AS_SUBMIT = 'https://script.google.com/macros/s/AKfycbyq687XCjn2YbtAjLHvrWE0RZ5u-Tyijhoa_5nWHkJorE62_G1xYLEvEmx3dTA9Zs9k/exec';
+
+// Time auto-format: user types 2130 → gets 21:30
+function autoFormatTime(input){
+  let v = input.value.replace(/[^0-9]/g,'');
+  if(v.length > 4) v = v.slice(0,4);
+  if(v.length >= 3) v = v.slice(0,2) + ':' + v.slice(2);
+  input.value = v;
+}
 
 // Phone validation — Argentine format +549 + 10 digits
 function validateTelForm(){
