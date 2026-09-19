@@ -262,13 +262,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 /* ── DARK TILE INVERSION ──────────────────────────── */
 /* Inverts OSM tiles to dark. Markers/popups are in separate
    Leaflet panes so they are NOT affected by this filter. */
-.leaflet-tile-pane{
-  filter:invert(100%) hue-rotate(180deg) brightness(92%) contrast(88%) saturate(0.85);
-}
-/* Remove tile seam artifacts from invert filter */
-.leaflet-container{background:#0e0d0b}
-/* Scale each tile 1% so neighbours overlap — hides inversion seams completely */
-img.leaflet-tile{border:0 !important;outline:none !important;transform:scale(1.01);transform-origin:center center}
+.leaflet-container{background:#1a1a14}
+img.leaflet-tile{border:0 !important;outline:none !important}
 
 /* ── PAST EVENT CARDS ─────────────────────────────── */
 .past-card{opacity:.32;border-color:transparent!important;background:var(--bg)!important}
@@ -713,10 +708,13 @@ function goToEventWeek(fecha){
 
 // ── MAP ───────────────────────────────────────────────
 const map=L.map('map',{center:CENTER,zoom:15,zoomControl:false});
-// OSM tiles + CSS inversion = free dark map, no API key ever needed
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-  attribution:'© <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
-  maxZoom:19
+// ESRI Dark Gray Canvas — natively dark, no CSS filter, zero tile seams
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{
+  attribution:'Tiles &copy; <a href="https://www.esri.com">Esri</a>',
+  maxZoom:19, maxNativeZoom:16
+}).addTo(map);
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',{
+  attribution:'',maxZoom:19,maxNativeZoom:13
 }).addTo(map);
 
 // ── HELPERS ───────────────────────────────────────────
@@ -1329,17 +1327,37 @@ async function submitEvent(){
       mode:'no-cors', // submission doesn't need response body
     });
     // Show success (no-cors means we can't read response, assume success)
+    // Build WhatsApp + email links for flyer sending
+    const waMsg=encodeURIComponent(
+      'Hola! Registré el evento "'+nombre+'" ('+fechaFmt+') en Areco Eventos.'+
+      (flyerName?'\nTe envío el flyer como: '+flyerName:'')
+    );
+    const waUrl='https://wa.me/5492326421909?text='+waMsg;
+    const mailSubj=encodeURIComponent('Flyer evento: '+nombre);
+    const mailBody=encodeURIComponent(
+      'Hola!\n\nRegistré el evento "'+nombre+'" ('+fechaFmt+') en Areco Eventos.\n'+
+      (flyerName?'\nAdjunto el flyer con el nombre: '+flyerName:'')+'\n\nSaludos'
+    );
+    const mailUrl='mailto:eventos@datamaniacs.ar?subject='+mailSubj+'&body='+mailBody;
+
     document.getElementById('subForm').innerHTML=`
       <div class="form-success">
         <div class="form-success-icon">🎉</div>
         <h3>¡Evento recibido!</h3>
-        <p>Revisamos tu evento y lo publicamos en el mapa en menos de 24 horas.<br><br>
-        Te avisamos a <strong>${email}</strong> cuando esté activo.
-        ${flyerName?`<br><br>📎 <strong>Envianos tu flyer</strong> con el nombre exacto:<br>
-        <code style="background:rgba(201,168,76,0.1);padding:4px 8px;border-radius:4px;color:var(--gold2);font-size:11px;word-break:break-all">${flyerName}</code><br>
-        <span style="font-size:11px;color:var(--muted)">1080×1080px · JPG o PNG · por WhatsApp o email</span>`:''}
-        ${document.getElementById('f-tickets').checked?'<br><br>⭐ <strong>¡Nos contactamos sobre la venta de entradas!</strong>':''}</p>
-        <button class="form-submit" style="margin-top:20px;max-width:200px;margin-left:auto;margin-right:auto" onclick="closeSubModal()">Cerrar</button>
+        <p>Revisamos tu evento y lo publicamos en el mapa en menos de 24 horas.<br>
+        Te avisamos a <strong>${email}</strong> cuando esté activo.</p>
+        ${flyerName?`
+        <div style="background:rgba(201,168,76,0.08);border:1px solid var(--border);border-radius:10px;padding:14px;margin:14px 0;text-align:left">
+          <div style="font-size:11px;font-weight:600;color:var(--gold);margin-bottom:6px">📎 ENVIANOS TU FLYER</div>
+          <code style="font-size:11px;color:var(--gold2);word-break:break-all;display:block;margin-bottom:6px">${flyerName}</code>
+          <div style="font-size:10px;color:var(--muted);margin-bottom:12px">1080×1080px · JPG o PNG</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <a href="${waUrl}" target="_blank" style="flex:1;min-width:120px;background:#25D366;color:#fff;border:none;border-radius:8px;padding:10px;font-size:12px;font-weight:700;text-decoration:none;text-align:center;display:block">📱 WhatsApp</a>
+            <a href="${mailUrl}" style="flex:1;min-width:120px;background:var(--s2);color:var(--gold);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:12px;font-weight:700;text-decoration:none;text-align:center;display:block">📧 Email</a>
+          </div>
+        </div>`:''}
+        ${document.getElementById('f-tickets').checked?'<p style="font-size:12px;color:var(--gold2)">⭐ ¡Nos contactamos sobre la venta de entradas!</p>':''}
+        <button class="form-submit" style="margin-top:8px;max-width:200px;margin-left:auto;margin-right:auto" onclick="closeSubModal()">Cerrar</button>
       </div>`;
   }catch(e){
     btn.disabled=false;btn.textContent='Enviar mi evento →';
