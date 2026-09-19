@@ -17,7 +17,8 @@
     "activo": "true",
     "fecha_scrape": "09/09/2026",
     "tipo_fuente": "Scrape",
-    "ultima_actualizacion": "09/10/2026"
+    "ultima_actualizacion": "09/10/2026",
+    "validacion": ""
   },
   {
     "id": "39b7acb577a8",
@@ -37,7 +38,8 @@
     "activo": "true",
     "fecha_scrape": "09/09/2026",
     "tipo_fuente": "Scrape",
-    "ultima_actualizacion": "09/10/2026"
+    "ultima_actualizacion": "09/10/2026",
+    "validacion": ""
   },
   {
     "id": "f41d32d049a4",
@@ -57,7 +59,8 @@
     "activo": "true",
     "fecha_scrape": "09/09/2026",
     "tipo_fuente": "Scrape",
-    "ultima_actualizacion": "09/10/2026"
+    "ultima_actualizacion": "09/10/2026",
+    "validacion": ""
   },
   {
     "id": "d4633246cfa8",
@@ -77,7 +80,8 @@
     "activo": "true",
     "fecha_scrape": "09/09/2026",
     "tipo_fuente": "Scrape",
-    "ultima_actualizacion": "09/10/2026"
+    "ultima_actualizacion": "09/10/2026",
+    "validacion": ""
   },
   {
     "id": "59988f1eafdd",
@@ -97,7 +101,8 @@
     "activo": "true",
     "fecha_scrape": "09/09/2026",
     "tipo_fuente": "Scrape",
-    "ultima_actualizacion": "09/10/2026"
+    "ultima_actualizacion": "09/10/2026",
+    "validacion": ""
   },
   {
     "id": "a707bf664dcc",
@@ -117,7 +122,8 @@
     "activo": "true",
     "fecha_scrape": "09/09/2026",
     "tipo_fuente": "Scrape",
-    "ultima_actualizacion": "09/10/2026"
+    "ultima_actualizacion": "09/10/2026",
+    "validacion": ""
   },
   {
     "id": "0f70b97754f7",
@@ -137,7 +143,8 @@
     "activo": "true",
     "fecha_scrape": "09/09/2026",
     "tipo_fuente": "Scrape",
-    "ultima_actualizacion": "09/10/2026"
+    "ultima_actualizacion": "09/10/2026",
+    "validacion": ""
   },
   {
     "id": "208e4a767360",
@@ -157,7 +164,8 @@
     "activo": "true",
     "fecha_scrape": "09/09/2026",
     "tipo_fuente": "Scrape",
-    "ultima_actualizacion": "09/13/2026"
+    "ultima_actualizacion": "09/13/2026",
+    "validacion": ""
   },
   {
     "id": "4d523f3b5847",
@@ -177,7 +185,8 @@
     "activo": "true",
     "fecha_scrape": "09/09/2026",
     "tipo_fuente": "Scrape",
-    "ultima_actualizacion": "09/13/2026"
+    "ultima_actualizacion": "09/13/2026",
+    "validacion": ""
   },
   {
     "id": "1424153aa4b7",
@@ -197,7 +206,8 @@
     "activo": "true",
     "fecha_scrape": "09/09/2026",
     "tipo_fuente": "Scrape",
-    "ultima_actualizacion": "09/13/2026"
+    "ultima_actualizacion": "09/13/2026",
+    "validacion": ""
   },
   {
     "id": "e2c7d2d2387d",
@@ -217,7 +227,8 @@
     "activo": "true",
     "fecha_scrape": "09/09/2026",
     "tipo_fuente": "Scrape",
-    "ultima_actualizacion": "09/13/2026"
+    "ultima_actualizacion": "09/13/2026",
+    "validacion": ""
   },
   {
     "id": "manual_gonzalez_sep13",
@@ -237,7 +248,8 @@
     "activo": "true",
     "fecha_scrape": "09/09/2026",
     "tipo_fuente": "Manual",
-    "ultima_actualizacion": "09/09/2026"
+    "ultima_actualizacion": "09/09/2026",
+    "validacion": ""
   },
   {
     "id": "manual_otramood_sep12",
@@ -257,7 +269,8 @@
     "activo": "false",
     "fecha_scrape": "09/09/2026",
     "tipo_fuente": "Manual",
-    "ultima_actualizacion": "09/09/2026"
+    "ultima_actualizacion": "09/09/2026",
+    "validacion": ""
   },
   {
     "id": "manual_tirandoyunta_sep11",
@@ -277,7 +290,8 @@
     "activo": "false",
     "fecha_scrape": "09/09/2026",
     "tipo_fuente": "Manual",
-    "ultima_actualizacion": "09/09/2026"
+    "ultima_actualizacion": "09/09/2026",
+    "validacion": ""
   },
   {
     "id": "6c915f02d659",
@@ -293,11 +307,12 @@
     "link_accion": "https://www.sanantoniodeareco.com/eventos/pena-al-fogon",
     "fuente_nombre": "SanAntoniodeAreco.com",
     "fuente_url": "https://www.sanantoniodeareco.com/eventos/pena-al-fogon",
-    "imagen_url": "https://www.sanantoniodeareco.com/wp-content/uploads/2026/08/captura-de-pantalla-2026-08-29-110710.png",
+    "imagen_url": "https://www.sanantoniodeareco.com/wp-content/uploads/2026/08/pena-al-fogon.png",
     "activo": "true",
     "fecha_scrape": "09/09/2026",
     "tipo_fuente": "Scrape",
-    "ultima_actualizacion": "09/16/2026"
+    "ultima_actualizacion": "09/19/2026",
+    "validacion": ""
   },
   {
     "id": "manual_fogonerosduo_sep18",
@@ -317,7 +332,8 @@
     "activo": "true",
     "fecha_scrape": "09/14/2026",
     "tipo_fuente": "Manual",
-    "ultima_actualizacion": "09/14/2026"
+    "ultima_actualizacion": "09/14/2026",
+    "validacion": ""
   },
   {
     "id": "manual_pablorocha_sep19",
@@ -337,7 +353,8 @@
     "activo": "true",
     "fecha_scrape": "09/14/2026",
     "tipo_fuente": "Manual",
-    "ultima_actualizacion": "09/14/2026"
+    "ultima_actualizacion": "09/14/2026",
+    "validacion": ""
   },
   {
     "id": "manual_porelsur_sep26",
@@ -357,7 +374,8 @@
     "activo": "true",
     "fecha_scrape": "09/14/2026",
     "tipo_fuente": "Manual",
-    "ultima_actualizacion": "09/14/2026"
+    "ultima_actualizacion": "09/14/2026",
+    "validacion": ""
   },
   {
     "id": "manual_jineteada_sep19",
@@ -377,7 +395,8 @@
     "activo": "true",
     "fecha_scrape": "09/14/2026",
     "tipo_fuente": "Manual",
-    "ultima_actualizacion": "09/14/2026"
+    "ultima_actualizacion": "09/14/2026",
+    "validacion": ""
   },
   {
     "id": "manual_jineteada_sep20",
@@ -397,7 +416,8 @@
     "activo": "true",
     "fecha_scrape": "09/14/2026",
     "tipo_fuente": "Manual",
-    "ultima_actualizacion": "09/14/2026"
+    "ultima_actualizacion": "09/14/2026",
+    "validacion": ""
   },
   {
     "id": "manual_rockpizza_oct03",
@@ -417,7 +437,8 @@
     "activo": "true",
     "fecha_scrape": "09/15/2026",
     "tipo_fuente": "Manual",
-    "ultima_actualizacion": "09/15/2026"
+    "ultima_actualizacion": "09/15/2026",
+    "validacion": ""
   },
   {
     "id": "manual_alambre_oct31",
@@ -437,11 +458,12 @@
     "activo": "true",
     "fecha_scrape": "09/15/2026",
     "tipo_fuente": "Manual",
-    "ultima_actualizacion": "09/15/2026"
+    "ultima_actualizacion": "09/15/2026",
+    "validacion": ""
   },
   {
     "id": "bbf4eb567747",
-    "fecha": "Ver fuente",
+    "fecha": "11/15/2026",
     "hora": "17:00",
     "nombre": "87° Fiesta de la Tradición 2026",
     "categoria": "Música",
@@ -453,10 +475,95 @@
     "link_accion": "https://www.sanantoniodeareco.com/eventos/87-fiesta-de-la-tradicion-2026",
     "fuente_nombre": "SanAntoniodeAreco.com",
     "fuente_url": "https://www.sanantoniodeareco.com/eventos/87-fiesta-de-la-tradicion-2026",
-    "imagen_url": "https://www.sanantoniodeareco.com/wp-content/uploads/2026/09/captura-de-pantalla-2026-09-15-185336.png",
+    "imagen_url": "https://www.sanantoniodeareco.com/wp-content/uploads/2026/08/18489951_1538640319489084_3191359734279318964_o.jpg",
     "activo": "true",
     "fecha_scrape": "09/16/2026",
     "tipo_fuente": "Scrape",
-    "ultima_actualizacion": "09/16/2026"
+    "ultima_actualizacion": "09/19/2026",
+    "validacion": ""
+  },
+  {
+    "id": "sub_mu4q4rs6",
+    "fecha": "09/18/2026",
+    "hora": "21:30 hs",
+    "nombre": "wfqf",
+    "categoria": "Música",
+    "lugar": "Galpon Chamico",
+    "descripcion": "wfwefwef\n[Contacto: efwfwef · tomas.araguz@gmail.com · +5497873743737]",
+    "precio": "$10.000",
+    "es_datamanIAcs": "false",
+    "preventa_disponible": "false",
+    "link_accion": "wdqwqwd",
+    "fuente_nombre": "Formulario web",
+    "fuente_url": "wdqwqwd",
+    "imagen_url": "/images/2026-09-18_galpon-chamico_wfqf.png",
+    "activo": "false",
+    "fecha_scrape": "",
+    "tipo_fuente": "Manual",
+    "ultima_actualizacion": "09/16/2026",
+    "validacion": "Pendiente"
+  },
+  {
+    "id": "ea240d86d289",
+    "fecha": "10/02/2026",
+    "hora": "09:45",
+    "nombre": "XX Atada de los Pagos de Areco",
+    "categoria": "Tradición",
+    "lugar": "Parque Criollo R. Güiraldes",
+    "descripcion": "Servicio de cantina durante todo el fin de semana.",
+    "precio": "Consultar",
+    "es_datamanIAcs": "false",
+    "preventa_disponible": "false",
+    "link_accion": "https://www.sanantoniodeareco.com/eventos/xx-atada-de-los-pagos-de-areco",
+    "fuente_nombre": "SanAntoniodeAreco.com",
+    "fuente_url": "https://www.sanantoniodeareco.com/eventos/xx-atada-de-los-pagos-de-areco",
+    "imagen_url": "https://www.sanantoniodeareco.com/wp-content/uploads/2021/02/areco-logo-verde.png",
+    "activo": "true",
+    "fecha_scrape": "09/19/2026",
+    "tipo_fuente": "Scrape",
+    "ultima_actualizacion": "09/19/2026",
+    "validacion": ""
+  },
+  {
+    "id": "e4feec1a2cfe",
+    "fecha": "10/03/2026",
+    "hora": "09:45",
+    "nombre": "XX Atada de los Pagos de Areco",
+    "categoria": "Tradición",
+    "lugar": "Parque Criollo R. Güiraldes",
+    "descripcion": "Servicio de cantina durante todo el fin de semana.",
+    "precio": "Consultar",
+    "es_datamanIAcs": "false",
+    "preventa_disponible": "false",
+    "link_accion": "https://www.sanantoniodeareco.com/eventos/xx-atada-de-los-pagos-de-areco-2",
+    "fuente_nombre": "SanAntoniodeAreco.com",
+    "fuente_url": "https://www.sanantoniodeareco.com/eventos/xx-atada-de-los-pagos-de-areco-2",
+    "imagen_url": "https://www.sanantoniodeareco.com/wp-content/uploads/2021/02/areco-logo-verde.png",
+    "activo": "true",
+    "fecha_scrape": "09/19/2026",
+    "tipo_fuente": "Scrape",
+    "ultima_actualizacion": "09/19/2026",
+    "validacion": ""
+  },
+  {
+    "id": "88d2fc402078",
+    "fecha": "10/04/2026",
+    "hora": "09:45",
+    "nombre": "XX Atada de los Pagos de Areco",
+    "categoria": "Tradición",
+    "lugar": "Parque Criollo R. Güiraldes",
+    "descripcion": "Servicio de cantina durante todo el fin de semana.",
+    "precio": "Consultar",
+    "es_datamanIAcs": "false",
+    "preventa_disponible": "false",
+    "link_accion": "https://www.sanantoniodeareco.com/eventos/xx-atada-de-los-pagos-de-areco-3",
+    "fuente_nombre": "SanAntoniodeAreco.com",
+    "fuente_url": "https://www.sanantoniodeareco.com/eventos/xx-atada-de-los-pagos-de-areco-3",
+    "imagen_url": "https://www.sanantoniodeareco.com/wp-content/uploads/2021/02/areco-logo-verde.png",
+    "activo": "true",
+    "fecha_scrape": "09/19/2026",
+    "tipo_fuente": "Scrape",
+    "ultima_actualizacion": "09/19/2026",
+    "validacion": ""
   }
 ]
