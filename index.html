@@ -9,17 +9,17 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 :root{
-  --bg:#0e0d0b;--s1:#171510;--s2:#1e1b16;--s3:#252118;
-  --gold:#c9a84c;--gold2:#e8c97a;--ink:#f2ead8;--ink2:#c4b89a;
-  --muted:#6b6150;--border:rgba(201,168,76,0.14);--b2:rgba(255,255,255,0.05);
-  --green:#2a7a50;--danger:#c05a4a;--r:8px;
+  --bg:#0d0c09;--s1:#14120e;--s2:#1b1812;--s3:#211d15;
+  --gold:#e2b94f;--gold2:#f3d477;--ink:#f4f0e7;--ink2:#9c927d;
+  --muted:#6b6150;--border:rgba(226,185,79,0.14);--b2:rgba(255,255,255,0.05);
+  --green:#2a7a50;--danger:#c05a4a;--r:15px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;font-size:14px}
 .shell{display:flex;height:100vh;width:100vw}
 
 /* ── SIDEBAR ─────────────────────────────────────── */
-.sidebar{width:340px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow:hidden;z-index:1000}
+.sidebar{width:340px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow:hidden;z-index:1000;box-shadow:4px 0 28px rgba(0,0,0,0.55),2px 0 8px rgba(0,0,0,0.3)}
 .sb-head{padding:18px 18px 14px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(201,168,76,0.07) 0%,transparent 100%);flex-shrink:0}
 .brand-text h1{font-family:'Playfair Display',serif;font-size:19px;font-weight:900;letter-spacing:-.02em;color:var(--ink);line-height:1;margin-bottom:14px}
 .brand-text h1 em{color:var(--gold);font-style:normal}
@@ -57,9 +57,15 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 .sb-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 .ev-count{font-size:10px;color:var(--muted);padding:2px 4px 8px}
 .date-div{font-size:10px;font-weight:600;color:var(--gold);letter-spacing:.08em;padding:10px 4px 5px;border-bottom:1px solid rgba(201,168,76,0.15);margin-bottom:5px;text-transform:capitalize}
-.ecard{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);padding:11px 12px;margin-bottom:6px;cursor:pointer;transition:border-color .15s,background .15s}
-.ecard:hover{border-color:rgba(201,168,76,0.3);background:var(--s3)}
-.ecard.active{border-color:var(--gold);background:rgba(201,168,76,0.07)}
+.ecard{
+  background:linear-gradient(160deg,var(--s2) 0%,rgba(20,17,12,0.85) 100%);
+  border:1px solid rgba(226,185,79,0.08);border-radius:15px;
+  padding:13px 14px;margin-bottom:8px;cursor:pointer;
+  box-shadow:0 2px 10px rgba(0,0,0,0.25);
+  transition:transform .15s ease-out,box-shadow .15s,border-color .15s,background .15s
+}
+.ecard:hover{border-color:rgba(226,185,79,0.22);background:var(--s3);transform:translateY(-2px);box-shadow:0 6px 22px rgba(0,0,0,0.4)}
+.ecard.active{border-color:var(--gold);background:rgba(226,185,79,0.08);box-shadow:0 4px 18px rgba(226,185,79,0.12)}
 .ecard.dm{border-left:2px solid var(--gold)}
 .ecard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:5px}
 .ecard-name{font-family:'Playfair Display',serif;font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.3;flex:1}
@@ -79,7 +85,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 
 /* ── MAP ──────────────────────────────────────────── */
 #map{flex:1;height:100vh}
-.leaflet-popup-content-wrapper{background:var(--s1) !important;border:1px solid var(--border) !important;border-radius:10px !important;color:var(--ink) !important;box-shadow:0 12px 40px rgba(0,0,0,.7) !important}
+.leaflet-popup-content-wrapper{background:var(--s3) !important;border:1px solid rgba(226,185,79,0.16) !important;border-radius:14px !important;color:var(--ink) !important;box-shadow:0 16px 48px rgba(0,0,0,.8),0 4px 12px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.04) !important}
 .leaflet-popup-tip{background:var(--s1) !important}
 .leaflet-popup-close-button{color:var(--muted) !important;top:8px !important;right:8px !important}
 .pname{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--ink);margin-bottom:8px;line-height:1.3}
@@ -259,6 +265,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 .c-evento{background:rgba(107,97,80,.18);color:var(--muted);border:1px solid rgba(107,97,80,.2)}
 .c-dm{background:rgba(232,201,122,.18);color:var(--gold2);border:1px solid var(--gold)}
 
+/* ── MARKER HOVER ───────────────────────────────────── */
+.leaflet-marker-icon{transition:filter .15s}
+.leaflet-marker-icon:hover{filter:brightness(1.18) drop-shadow(0 2px 8px rgba(226,185,79,0.4));z-index:1000!important}
 /* ── DARK TILE INVERSION ──────────────────────────── */
 /* Inverts OSM tiles to dark. Markers/popups are in separate
    Leaflet panes so they are NOT affected by this filter. */
@@ -283,8 +292,8 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .map-brand img{width:100%;max-height:56px;object-fit:contain;mix-blend-mode:luminosity;opacity:1}
 .map-brand-tagline{font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);align-self:flex-start}
 /* ── ADD EVENT BUTTON ─────────────────────────────── */
-.add-ev-btn{width:100%;justify-content:center;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0e0d0b;border:none;border-radius:999px;padding:11px 16px;font-family:Inter,sans-serif;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.35);transition:filter .2s,transform .15s;display:flex;align-items:center;gap:6px;white-space:nowrap;box-sizing:border-box}
-.add-ev-btn:hover{filter:brightness(1.08);transform:translateY(-2px)}
+.add-ev-btn{width:100%;justify-content:center;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0d0c09;border:none;border-radius:999px;padding:10px 15px;font-family:Inter,sans-serif;font-size:11.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(226,185,79,0.2);transition:filter .2s,transform .15s,box-shadow .2s;display:flex;align-items:center;gap:6px;white-space:nowrap;box-sizing:border-box}
+.add-ev-btn:hover{filter:brightness(1.06);transform:translateY(-1px);box-shadow:0 4px 16px rgba(226,185,79,0.28)}
 /* ── SUBMISSION MODAL ─────────────────────────────── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(6px);z-index:3000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;padding:16px}
 .modal-overlay.open{opacity:1;pointer-events:auto}
@@ -313,6 +322,108 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .form-success-icon{font-size:52px;margin-bottom:14px}
 .form-success h3{font-family:Playfair Display,serif;font-size:22px;color:var(--gold);margin-bottom:10px}
 .form-success p{font-size:13px;color:var(--ink2);line-height:1.7}
+
+/* ── FLOATING TIME NAVIGATOR ─────────────────────── */
+.time-nav{
+  position:absolute;
+  top:22px;left:50%;
+  transform:translateX(-50%);
+  width:660px;
+  max-width:min(660px,calc(100% - 210px));
+  z-index:900;
+  background:linear-gradient(160deg,#211d15 0%,#1a1712 100%);
+  border:1px solid rgba(226,185,79,0.18);
+  border-radius:22px;
+  box-shadow:0 22px 60px rgba(0,0,0,0.52),0 8px 20px rgba(0,0,0,0.32),inset 0 1px 0 rgba(255,255,255,0.05);
+  backdrop-filter:blur(6px);
+  overflow:hidden;
+  user-select:none;
+}
+.tn-main{display:flex;align-items:stretch;min-height:100px}
+.tn-btn{
+  flex:0 0 auto;width:130px;
+  background:none;border:none;cursor:pointer;
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
+  padding:14px 16px;gap:3px;
+  min-height:48px;color:var(--ink);
+  transition:background .15s;
+}
+.tn-btn:hover{background:rgba(226,185,79,0.07)}
+.tn-btn:focus-visible{outline:2px solid var(--gold);outline-offset:-3px;border-radius:4px}
+.tn-next{align-items:flex-end;text-align:right}
+.tn-arrow{font-size:24px;color:var(--gold);line-height:1;font-weight:300;transition:transform .15s}
+.tn-btn:hover .tn-arrow{transform:translateX(-3px)}
+.tn-next:hover .tn-arrow{transform:translateX(3px)}
+.tn-btn-label{font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.tn-btn-range{font-size:10.5px;color:var(--ink2);margin-top:1px}
+.tn-divider{width:1px;background:rgba(226,185,79,0.1);flex-shrink:0;margin:14px 0}
+.tn-center{
+  flex:1;min-width:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:14px 10px;gap:5px;
+  position:relative;
+}
+.tn-center::after{
+  content:'';position:absolute;
+  bottom:0;left:15%;right:15%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(226,185,79,0.12),transparent);
+}
+.tn-eyebrow{font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.tn-date{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(17px,2.2vw,22px);font-weight:700;
+  color:var(--ink);letter-spacing:-.02em;text-align:center;line-height:1.1;
+  transition:transform .22s ease-out,opacity .18s ease-out;
+}
+.tn-status-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:2px}
+.tn-chip{
+  font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 9px;border-radius:999px;
+  background:rgba(226,185,79,0.15);color:var(--gold);border:1px solid rgba(226,185,79,0.25);
+}
+.tn-chip-future{background:rgba(107,97,80,0.18);color:var(--muted);border-color:rgba(107,97,80,0.2)}
+.tn-chip-past{background:rgba(60,50,35,0.25);color:#6b6150;border-color:rgba(60,50,35,0.2)}
+.tn-count{font-size:11px;color:var(--ink2);font-weight:600}
+/* Seven-day strip */
+.tn-strip{
+  border-top:1px solid rgba(226,185,79,0.08);
+  display:flex;align-items:center;
+  padding:7px 12px;gap:2px;
+  overflow-x:auto;scrollbar-width:none;
+}
+.tn-strip::-webkit-scrollbar{display:none}
+.tn-day{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  flex:1;min-width:34px;padding:5px 3px;border-radius:8px;
+  transition:background .15s;
+}
+.tn-day-name{font-size:8.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.tn-day-num{font-size:13px;font-weight:600;color:var(--ink2)}
+.tn-day-today{background:rgba(226,185,79,0.12)}
+.tn-day-today .tn-day-name,.tn-day-today .tn-day-num{color:var(--gold);font-weight:700}
+/* Return to current week */
+.tn-return-bar{
+  border-top:1px solid rgba(226,185,79,0.08);
+  padding:7px 16px;text-align:center;
+}
+.tn-return-btn{
+  background:none;border:none;cursor:pointer;
+  font-size:11px;font-weight:600;color:var(--gold2);
+  opacity:.75;transition:opacity .15s;letter-spacing:.02em;
+}
+.tn-return-btn:hover{opacity:1}
+.tn-return-btn:focus-visible{outline:2px solid var(--gold);border-radius:4px;padding:2px 4px}
+/* Reduced motion */
+@media(prefers-reduced-motion:reduce){
+  .tn-date{transition:opacity .15s}
+  .ecard{transition:border-color .15s,background .15s}
+}
+/* Events list heading */
+.ev-week-heading{
+  font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);padding:10px 4px 6px;
+  border-bottom:1px solid var(--b2);margin-bottom:8px;
+}
 /* ── MOBILE — stacked layout (header → map → list) ── */
 @media(max-width:680px){
   .shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
@@ -374,6 +485,19 @@ img.leaflet-tile{border:none !important;outline:none !important}
   }
 
   .dm-sheet{max-height:94vh}
+
+  /* Time nav on mobile: smaller, still floated on map */
+  .time-nav{
+    top:6px;
+    max-width:calc(100% - 20px);
+    border-radius:14px;
+  }
+  .tn-btn{width:90px;padding:10px 10px}
+  .tn-btn-range{display:none}
+  .tn-date{font-size:15px}
+  .tn-eyebrow{display:none}
+  .tn-strip{padding:5px 8px}
+  .tn-day{min-width:28px}
 }
 </style>
 </head>
@@ -574,28 +698,11 @@ img.leaflet-tile{border:none !important;outline:none !important}
 
 <div class="shell">
   <aside class="sidebar" id="sidebar">
-    <div class="sb-head" onclick="toggleMobileSidebar()">
+    <div class="sb-head">
       <div class="mob-handle"></div>
-      <div class="brand-text" style="margin-bottom:14px">
+      <div class="brand-text">
         <h1><em>Areco</em> Eventos</h1>
         <small>by DataManIAcs · San Antonio de Areco</small>
-      </div>
-      <!-- Week navigator redesign -->
-      <div class="week-nav">
-        <button class="wn-btn" id="wPrev" title="Semana anterior">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M6 3L2 9l4 6M2 9h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <div class="wn-center">
-          <div class="wn-label" id="wLabel">–</div>
-          <div class="wn-sub">Tocá para navegar semanas</div>
-        </div>
-        <button class="wn-btn" id="wNext" title="Semana siguiente">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M12 3l4 6-4 6M16 9H2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
       </div>
     </div>
     <div class="sb-filters">
@@ -607,6 +714,36 @@ img.leaflet-tile{border:none !important;outline:none !important}
     </div>
   </aside>
   <div id="map">
+    <!-- Floating Time Navigator -->
+    <nav class="time-nav" id="timeNav" aria-label="Navegación por semanas">
+      <div class="tn-main">
+        <button class="tn-btn tn-prev" id="wPrev" aria-label="Ir a la semana anterior">
+          <span class="tn-arrow">←</span>
+          <span class="tn-btn-label">Semana anterior</span>
+          <span class="tn-btn-range" id="tnPrevRange">–</span>
+        </button>
+        <div class="tn-divider"></div>
+        <div class="tn-center">
+          <div class="tn-eyebrow">NAVEGÁ POR EL TIEMPO</div>
+          <div class="tn-date" id="tnDate">–</div>
+          <div class="tn-status-row">
+            <span class="tn-chip" id="tnChip">ESTA SEMANA</span>
+            <span class="tn-count" id="tnCount">–</span>
+          </div>
+        </div>
+        <div class="tn-divider"></div>
+        <button class="tn-btn tn-next" id="wNext" aria-label="Ir a la semana siguiente">
+          <span class="tn-btn-range" id="tnNextRange">–</span>
+          <span class="tn-btn-label">Semana siguiente</span>
+          <span class="tn-arrow">→</span>
+        </button>
+      </div>
+      <div class="tn-strip" id="tnStrip"></div>
+      <div class="tn-return-bar" id="tnReturnBar" style="display:none">
+        <button class="tn-return-btn" id="tnReturn" aria-label="Volver a la semana actual"
+          onclick="wOff=0;render(0)">↩ Volver a esta semana</button>
+      </div>
+    </nav>
     <!-- Brand + button wrapper top-right -->
     <div class="map-brand-wrapper">
       <div class="map-brand">
@@ -718,10 +855,12 @@ const map=L.map('map',{center:CENTER,zoom:15,zoomControl:false});
 // OSM tiles with CSS inversion — best looking dark map, free, no API key
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
   attribution:'© <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
-  maxZoom:19,
+  tileSize:512,        // render each tile at 512px instead of 256px
+  zoomOffset:-1,       // fetch z-1 tiles → labels are 2× larger, same area visible
+  maxNativeZoom:18,
   updateWhenIdle:false,
   keepBuffer:4,
-  detectRetina:true,  // loads @2x tiles on high-DPI screens — much sharper
+  detectRetina:true,
 }).addTo(map);
 
 // ── HELPERS ───────────────────────────────────────────
@@ -886,7 +1025,10 @@ function renderList(list){
   if(!list.length){
     el.innerHTML=`<div class="empty"><strong>Sin eventos esta semana</strong>Probá otra semana o quitá el filtro.</div>`;return;
   }
-  let html=`<div class="ev-count">${list.length} evento${list.length!==1?'s':''}</div>`;
+  const r=wRange(wOff);
+  const headingDate=r.start.toLocaleDateString('es-AR',{day:'numeric',month:'long'})+' – '+r.end.toLocaleDateString('es-AR',{day:'numeric',month:'long'});
+  let html=`<div class="ev-week-heading">Eventos · ${headingDate}</div>`
+    +`<div class="ev-count">${list.length} evento${list.length!==1?'s':''} encontrado${list.length!==1?'s':''}</div>`;
   let lastD=null;
   list.forEach(ev=>{
     const d=parseD(ev.fecha),ds=prettyD(d);
@@ -1016,7 +1158,7 @@ function renderMap(list, future=[], past=[]){
         const col='#e8c97a';
         const pulse='animation:pulse 2s ease-in-out infinite;';
         li=L.divIcon({
-          html:`<div style="width:36px;height:36px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #0e0d0b;box-shadow:0 3px 12px rgba(0,0,0,0.65);display:flex;align-items:center;justify-content:center;${pulse}"><img src="${icon}" style="width:21px;height:21px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.outerHTML='<span style=transform:rotate(45deg);font-size:12px>★</span>'"></div>`,
+          html:`<div style="width:36px;height:36px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(0,0,0,0.7);box-shadow:0 4px 16px rgba(0,0,0,0.7),0 1px 4px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;${pulse}"><img src="${icon}" style="width:21px;height:21px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.outerHTML='<span style=transform:rotate(45deg);font-size:12px>★</span>'"></div>`,
           className:'',iconSize:[34,34],iconAnchor:[17,34],popupAnchor:[1,-38]
         });
         m=L.marker(off,{icon:li}).addTo(map);
@@ -1025,7 +1167,7 @@ function renderMap(list, future=[], past=[]){
       } else {
         const col='#c9a84c';
         li=L.divIcon({
-          html:`<div style="width:36px;height:36px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #0e0d0b;box-shadow:0 3px 12px rgba(0,0,0,0.65);display:flex;align-items:center;justify-content:center;"><img src="${icon}" style="width:21px;height:21px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.outerHTML='<span style=transform:rotate(45deg);font-size:12px>●</span>'"></div>`,
+          html:`<div style="width:36px;height:36px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(0,0,0,0.7);box-shadow:0 4px 16px rgba(0,0,0,0.7),0 1px 4px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;"><img src="${icon}" style="width:21px;height:21px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.outerHTML='<span style=transform:rotate(45deg);font-size:12px>●</span>'"></div>`,
           className:'',iconSize:[34,34],iconAnchor:[17,34],popupAnchor:[1,-38]
         });
         const d=parseD(ev.fecha);
@@ -1098,13 +1240,96 @@ function pastEvents(){
 }
 
 // ── FULL RENDER ───────────────────────────────────────
-function render(){
-  document.getElementById('wLabel').textContent=wLabel(wRange(wOff));
+function render(direction=0){
   const list=filtered();
   renderList(list);
   renderMap(list, futureEvents(), pastEvents());
-  // Auto-zoom to fit visible active events
   fitMapToEvents();
+  updateTimeNav(list.length, direction);
+}
+
+// ── FLOATING TIME NAVIGATOR ────────────────────────────
+const DAY_NAMES = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+
+function updateTimeNav(count, direction){
+  const r     = wRange(wOff);
+  const rPrev = wRange(wOff-1);
+  const rNext = wRange(wOff+1);
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  // Main date display (large)
+  const fmt = (d) => d.toLocaleDateString('es-AR',{day:'numeric',month:'long'}).toUpperCase();
+  const startD = r.start.getDate();
+  const endD   = r.end.getDate();
+  const month  = r.end.toLocaleDateString('es-AR',{month:'long'}).toUpperCase();
+  const mainDate = startD + '–' + endD + ' ' + month;
+
+  // Animate center on direction change
+  const dateEl = document.getElementById('tnDate');
+  if(dateEl && direction!==0){
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+    if(!prefersReduced){
+      const tx = direction===1?'28px':'-28px';
+      dateEl.style.transition='none';
+      dateEl.style.transform='translateX('+tx+')';
+      dateEl.style.opacity='0';
+      requestAnimationFrame(()=>{
+        dateEl.style.transition='transform 220ms ease-out,opacity 180ms ease-out';
+        dateEl.style.transform='translateX(0)';
+        dateEl.style.opacity='1';
+      });
+    } else {
+      dateEl.style.opacity='0';
+      setTimeout(()=>dateEl.style.opacity='1',80);
+    }
+  }
+  if(dateEl) dateEl.textContent = mainDate;
+
+  // Previous / next week ranges
+  const smallFmt=(r)=>{
+    const s=r.start.toLocaleDateString('es-AR',{day:'numeric',month:'short'});
+    const e=r.end.toLocaleDateString('es-AR',{day:'numeric',month:'short'});
+    return s+' – '+e;
+  };
+  const prevEl=document.getElementById('tnPrevRange');
+  const nextEl=document.getElementById('tnNextRange');
+  if(prevEl) prevEl.textContent=smallFmt(rPrev);
+  if(nextEl) nextEl.textContent=smallFmt(rNext);
+
+  // Status chip
+  const chip=document.getElementById('tnChip');
+  if(chip){
+    if(today>=r.start&&today<=r.end){
+      chip.textContent='ESTA SEMANA';chip.className='tn-chip';
+    } else if(r.start>today){
+      chip.textContent=wOff===1?'PRÓXIMA SEMANA':'SEMANA FUTURA';chip.className='tn-chip tn-chip-future';
+    } else {
+      chip.textContent=wOff===-1?'SEMANA PASADA':'SEMANA ANTERIOR';chip.className='tn-chip tn-chip-past';
+    }
+  }
+
+  // Event count
+  const countEl=document.getElementById('tnCount');
+  if(countEl) countEl.textContent=count+' EVENTO'+(count!==1?'S':'');
+
+  // Seven-day strip
+  const strip=document.getElementById('tnStrip');
+  if(strip){
+    let html='';
+    for(let i=0;i<7;i++){
+      const d=new Date(r.start);d.setDate(r.start.getDate()+i);
+      const isToday=d.getTime()===today.getTime();
+      html+='<div class="tn-day'+(isToday?' tn-day-today':'')+'">'
+        +'<span class="tn-day-name">'+DAY_NAMES[i]+'</span>'
+        +'<span class="tn-day-num">'+d.getDate()+'</span>'
+        +'</div>';
+    }
+    strip.innerHTML=html;
+  }
+
+  // Return-to-current-week
+  const retBar=document.getElementById('tnReturnBar');
+  if(retBar) retBar.style.display=wOff!==0?'block':'none';
 }
 
 // Zoom only if active markers are outside current viewport
@@ -1162,8 +1387,8 @@ function setF(f,el){
   activeFilter=f;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));el.classList.add('on');render();
 }
 
-document.getElementById('wPrev').onclick=(e)=>{e.stopPropagation();wOff--;render();};
-document.getElementById('wNext').onclick=(e)=>{e.stopPropagation();wOff++;render();};
+document.getElementById('wPrev').onclick=(e)=>{e.stopPropagation();wOff--;render(-1);};
+document.getElementById('wNext').onclick=(e)=>{e.stopPropagation();wOff++;render(1);};
 
 // ── MOBILE SIDEBAR TOGGLE ─────────────────────────────
 function toggleMobileSidebar(){
@@ -1383,7 +1608,7 @@ async function init(){
     evs = Array.isArray(data) ? data : [];
     console.log('Events loaded: ' + evs.length);
     buildPills();
-    render();
+    render(0);
     initGeolocation();
     autoOpenMobile();
   }catch(e){
