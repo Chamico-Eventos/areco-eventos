@@ -339,28 +339,28 @@ img.leaflet-tile{border:none !important;outline:none !important}
   overflow:hidden;
   user-select:none;
 }
-.tn-main{display:flex;align-items:stretch;min-height:72px}
+.tn-main{display:flex;align-items:stretch;min-height:56px}
 .tn-btn{
   flex:0 0 auto;width:130px;
   background:none;border:none;cursor:pointer;
   display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
-  padding:8px 14px;gap:3px;
-  min-height:48px;color:var(--ink);
+  padding:6px 12px;gap:2px;
+  min-height:44px;color:var(--ink);
   transition:background .15s;
 }
 .tn-btn:hover{background:rgba(226,185,79,0.07)}
 .tn-btn:focus-visible{outline:2px solid var(--gold);outline-offset:-3px;border-radius:4px}
 .tn-next{align-items:flex-end;text-align:right}
-.tn-arrow{font-size:24px;color:var(--gold);line-height:1;font-weight:300;transition:transform .15s}
+.tn-arrow{font-size:20px;color:var(--gold);line-height:1;font-weight:300;transition:transform .15s;display:flex;align-items:center}
 .tn-btn:hover .tn-arrow{transform:translateX(-3px)}
 .tn-next:hover .tn-arrow{transform:translateX(3px)}
-.tn-btn-label{font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.tn-btn-label{font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .tn-btn-range{font-size:10.5px;color:var(--ink2);margin-top:1px}
 .tn-divider{width:1px;background:rgba(226,185,79,0.1);flex-shrink:0;margin:14px 0}
 .tn-center{
   flex:1;min-width:0;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:8px 10px;gap:3px;
+  padding:4px 10px;gap:2px;
   position:relative;
 }
 .tn-center::after{
@@ -375,15 +375,15 @@ img.leaflet-tile{border:none !important;outline:none !important}
   color:var(--ink);letter-spacing:-.02em;text-align:center;line-height:1.1;
   transition:transform .22s ease-out,opacity .18s ease-out;
 }
-.tn-status-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:2px}
+.tn-status-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:1px}
 .tn-chip{
-  font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-  padding:3px 9px;border-radius:999px;
+  font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:2px 7px;border-radius:999px;
   background:rgba(226,185,79,0.15);color:var(--gold);border:1px solid rgba(226,185,79,0.25);
 }
 .tn-chip-future{background:rgba(107,97,80,0.18);color:var(--muted);border-color:rgba(107,97,80,0.2)}
 .tn-chip-past{background:rgba(60,50,35,0.25);color:#6b6150;border-color:rgba(60,50,35,0.2)}
-.tn-count{font-size:11px;color:var(--ink2);font-weight:600}
+.tn-count{font-size:10px;color:var(--ink2);font-weight:600}
 /* Seven-day strip */
 .tn-strip{
   border-top:1px solid rgba(226,185,79,0.08);
@@ -735,7 +735,7 @@ img.leaflet-tile{border:none !important;outline:none !important}
     <nav class="time-nav" id="timeNav" aria-label="Navegación por semanas">
       <div class="tn-main">
         <button class="tn-btn tn-prev" id="wPrev" aria-label="Ir a la semana anterior">
-          <span class="tn-arrow">←</span>
+          <span class="tn-arrow"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M13 4 7 10l6 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 4 2 10l6 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           <span class="tn-btn-label">Semana anterior</span>
           <span class="tn-btn-range" id="tnPrevRange">–</span>
         </button>
@@ -752,7 +752,7 @@ img.leaflet-tile{border:none !important;outline:none !important}
         <button class="tn-btn tn-next" id="wNext" aria-label="Ir a la semana siguiente">
           <span class="tn-btn-range" id="tnNextRange">–</span>
           <span class="tn-btn-label">Semana siguiente</span>
-          <span class="tn-arrow">→</span>
+          <span class="tn-arrow"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 4l6 6-6 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </button>
       </div>
       <div class="tn-timeline" id="tnTimeline"></div>
@@ -1092,13 +1092,15 @@ function renderMap(list, future=[], past=[]){
     // Opacity: week1=0.55 → decreasing
     const op=Math.max(0.12,0.58-weeksAhead*0.1);
     const dm=isDM(ev);
+    const {icon:evIcon}=catMeta(ev);  // same icon as active markers
+    const iconSz=Math.max(8,sz-11);
     const col=dm?`rgba(232,201,122,${op*0.45})`:`rgba(180,160,100,${op*0.35})`;
     const ghostHtml=`<div style="
       width:${sz}px;height:${sz}px;background:${col};
       border-radius:50% 50% 50% 0;transform:rotate(-45deg);
       border:1px solid rgba(226,185,79,${op*0.4});
       display:flex;align-items:center;justify-content:center;
-    "><span style="transform:rotate(45deg);font-size:${Math.max(6,sz-10)}px;opacity:.6">${dm?'★':'●'}</span></div>`;
+    "><img src="${evIcon}" style="width:${iconSz}px;height:${iconSz}px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.style.display='none'"></div>`;
     const li=L.divIcon({html:ghostHtml,className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz],popupAnchor:[0,-sz-2]});
     const d=parseD(ev.fecha);
     const pop=`<div style="font-family:'Inter',sans-serif;font-size:11px;max-width:200px;color:var(--muted)">
