@@ -339,12 +339,12 @@ img.leaflet-tile{border:none !important;outline:none !important}
   overflow:hidden;
   user-select:none;
 }
-.tn-main{display:flex;align-items:stretch;min-height:100px}
+.tn-main{display:flex;align-items:stretch;min-height:72px}
 .tn-btn{
   flex:0 0 auto;width:130px;
   background:none;border:none;cursor:pointer;
   display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
-  padding:14px 16px;gap:3px;
+  padding:8px 14px;gap:3px;
   min-height:48px;color:var(--ink);
   transition:background .15s;
 }
@@ -360,7 +360,7 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .tn-center{
   flex:1;min-width:0;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:14px 10px;gap:5px;
+  padding:8px 10px;gap:3px;
   position:relative;
 }
 .tn-center::after{
@@ -368,10 +368,10 @@ img.leaflet-tile{border:none !important;outline:none !important}
   bottom:0;left:15%;right:15%;height:1px;
   background:linear-gradient(90deg,transparent,rgba(226,185,79,0.12),transparent);
 }
-.tn-eyebrow{font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.tn-eyebrow{display:none}
 .tn-date{
   font-family:'Playfair Display',serif;
-  font-size:clamp(17px,2.2vw,22px);font-weight:700;
+  font-size:clamp(15px,1.8vw,19px);font-weight:700;
   color:var(--ink);letter-spacing:-.02em;text-align:center;line-height:1.1;
   transition:transform .22s ease-out,opacity .18s ease-out;
 }
@@ -388,23 +388,40 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .tn-strip{
   border-top:1px solid rgba(226,185,79,0.08);
   display:flex;align-items:center;
-  padding:7px 12px;gap:2px;
+  padding:3px 10px 4px;gap:1px;
   overflow-x:auto;scrollbar-width:none;
 }
 .tn-strip::-webkit-scrollbar{display:none}
 .tn-day{
-  display:flex;flex-direction:column;align-items:center;gap:2px;
-  flex:1;min-width:34px;padding:5px 3px;border-radius:8px;
+  display:flex;flex-direction:column;align-items:center;gap:1px;
+  flex:1;min-width:28px;padding:3px 2px;border-radius:6px;
   transition:background .15s;
 }
-.tn-day-name{font-size:8.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
-.tn-day-num{font-size:13px;font-weight:600;color:var(--ink2)}
+.tn-day-name{font-size:7px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tn-day-num{font-size:11px;font-weight:600;color:var(--ink2)}
 .tn-day-today{background:rgba(226,185,79,0.12)}
 .tn-day-today .tn-day-name,.tn-day-today .tn-day-num{color:var(--gold);font-weight:700}
+/* Timeline mood bar */
+.tn-timeline{
+  display:flex;align-items:center;
+  padding:5px 16px 2px;gap:0;
+}
+.tn-tl-item{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  transition:opacity .2s;
+}
+.tn-tl-dot{width:5px;height:5px;border-radius:50%;background:var(--muted);flex-shrink:0}
+.tl-dot-now{
+  width:8px;height:8px;
+  background:var(--gold);
+  box-shadow:0 0 8px rgba(226,185,79,0.7);
+}
+.tn-tl-label{font-size:7.5px;color:var(--muted);white-space:nowrap;letter-spacing:.02em}
+.tn-tl-line{flex:1;height:1px;background:rgba(107,97,80,0.25);min-width:8px}
 /* Return to current week */
 .tn-return-bar{
   border-top:1px solid rgba(226,185,79,0.08);
-  padding:7px 16px;text-align:center;
+  padding:4px 16px;text-align:center;
 }
 .tn-return-btn{
   background:none;border:none;cursor:pointer;
@@ -738,6 +755,7 @@ img.leaflet-tile{border:none !important;outline:none !important}
           <span class="tn-arrow">→</span>
         </button>
       </div>
+      <div class="tn-timeline" id="tnTimeline"></div>
       <div class="tn-strip" id="tnStrip"></div>
       <div class="tn-return-bar" id="tnReturnBar" style="display:none">
         <button class="tn-return-btn" id="tnReturn" aria-label="Volver a la semana actual"
@@ -1062,6 +1080,35 @@ function renderMap(list, future=[], past=[]){
   Object.values(mkrs).forEach(m=>map.removeLayer(m));mkrs={};
   Object.values(ghostMkrs).forEach(m=>map.removeLayer(m));ghostMkrs={};
 
+  // ── Progressive future markers (further = smaller + more transparent) ──
+  const {end:wEnd}=wRange(wOff);
+  future.forEach(ev=>{
+    const c=coords(ev.lugar);if(!c)return;
+    const evDate=parseD(ev.fecha);
+    const daysAhead=evDate?Math.max(1,Math.ceil((evDate-wEnd)/(24*60*60*1000))):7;
+    const weeksAhead=Math.min(Math.ceil(daysAhead/7),5);
+    // Size: week1=24px → week2=20px → week3=17px → week4+=14px
+    const sz=Math.max(14,26-weeksAhead*3);
+    // Opacity: week1=0.55 → decreasing
+    const op=Math.max(0.12,0.58-weeksAhead*0.1);
+    const dm=isDM(ev);
+    const col=dm?`rgba(232,201,122,${op*0.45})`:`rgba(180,160,100,${op*0.35})`;
+    const ghostHtml=`<div style="
+      width:${sz}px;height:${sz}px;background:${col};
+      border-radius:50% 50% 50% 0;transform:rotate(-45deg);
+      border:1px solid rgba(226,185,79,${op*0.4});
+      display:flex;align-items:center;justify-content:center;
+    "><span style="transform:rotate(45deg);font-size:${Math.max(6,sz-10)}px;opacity:.6">${dm?'★':'●'}</span></div>`;
+    const li=L.divIcon({html:ghostHtml,className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz],popupAnchor:[0,-sz-2]});
+    const d=parseD(ev.fecha);
+    const pop=`<div style="font-family:'Inter',sans-serif;font-size:11px;max-width:200px;color:var(--muted)">
+      <div style="font-family:'Playfair Display',serif;font-size:13px;color:var(--ink2);margin-bottom:4px">${ev.nombre||'Evento'}</div>
+      <div style="line-height:1.6">${d?`📅 ${prettyD(d)}<br>`:''}${ev.lugar?`📍 ${ev.lugar}`:''}
+      </div><div style="margin-top:6px;font-size:10px;font-style:italic;cursor:pointer" onclick="goToEventWeek('${ev.fecha}')">Ver esta semana →</div></div>`;
+    const m=L.marker(c,{icon:li,opacity:op}).bindPopup(pop,{maxWidth:210}).addTo(map);
+    ghostMkrs['fut_'+ev.id]=m;
+  });
+
   // ── Past event markers (last 60 days) — very faded dark gray ──
   past.forEach(ev=>{
     const c=coords(ev.lugar);if(!c)return;
@@ -1158,7 +1205,7 @@ function renderMap(list, future=[], past=[]){
         const col='#e8c97a';
         const pulse='animation:pulse 2s ease-in-out infinite;';
         li=L.divIcon({
-          html:`<div style="width:36px;height:36px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(0,0,0,0.7);box-shadow:0 4px 16px rgba(0,0,0,0.7),0 1px 4px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;${pulse}"><img src="${icon}" style="width:21px;height:21px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.outerHTML='<span style=transform:rotate(45deg);font-size:12px>★</span>'"></div>`,
+          html:`<div style="width:36px;height:36px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(0,0,0,0.7);box-shadow:0 4px 16px rgba(0,0,0,0.7),0 0 14px rgba(226,185,79,0.45),0 1px 4px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;${pulse}"><img src="${icon}" style="width:21px;height:21px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.outerHTML='<span style=transform:rotate(45deg);font-size:12px>★</span>'"></div>`,
           className:'',iconSize:[34,34],iconAnchor:[17,34],popupAnchor:[1,-38]
         });
         m=L.marker(off,{icon:li}).addTo(map);
@@ -1167,7 +1214,7 @@ function renderMap(list, future=[], past=[]){
       } else {
         const col='#c9a84c';
         li=L.divIcon({
-          html:`<div style="width:36px;height:36px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(0,0,0,0.7);box-shadow:0 4px 16px rgba(0,0,0,0.7),0 1px 4px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;"><img src="${icon}" style="width:21px;height:21px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.outerHTML='<span style=transform:rotate(45deg);font-size:12px>●</span>'"></div>`,
+          html:`<div style="width:36px;height:36px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(0,0,0,0.7);box-shadow:0 4px 16px rgba(0,0,0,0.7),0 0 10px rgba(226,185,79,0.28),0 1px 4px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;"><img src="${icon}" style="width:21px;height:21px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.outerHTML='<span style=transform:rotate(45deg);font-size:12px>●</span>'"></div>`,
           className:'',iconSize:[34,34],iconAnchor:[17,34],popupAnchor:[1,-38]
         });
         const d=parseD(ev.fecha);
@@ -1258,11 +1305,8 @@ function updateTimeNav(count, direction){
   const today = new Date(); today.setHours(0,0,0,0);
 
   // Main date display (large)
-  const fmt = (d) => d.toLocaleDateString('es-AR',{day:'numeric',month:'long'}).toUpperCase();
-  const startD = r.start.getDate();
-  const endD   = r.end.getDate();
-  const month  = r.end.toLocaleDateString('es-AR',{month:'long'}).toUpperCase();
-  const mainDate = startD + '–' + endD + ' ' + month;
+  // Date in original approved format: '14 sept — 20 sept'
+  const mainDate = wLabel(r);
 
   // Animate center on direction change
   const dateEl = document.getElementById('tnDate');
@@ -1330,6 +1374,26 @@ function updateTimeNav(count, direction){
   // Return-to-current-week
   const retBar=document.getElementById('tnReturnBar');
   if(retBar) retBar.style.display=wOff!==0?'block':'none';
+
+  // Timeline mood bar — 5 weeks centered on current
+  const tl=document.getElementById('tnTimeline');
+  if(tl){
+    const range=[-2,-1,0,1,2];
+    let tlHtml='';
+    range.forEach((d,i)=>{
+      const rw=wRange(wOff+d);
+      const isCurrent=d===0;
+      const label=rw.start.getDate()+' '+
+        rw.start.toLocaleDateString('es-AR',{month:'short'}).replace('.','');
+      const opacity=isCurrent?1:Math.abs(d)===1?0.3:0.13;
+      if(i>0) tlHtml+='<div class="tn-tl-line"></div>';
+      tlHtml+='<div class="tn-tl-item" style="opacity:'+opacity+'">'+
+        '<div class="tn-tl-dot'+(isCurrent?' tl-dot-now':'')+'"></div>'+
+        (!isCurrent?'<div class="tn-tl-label">'+label+'</div>':'')+
+        '</div>';
+    });
+    tl.innerHTML=tlHtml;
+  }
 }
 
 // Zoom only if active markers are outside current viewport
