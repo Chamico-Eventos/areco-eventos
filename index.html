@@ -262,8 +262,20 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 /* ── DARK TILE INVERSION ──────────────────────────── */
 /* Inverts OSM tiles to dark. Markers/popups are in separate
    Leaflet panes so they are NOT affected by this filter. */
-.leaflet-container{background:#1a1a14}
-img.leaflet-tile{border:0 !important;outline:none !important}
+.leaflet-tile-pane{
+  filter:invert(100%) hue-rotate(180deg) brightness(92%) contrast(88%) saturate(0.85);
+  /* GPU layer — tiles composite as one before filter = no seam artifacts */
+  transform:translateZ(0);
+  will-change:transform;
+}
+.leaflet-container{background:#0a0a08}
+img.leaflet-tile{
+  border:none !important;
+  outline:none !important;
+  /* Crisp pixel edges — eliminates sub-pixel gap rendering */
+  image-rendering:-webkit-optimize-contrast;
+  image-rendering:pixelated;
+}
 
 /* ── PAST EVENT CARDS ─────────────────────────────── */
 .past-card{opacity:.32;border-color:transparent!important;background:var(--bg)!important}
@@ -708,13 +720,12 @@ function goToEventWeek(fecha){
 
 // ── MAP ───────────────────────────────────────────────
 const map=L.map('map',{center:CENTER,zoom:15,zoomControl:false});
-// ESRI Dark Gray Canvas — natively dark, no CSS filter, zero tile seams
-L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{
-  attribution:'Tiles &copy; <a href="https://www.esri.com">Esri</a>',
-  maxZoom:19, maxNativeZoom:16
-}).addTo(map);
-L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',{
-  attribution:'',maxZoom:19,maxNativeZoom:13
+// OSM tiles with CSS inversion — best looking dark map, free, no API key
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  attribution:'© <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
+  maxZoom:19,
+  updateWhenIdle:false,
+  keepBuffer:4,
 }).addTo(map);
 
 // ── HELPERS ───────────────────────────────────────────
