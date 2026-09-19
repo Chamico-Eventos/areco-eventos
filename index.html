@@ -1092,13 +1092,16 @@ function renderMap(list, future=[], past=[]){
     // Opacity: week1=0.55 → decreasing
     const op=Math.max(0.12,0.58-weeksAhead*0.1);
     const dm=isDM(ev);
-    const {icon:evIcon}=catMeta(ev);  // same icon as active markers
+    const {icon:evIcon}=catMeta(ev);
     const iconSz=Math.max(8,sz-11);
-    const col=dm?`rgba(232,201,122,${op*0.45})`:`rgba(180,160,100,${op*0.35})`;
+    // SOLID background (same as active markers) so mix-blend-mode:multiply renders icon correctly.
+    // Transparency is controlled entirely by Leaflet's opacity parameter on the marker.
+    const col=dm?'#e8c97a':'#c9a84c';
     const ghostHtml=`<div style="
       width:${sz}px;height:${sz}px;background:${col};
       border-radius:50% 50% 50% 0;transform:rotate(-45deg);
-      border:1px solid rgba(226,185,79,${op*0.4});
+      border:2px solid rgba(0,0,0,0.5);
+      box-shadow:0 2px 8px rgba(0,0,0,0.55);
       display:flex;align-items:center;justify-content:center;
     "><img src="${evIcon}" style="width:${iconSz}px;height:${iconSz}px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.style.display='none'"></div>`;
     const li=L.divIcon({html:ghostHtml,className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz],popupAnchor:[0,-sz-2]});
@@ -1114,14 +1117,15 @@ function renderMap(list, future=[], past=[]){
   // ── Past event markers (last 60 days) — very faded dark gray ──
   past.forEach(ev=>{
     const c=coords(ev.lugar);if(!c)return;
+    const {icon:pastIcon}=catMeta(ev);
     const pastHtml=`<div style="
       width:16px;height:16px;
-      background:rgba(80,70,55,0.35);
+      background:#5a4e3a;
       border-radius:50% 50% 50% 0;
       transform:rotate(-45deg);
-      border:1px solid rgba(120,110,90,0.25);
+      border:1px solid rgba(90,78,58,0.6);
       display:flex;align-items:center;justify-content:center;
-    "><span style="transform:rotate(45deg);font-size:7px;opacity:.4;color:#a89880">✓</span></div>`;
+    "><img src="${pastIcon}" style="width:9px;height:9px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply;filter:grayscale(0.6)" onerror="this.style.display='none'"></div>`;
     const li=L.divIcon({html:pastHtml,className:'',iconSize:[16,16],iconAnchor:[8,16],popupAnchor:[0,-18]});
     const d=parseD(ev.fecha);
     const pop=`<div style="font-family:'Inter',sans-serif;font-size:11px;max-width:200px;color:var(--muted)">
@@ -1136,35 +1140,7 @@ function renderMap(list, future=[], past=[]){
     ghostMkrs['past_'+ev.id]=m;
   });
 
-  // ── Ghost markers for future events ───────────────────
-  future.forEach(ev=>{
-    const c=coords(ev.lugar);if(!c)return;
-    const dm=isDM(ev);
-    const ghostHtml=`<div style="
-      width:22px;height:22px;
-      background:${dm?'rgba(232,201,122,0.22)':'rgba(180,160,100,0.18)'};
-      border-radius:50% 50% 50% 0;
-      transform:rotate(-45deg);
-      border:1px solid ${dm?'rgba(232,201,122,0.45)':'rgba(180,160,100,0.3)'};
-      display:flex;align-items:center;justify-content:center;
-    "><span style="transform:rotate(45deg);font-size:9px;opacity:.55">${dm?'★':'●'}</span></div>`;
-
-    const li=L.divIcon({html:ghostHtml,className:'',iconSize:[22,22],iconAnchor:[11,22],popupAnchor:[0,-24]});
-    const d=parseD(ev.fecha);
-    const pop=`<div style="font-family:'Inter',sans-serif;font-size:12px;max-width:220px">
-      <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px">${ev.nombre||'Evento'}</div>
-      <div style="color:var(--ink2);line-height:1.7">
-        ${d?`📅 ${prettyD(d)}<br>`:''}
-        ${ev.hora&&ev.hora!=='Todo el día'?`🕐 ${ev.hora} hs<br>`:''}
-        ${ev.lugar?`📍 ${ev.lugar}<br>`:''}
-      </div>
-      <div style="margin-top:8px;font-size:11px;color:var(--muted);cursor:pointer"
-           onclick="goToEventWeek('${ev.fecha}')">Ver esta semana →</div>
-    </div>`;
-
-    const m=L.marker(c,{icon:li,opacity:0.7}).bindPopup(pop,{maxWidth:240}).addTo(map);
-    ghostMkrs[ev.id]=m;
-  });
+  // (future ghosts rendered progressively above with category icons)
 
   // ── Active markers for current week ───────────────────
   const TODAY=new Date();TODAY.setHours(0,0,0,0);
@@ -1186,15 +1162,16 @@ function renderMap(list, future=[], past=[]){
       let li, m;
 
       if(alreadyPast){
-        // Event in current week but already happened → past style
+        // Event in current week but already happened — same icon, muted
+        const {icon:apIcon}=catMeta(ev);
         const pastHtml=`<div style="
           width:20px;height:20px;
-          background:rgba(80,70,55,0.4);
+          background:#5a4e3a;
           border-radius:50% 50% 50% 0;
           transform:rotate(-45deg);
-          border:1px solid rgba(120,110,90,0.3);
+          border:1px solid rgba(90,78,58,0.6);
           display:flex;align-items:center;justify-content:center;
-        "><span style="transform:rotate(45deg);font-size:8px;opacity:.45;color:#a89880">✓</span></div>`;
+        "><img src="${apIcon}" style="width:11px;height:11px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply;filter:grayscale(0.5)" onerror="this.style.display='none'"></div>`;
         li=L.divIcon({html:pastHtml,className:'',iconSize:[20,20],iconAnchor:[10,20],popupAnchor:[0,-22]});
         const d=parseD(ev.fecha);
         const pop=`<div style="font-family:'Inter',sans-serif;font-size:11px;max-width:200px;color:var(--muted)">
