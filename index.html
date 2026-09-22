@@ -288,6 +288,8 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .map-brand{background:rgba(14,13,11,0.82);backdrop-filter:blur(10px);border:1px solid rgba(201,168,76,0.18);border-radius:12px;padding:10px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;width:100%}
 .map-brand img{width:100%;max-height:56px;object-fit:contain;mix-blend-mode:luminosity;opacity:1}
 .map-brand-tagline{font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);align-self:flex-start}
+/* Mobile add-button wrapper hidden on desktop */
+.mob-add-btn-wrap{display:none}
 /* ── ADD EVENT BUTTON ─────────────────────────────── */
 .add-ev-btn{width:100%;justify-content:center;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0d0c09;border:none;border-radius:999px;padding:10px 15px;font-family:Inter,sans-serif;font-size:11.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(226,185,79,0.2);transition:filter .2s,transform .15s,box-shadow .2s;display:flex;align-items:center;gap:6px;white-space:nowrap;box-sizing:border-box}
 .add-ev-btn:hover{filter:brightness(1.06);transform:translateY(-1px);box-shadow:0 4px 16px rgba(226,185,79,0.28)}
@@ -467,32 +469,35 @@ img.leaflet-tile{border:none !important;outline:none !important}
   /* Sidebar dissolves into flex — children become direct shell items */
   .sidebar{display:contents}
 
-  /* 1 — Compact header with week nav */
+  /* 1 — Compact header: title + add-event button side by side, no subtitle */
   .sb-head{
     order:1;flex-shrink:0;
     background:var(--s1);
     border-bottom:1px solid var(--border);
     border-right:none;border-radius:0;
-    padding:10px 14px;cursor:default;
+    padding:8px 12px;cursor:default;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
   }
   .mob-handle{display:none}
-  .brand-text h1{font-size:16px;margin-bottom:8px}
-  .wn-sub{display:none}
-  .wn-btn{padding:9px 12px}
-  .wn-label{font-size:12px}
+  /* 4A: hide the "by DataManIAcs" subtitle on mobile */
+  .brand-text small{display:none}
+  .brand-text h1{font-size:17px;margin-bottom:0;line-height:1}
+  /* 4B: add-event button moves into header row */
+  .map-brand-wrapper{display:none} /* hide the map overlay wrapper on mobile */
+  .mob-add-btn-wrap{display:flex;flex-shrink:0} /* shown on mobile only */
 
   /* 2 — Category filters */
   .sb-filters{
     order:2;flex-shrink:0;
     background:var(--s1);
-    padding:8px 14px;
+    padding:6px 12px;
     border-bottom:1px solid var(--b2);
   }
 
-  /* 3 — Map ~30% height */
+  /* 3 — Map 40% height */
   #map{
     order:3;
-    height:30vh;
+    height:40vh;
     flex-shrink:0;
     width:100%;
     position:relative;z-index:5;
@@ -507,33 +512,26 @@ img.leaflet-tile{border:none !important;outline:none !important}
     padding-bottom:20px;
   }
 
-  /* Compact brand overlay on small map */
-  .map-brand-wrapper{top:6px;right:6px;min-width:130px;gap:5px}
-  .map-brand{padding:5px 10px;gap:4px}
-  .map-brand img{max-height:20px}
-  .map-brand-tagline{font-size:7px}
-
-  /* Move add-event button inside the map, bottom-left */
-  .add-ev-btn{
-    position:absolute;bottom:8px;left:8px;
-    padding:8px 12px;font-size:11px;
-    box-shadow:0 2px 10px rgba(201,168,76,0.35);
-  }
-
   .dm-sheet{max-height:94vh}
 
-  /* Time nav on mobile: smaller, still floated on map */
+  /* 4C & 4D: Time nav on mobile — very compact, just ‹ date › arrows, no strip/timeline */
   .time-nav{
-    top:6px;
-    max-width:calc(100% - 20px);
-    border-radius:14px;
+    top:4px;
+    max-width:calc(100% - 16px);
+    border-radius:10px;
   }
-  .tn-btn{width:90px;padding:10px 10px}
+  .tn-main{min-height:36px}
+  .tn-btn{width:52px;padding:6px 8px;gap:4px}
   .tn-btn-range{display:none}
-  .tn-date{font-size:15px}
-  .tn-eyebrow{display:none}
-  .tn-strip{padding:5px 8px}
-  .tn-day{min-width:28px}
+  .tn-btn-label{display:none}
+  .tn-time-icon{height:28px}
+  .tn-date{font-size:12px}
+  .tn-status-row{display:none} /* hide chip + count on mobile */
+  .tn-divider{margin:8px 0}
+  .tn-strip{display:none} /* hide 7-day strip — too wide for 40vh map */
+  .tn-timeline{display:none} /* hide timeline dots */
+  .tn-return-bar{padding:3px 10px}
+  .tn-return-btn{font-size:10px}
 }
 </style>
 </head>
@@ -739,6 +737,10 @@ img.leaflet-tile{border:none !important;outline:none !important}
       <div class="brand-text">
         <h1><em>Areco</em> Eventos</h1>
         <small>by DataManIAcs · San Antonio de Areco</small>
+      </div>
+      <!-- Mobile-only: add-event button lives here next to the title -->
+      <div class="mob-add-btn-wrap">
+        <button class="add-ev-btn" onclick="openSubModal()" style="padding:7px 12px;font-size:10.5px">✦ Agregá tu evento</button>
       </div>
     </div>
     <div class="sb-filters">
@@ -1173,41 +1175,38 @@ function renderMap(list, future=[], past=[]){
           </div><div style="margin-top:6px;font-size:10px;font-style:italic">Evento pasado</div></div>`;
         m=L.marker(off,{icon:li,opacity:0.5}).bindPopup(pop,{maxWidth:210}).addTo(map);
 
-      } else if(dm){
-        const col='#e8c97a';
-        const pulse='animation:pulse 2s ease-in-out infinite;';
-        li=L.divIcon({
-          html:`<div style="width:36px;height:36px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(0,0,0,0.7);box-shadow:0 4px 16px rgba(0,0,0,0.7),0 0 14px rgba(226,185,79,0.45),0 1px 4px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;${pulse}"><img src="${icon}" style="width:21px;height:21px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.outerHTML='<span style=transform:rotate(45deg);font-size:12px>★</span>'"></div>`,
-          className:'',iconSize:[34,34],iconAnchor:[17,34],popupAnchor:[1,-38]
-        });
-        m=L.marker(off,{icon:li}).addTo(map);
-        m.on('click',()=>{ selById(ev.id,false); openSheet(ev); });
-
       } else {
-        const col='#c9a84c';
+        // All active events get the pulsing glow — DM gets gold, others get standard gold
+        const col = dm ? '#e8c97a' : '#c9a84c';
+        const glowCol = dm ? 'rgba(226,185,79,0.55)' : 'rgba(201,168,76,0.42)';
         li=L.divIcon({
-          html:`<div style="width:36px;height:36px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(0,0,0,0.7);box-shadow:0 4px 16px rgba(0,0,0,0.7),0 0 10px rgba(226,185,79,0.28),0 1px 4px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;"><img src="${icon}" style="width:21px;height:21px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.outerHTML='<span style=transform:rotate(45deg);font-size:12px>●</span>'"></div>`,
+          html:`<div style="width:36px;height:36px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(0,0,0,0.7);box-shadow:0 4px 16px rgba(0,0,0,0.7),0 0 14px ${glowCol},0 1px 4px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;animation:pulse 2s ease-in-out infinite;"><img src="${icon}" style="width:21px;height:21px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.outerHTML='<span style=transform:rotate(45deg);font-size:12px>★</span>'"></div>`,
           className:'',iconSize:[34,34],iconAnchor:[17,34],popupAnchor:[1,-38]
         });
-        const d=parseD(ev.fecha);
-        const c2=coords(ev.lugar);
-        const gmDir=c2?`https://www.google.com/maps/dir/?api=1&destination=${c2[0]},${c2[1]}`:'';
-        const pop=`<div style="min-width:200px;max-width:260px;font-family:'Inter',sans-serif">
-          <div class="pname">${ev.nombre||'Evento'}</div>
-          <div class="pbody">
-            ${ev.lugar?`📍 ${ev.lugar}<br>`:''}
-            ${d?`📅 ${prettyD(d)}<br>`:''}
-            ${ev.hora&&ev.hora!=='Todo el día'?`🕐 ${ev.hora} hs<br>`:''}
-            ${ev.precio&&ev.precio!=='Consultar'?`<br><span class="pgold">${ev.precio}</span>`:''}
-            ${ev.descripcion?`<br><br><span style="font-size:11px;color:#6b6150;line-height:1.6">${ev.descripcion.slice(0,120)}…</span>`:''}
-          </div>
-          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
-            ${ev.link_accion?`<a class="plink" href="${ev.link_accion}" target="_blank">Ver más →</a>`:''}
-            ${gmDir?`<a class="plink" href="${gmDir}" target="_blank" style="color:var(--ink2)">🗺 Cómo llegar</a>`:''}
-          </div>
-        </div>`;
-        m=L.marker(off,{icon:li}).bindPopup(pop,{maxWidth:280}).addTo(map);
-        m.on('click',()=>selById(ev.id,false));
+        if(dm){
+          m=L.marker(off,{icon:li}).addTo(map);
+          m.on('click',()=>{ selById(ev.id,false); openSheet(ev); });
+        } else {
+          const d=parseD(ev.fecha);
+          const c2=coords(ev.lugar);
+          const gmDir=c2?`https://www.google.com/maps/dir/?api=1&destination=${c2[0]},${c2[1]}`:'';
+          const pop=`<div style="min-width:200px;max-width:260px;font-family:'Inter',sans-serif">
+            <div class="pname">${ev.nombre||'Evento'}</div>
+            <div class="pbody">
+              ${ev.lugar?`📍 ${ev.lugar}<br>`:''}
+              ${d?`📅 ${prettyD(d)}<br>`:''}
+              ${ev.hora&&ev.hora!=='Todo el día'?`🕐 ${ev.hora} hs<br>`:''}
+              ${ev.precio&&ev.precio!=='Consultar'?`<br><span class="pgold">${ev.precio}</span>`:''}
+              ${ev.descripcion?`<br><br><span style="font-size:11px;color:#6b6150;line-height:1.6">${ev.descripcion.slice(0,120)}…</span>`:''}
+            </div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
+              ${ev.link_accion?`<a class="plink" href="${ev.link_accion}" target="_blank">Ver más →</a>`:''}
+              ${gmDir?`<a class="plink" href="${gmDir}" target="_blank" style="color:var(--ink2)">🗺 Cómo llegar</a>`:''}
+            </div>
+          </div>`;
+          m=L.marker(off,{icon:li}).bindPopup(pop,{maxWidth:280}).addTo(map);
+          m.on('click',()=>selById(ev.id,false));
+        }
       }
       mkrs[ev.id]=m;
     });
@@ -1369,16 +1368,24 @@ function updateTimeNav(count, direction, eventsList=[]){
 
 function fitMapToEvents(){
   const active=Object.values(mkrs);
-  if(active.length===0)return;
-  const bounds=map.getBounds();
-  const allVisible=active.every(m=>{
-    try{return bounds.contains(m.getLatLng());}catch{return true;}
-  });
-  if(allVisible)return;
+  // Fix 2: no events this week → reset to full Areco view so users see empty map
+  if(active.length===0){
+    map.setView(CENTER,14,{animate:true});
+    return;
+  }
+  // Fix 3: always ensure all active markers are visible AND not hidden under the time-nav
+  // Use generous top padding to account for the floating navigator (~110px desktop, ~80px mobile)
   try{
     const group=L.featureGroup(active);
     if(group.getBounds().isValid()){
-      map.fitBounds(group.getBounds(),{padding:[70,70],maxZoom:16,animate:true});
+      const isMobile=window.innerWidth<=680;
+      const topPad=isMobile?90:130; // clear the time-nav widget
+      map.fitBounds(group.getBounds(),{
+        paddingTopLeft:[20,topPad],
+        paddingBottomRight:[60,40],
+        maxZoom:16,
+        animate:true
+      });
     }
   }catch(e){}
 }
