@@ -88,9 +88,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 .leaflet-popup-content-wrapper{background:var(--s3) !important;border:1px solid rgba(226,185,79,0.16) !important;border-radius:14px !important;color:var(--ink) !important;box-shadow:0 16px 48px rgba(0,0,0,.8),0 4px 12px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.04) !important}
 .leaflet-popup-tip{background:var(--s1) !important}
 .leaflet-popup-close-button{color:var(--muted) !important;top:8px !important;right:8px !important}
-/* Flyer popup: remove inner padding so image fills the rounded corners */
-.popup-flyer .leaflet-popup-content{margin:0 !important;width:100% !important}
-.popup-flyer .leaflet-popup-content-wrapper{padding:0 !important;overflow:hidden !important}
+/* All active-event popups: hide the tip arrow (popup opens below icon, no arrow needed) */
+.popup-no-tip .leaflet-popup-tip-container{display:none !important}
+.popup-no-tip .leaflet-popup-content-wrapper{padding:0 !important;overflow:hidden !important}
+.popup-no-tip .leaflet-popup-content{margin:0 !important;width:auto !important}
 .pname{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--ink);margin-bottom:8px;line-height:1.3}
 .pbody{font-size:12px;color:var(--ink2);line-height:1.7}
 .pgold{color:var(--gold);font-weight:600}
@@ -1232,10 +1233,18 @@ function renderMap(list, future=[], past=[]){
         const glowCol = dm ? 'rgba(226,185,79,0.55)' : 'rgba(201,168,76,0.42)';
         li=L.divIcon({
           html:`<div style="width:36px;height:36px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(0,0,0,0.7);box-shadow:0 4px 16px rgba(0,0,0,0.7),0 0 14px ${glowCol},0 1px 4px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;animation:pulse 2s ease-in-out infinite;"><img src="${icon}" style="width:21px;height:21px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.outerHTML='<span style=transform:rotate(45deg);font-size:12px>★</span>'"></div>`,
-          className:'',iconSize:[34,34],iconAnchor:[0,0],
-          // Popup tip anchors at [0,0] = top-left of icon bounding box
-          // so popup body opens DOWN and to the RIGHT — icon stays at top-left of popup
-          popupAnchor:[18,0]
+          className:'',
+          iconSize:[34,34],
+          // iconAnchor: geographic point = top-left of the pin shape
+          iconAnchor:[0,0],
+          // popupAnchor: relative to iconAnchor.
+          // Leaflet places the popup TIP at iconAnchor + popupAnchor,
+          // then the popup box grows UPWARD from the tip.
+          // To get the popup BELOW the icon: push tip far below (large +Y),
+          // then compensate by pushing it back up via the popup's own offset option.
+          // Instead — simpler: use a custom CSS class to hide the tip and
+          // translate the popup down using offset:[x, y] in bindPopup options.
+          popupAnchor:[40, 10]
         });
 
         // Build unified popup for ALL active events
@@ -1248,14 +1257,14 @@ function renderMap(list, future=[], past=[]){
         const hasPreventa=String(ev.preventa_disponible).toLowerCase()==='true';
 
         const linksHtml=`
-          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;align-items:center">
-            ${dm&&hasPreventa?`<a class="plink" href="${ticketUrl}" target="_blank" style="background:rgba(226,185,79,0.15);border:1px solid rgba(226,185,79,0.35);border-radius:6px;padding:4px 10px;font-weight:600">🎟 Comprar entrada</a>`:''}
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;align-items:center">
+            ${dm&&hasPreventa?`<a class="plink" href="${ticketUrl}" target="_blank" style="background:rgba(226,185,79,0.15);border:1px solid rgba(226,185,79,0.35);border-radius:6px;padding:5px 12px;font-weight:600">🎟 Comprar entrada</a>`:''}
             ${(dm&&!hasPreventa||!dm)&&ev.link_accion?`<a class="plink" href="${ev.link_accion}" target="_blank">Ver más →</a>`:''}
             ${gmDir?`<a class="plink" href="${gmDir}" target="_blank" style="color:var(--ink2)">🗺 Cómo llegar</a>`:''}
           </div>`;
 
         const textHtml=`
-          <div class="pbody">
+          <div class="pbody" style="line-height:1.75">
             ${ev.lugar?`📍 ${ev.lugar}<br>`:''}
             ${d?`📅 ${prettyD(d)}<br>`:''}
             ${ev.hora&&ev.hora!=='Todo el día'?`🕐 ${ev.hora} hs<br>`:''}
@@ -1265,17 +1274,16 @@ function renderMap(list, future=[], past=[]){
 
         let pop;
         if(hasFlyer){
-          // Horizontal layout: text block LEFT, flyer image RIGHT
-          // Flyer is a tall rectangle keeping natural proportions — never stretched
-          pop=`<div style="width:380px;font-family:'Inter',sans-serif">
-            <div class="pname" style="margin-bottom:8px">${ev.nombre||'Evento'}</div>
-            <div style="display:flex;gap:12px;align-items:flex-start">
+          // Horizontal layout: text LEFT, flyer image RIGHT — no stretch, natural proportions
+          pop=`<div style="font-family:'Inter',sans-serif;padding:14px 16px">
+            <div class="pname" style="margin-bottom:10px">${ev.nombre||'Evento'}</div>
+            <div style="display:flex;gap:14px;align-items:flex-start">
               <div style="flex:1;min-width:0">
                 ${textHtml}
                 ${linksHtml}
               </div>
               <img src="${ev.imagen_url}"
-                style="width:140px;flex-shrink:0;height:auto;max-height:220px;
+                style="width:130px;flex-shrink:0;height:auto;max-height:210px;
                        object-fit:contain;object-position:top center;
                        border-radius:8px;border:1px solid rgba(226,185,79,0.2);
                        background:#0d0c09"
@@ -1283,16 +1291,21 @@ function renderMap(list, future=[], past=[]){
             </div>
           </div>`;
         } else {
-          pop=`<div style="min-width:210px;max-width:270px;font-family:'Inter',sans-serif">
+          pop=`<div style="font-family:'Inter',sans-serif;padding:14px 16px;min-width:210px;max-width:270px">
             <div class="pname">${ev.nombre||'Evento'}</div>
             ${textHtml}
             ${linksHtml}
           </div>`;
         }
 
+        // offset:[x,y] shifts the popup relative to where the tip would be.
+        // With iconAnchor:[0,0] and popupAnchor:[40,10], the tip is at icon top-left +40px right +10px down.
+        // The popup box normally grows UP from the tip. We use offset to push it DOWN instead,
+        // by adding enough vertical offset to clear the icon and put popup below it.
         m=L.marker(off,{icon:li}).bindPopup(pop,{
-          maxWidth: hasFlyer ? 400 : 280,
-          className: hasFlyer ? 'popup-flyer' : ''
+          maxWidth: hasFlyer ? 400 : 290,
+          className: 'popup-no-tip',
+          offset: L.point(0, 50)   // pushes the popup box 50px downward = below the icon
         }).addTo(map);
         m.on('click',()=>selById(ev.id,false));
       }
