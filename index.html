@@ -277,6 +277,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 }
 .leaflet-container{background:#0a0a08}
 img.leaflet-tile{border:none !important;outline:none !important}
+/* Hide OSM attribution bar — removes the blue lines at map edges */
+.leaflet-control-attribution{display:none !important}
 
 /* ── PAST EVENT CARDS ─────────────────────────────── */
 .past-card{opacity:.32;border-color:transparent!important;background:var(--bg)!important}
@@ -290,6 +292,29 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .map-brand-tagline{font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);align-self:flex-start}
 /* Mobile add-button wrapper hidden on desktop */
 .mob-add-btn-wrap{display:none}
+/* Mobile filter bar hidden on desktop */
+.mob-filter-bar{display:none}
+/* Desktop-only elements */
+.desktop-only{display:block}
+/* Mobile filter bar styles */
+.mob-week-nav{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.mob-wn-btn{background:none;border:1px solid var(--border);border-radius:6px;color:var(--gold);font-size:16px;line-height:1;padding:3px 9px;cursor:pointer;transition:background .15s}
+.mob-wn-btn:hover{background:rgba(201,168,76,0.12)}
+.mob-wn-label{font-size:11px;font-weight:600;color:var(--ink);white-space:nowrap;min-width:70px;text-align:center}
+.mob-cat-wrap{position:relative;flex:1;min-width:0}
+.mob-cat-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:6px;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--gold2);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.mob-cat-arrow{font-size:10px;opacity:.7;transition:transform .15s}
+.mob-cat-btn.open .mob-cat-arrow{transform:rotate(180deg)}
+.mob-cat-dropdown{
+  display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;
+  background:var(--s2);border:1px solid var(--border);border-radius:10px;
+  z-index:600;overflow:hidden;
+  box-shadow:0 8px 24px rgba(0,0,0,0.5);
+}
+.mob-cat-dropdown.open{display:block}
+.mob-cat-item{padding:9px 14px;font-size:13px;color:var(--ink2);cursor:pointer;transition:background .12s}
+.mob-cat-item:hover{background:rgba(226,185,79,0.08);color:var(--ink)}
+.mob-cat-item.on{color:var(--gold2);font-weight:600;background:rgba(226,185,79,0.1)}
 /* ── ADD EVENT BUTTON ─────────────────────────────── */
 .add-ev-btn{width:100%;justify-content:center;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0d0c09;border:none;border-radius:999px;padding:10px 15px;font-family:Inter,sans-serif;font-size:11.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(226,185,79,0.2);transition:filter .2s,transform .15s,box-shadow .2s;display:flex;align-items:center;gap:6px;white-space:nowrap;box-sizing:border-box}
 .add-ev-btn:hover{filter:brightness(1.06);transform:translateY(-1px);box-shadow:0 4px 16px rgba(226,185,79,0.28)}
@@ -486,13 +511,15 @@ img.leaflet-tile{border:none !important;outline:none !important}
   .map-brand-wrapper{display:none} /* hide the map overlay wrapper on mobile */
   .mob-add-btn-wrap{display:flex;flex-shrink:0} /* shown on mobile only */
 
-  /* 2 — Category filters */
+  /* 2 — Category filters: show mobile bar, hide desktop pills */
   .sb-filters{
     order:2;flex-shrink:0;
     background:var(--s1);
     padding:6px 12px;
     border-bottom:1px solid var(--b2);
   }
+  .desktop-only{display:none !important}
+  .mob-filter-bar{display:flex;align-items:center;gap:8px;width:100%}
 
   /* 3 — Map 40% height */
   #map{
@@ -503,14 +530,19 @@ img.leaflet-tile{border:none !important;outline:none !important}
     position:relative;z-index:5;
   }
 
-  /* 4 — Event list fills remaining space */
+  /* 4 — Event list: flex:1 with scroll; sb-head stays sticky at top via order */
+  /* c) Allow full-page scroll so users can scroll UP to reach the filter bar */
   .sb-list{
     order:4;
     flex:1;overflow-y:auto;
     background:var(--s1);
     border-top:1px solid var(--border);
     padding-bottom:20px;
+    /* Scroll the list, and momentum scroll lets users pull up to see filters+map */
+    -webkit-overflow-scrolling:touch;
   }
+  /* Make sb-head sticky so title always visible while scrolling the list */
+  .sb-head{position:sticky;top:0;z-index:20;}
 
   .dm-sheet{max-height:94vh}
 
@@ -744,8 +776,23 @@ img.leaflet-tile{border:none !important;outline:none !important}
       </div>
     </div>
     <div class="sb-filters">
-      <div class="filter-hd">Categoría</div>
-      <div class="pills" id="pills"></div>
+      <!-- Desktop: label + pills row -->
+      <div class="filter-hd desktop-only">Categoría</div>
+      <div class="pills desktop-only" id="pills"></div>
+      <!-- Mobile: compact week nav + category dropdown in one row -->
+      <div class="mob-filter-bar">
+        <div class="mob-week-nav">
+          <button class="mob-wn-btn" id="mobWPrev" aria-label="Semana anterior">‹</button>
+          <span class="mob-wn-label" id="mobWLabel">–</span>
+          <button class="mob-wn-btn" id="mobWNext" aria-label="Semana siguiente">›</button>
+        </div>
+        <div class="mob-cat-wrap">
+          <button class="mob-cat-btn" id="mobCatBtn" onclick="toggleMobCat(event)">
+            <span id="mobCatLabel">Todos</span> <span class="mob-cat-arrow">▾</span>
+          </button>
+          <div class="mob-cat-dropdown" id="mobCatDropdown"></div>
+        </div>
+      </div>
     </div>
     <div class="sb-list" id="list">
       <div class="empty"><strong>Cargando…</strong></div>
@@ -1049,9 +1096,10 @@ function renderList(list){
     el.innerHTML=`<div class="empty"><strong>Sin eventos esta semana</strong>Probá otra semana o quitá el filtro.</div>`;return;
   }
   const r=wRange(wOff);
-  const headingDate=r.start.toLocaleDateString('es-AR',{day:'numeric',month:'long'})+' – '+r.end.toLocaleDateString('es-AR',{day:'numeric',month:'long'});
-  let html=`<div class="ev-week-heading">Eventos · ${headingDate}</div>`
-    +`<div class="ev-count">${list.length} evento${list.length!==1?'s':''} encontrado${list.length!==1?'s':''}</div>`;
+  const fmtShort=d=>d.toLocaleDateString('es-AR',{day:'numeric',month:'short'});
+  const weekRange=`${fmtShort(r.start)} – ${fmtShort(r.end)}`;
+  const evCount=`${list.length} evento${list.length!==1?'s':''}`;
+  let html=`<div class="ev-week-heading">${evCount} · ${weekRange}</div>`;
   let lastD=null;
   list.forEach(ev=>{
     const d=parseD(ev.fecha),ds=prettyD(d);
@@ -1410,21 +1458,78 @@ function initGeolocation(){
   },null,{timeout:8000,enableHighAccuracy:false});
 }
 
-// ── CATEGORY PILLS ────────────────────────────────────
+// ── CATEGORY PILLS + MOBILE DROPDOWN ─────────────────
 function buildPills(){
   const cats=[...new Set(evs.map(e=>e.categoria).filter(Boolean))].sort();
   const hasDM=evs.some(e=>e.es_datamanIAcs==='TRUE');
+  // Desktop pills
   let h=`<div class="pill on" onclick="setF('all',this)">Todos</div>`;
   cats.forEach(c=>h+=`<div class="pill" onclick="setF('${c}',this)">${c}</div>`);
   if(hasDM)h+=`<div class="pill" onclick="setF('DM',this)">★ DataManIAcs</div>`;
   document.getElementById('pills').innerHTML=h;
+  // Mobile dropdown items
+  const dd=document.getElementById('mobCatDropdown');
+  if(dd){
+    let dh=`<div class="mob-cat-item on" onclick="setMobF('all',this)">Todos</div>`;
+    cats.forEach(c=>dh+=`<div class="mob-cat-item" onclick="setMobF('${c}',this)">${c}</div>`);
+    if(hasDM)dh+=`<div class="mob-cat-item" onclick="setMobF('DM',this)">★ DataManIAcs</div>`;
+    dd.innerHTML=dh;
+  }
 }
 function setF(f,el){
-  activeFilter=f;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));el.classList.add('on');render();
+  activeFilter=f;
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  render();
+}
+function setMobF(f,el){
+  activeFilter=f;
+  // Update dropdown items
+  document.querySelectorAll('.mob-cat-item').forEach(i=>i.classList.remove('on'));
+  el.classList.add('on');
+  // Update button label
+  const lbl=document.getElementById('mobCatLabel');
+  if(lbl) lbl.textContent=el.textContent;
+  // Close dropdown
+  document.getElementById('mobCatDropdown').classList.remove('open');
+  document.getElementById('mobCatBtn').classList.remove('open');
+  render();
+}
+function toggleMobCat(e){
+  e.stopPropagation();
+  const dd=document.getElementById('mobCatDropdown');
+  const btn=document.getElementById('mobCatBtn');
+  const isOpen=dd.classList.contains('open');
+  dd.classList.toggle('open',!isOpen);
+  btn.classList.toggle('open',!isOpen);
+}
+// Close dropdown when clicking outside
+document.addEventListener('click',()=>{
+  const dd=document.getElementById('mobCatDropdown');
+  const btn=document.getElementById('mobCatBtn');
+  if(dd){dd.classList.remove('open');}
+  if(btn){btn.classList.remove('open');}
+});
+
+// Mobile week nav label updater
+function updateMobWeekLabel(){
+  const r=wRange(wOff);
+  const s=r.start.toLocaleDateString('es-AR',{day:'numeric',month:'short'});
+  const e=r.end.toLocaleDateString('es-AR',{day:'numeric',month:'short'});
+  const lbl=document.getElementById('mobWLabel');
+  if(lbl) lbl.textContent=s+' – '+e;
 }
 
-document.getElementById('wPrev').onclick=(e)=>{e.stopPropagation();wOff--;render(-1);};
-document.getElementById('wNext').onclick=(e)=>{e.stopPropagation();wOff++;render(1);};
+document.getElementById('wPrev').onclick=(e)=>{e.stopPropagation();wOff--;render(-1);updateMobWeekLabel();};
+document.getElementById('wNext').onclick=(e)=>{e.stopPropagation();wOff++;render(1);updateMobWeekLabel();};
+
+// Wire up mobile week buttons
+document.addEventListener('DOMContentLoaded',()=>{
+  const mp=document.getElementById('mobWPrev');
+  const mn=document.getElementById('mobWNext');
+  if(mp) mp.onclick=(e)=>{e.stopPropagation();wOff--;render(-1);updateMobWeekLabel();};
+  if(mn) mn.onclick=(e)=>{e.stopPropagation();wOff++;render(1);updateMobWeekLabel();};
+});
 
 // ── MOBILE SIDEBAR TOGGLE ─────────────────────────────
 function toggleMobileSidebar(){}
@@ -1629,6 +1734,7 @@ async function init(){
     console.log('Events loaded: ' + evs.length);
     buildPills();
     render(0);
+    updateMobWeekLabel();
     initGeolocation();
     autoOpenMobile();
   }catch(e){
