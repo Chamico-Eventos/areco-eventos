@@ -1280,14 +1280,18 @@ function renderMap(list, future=[], past=[]){
           .bindPopup(popHtml,{maxWidth: hasFlyer?400:280, autoPan:false})
           .addTo(map);
 
+        let popupOpen = false;
         m.on('click',()=>{
-          if(m.isPopupOpen()){
+          if(popupOpen){
             m.closePopup();
+            popupOpen = false;
           } else {
             selById(ev.id,false);
             panForPopup(m, hasFlyer);
+            popupOpen = true;
           }
         });
+        m.on('popupclose',()=>{ popupOpen = false; });
       }
       mkrs[ev.id]=m;
     });
