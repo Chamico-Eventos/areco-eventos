@@ -1232,9 +1232,10 @@ function renderMap(list, future=[], past=[]){
         const glowCol = dm ? 'rgba(226,185,79,0.55)' : 'rgba(201,168,76,0.42)';
         li=L.divIcon({
           html:`<div style="width:36px;height:36px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(0,0,0,0.7);box-shadow:0 4px 16px rgba(0,0,0,0.7),0 0 14px ${glowCol},0 1px 4px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;animation:pulse 2s ease-in-out infinite;"><img src="${icon}" style="width:21px;height:21px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.outerHTML='<span style=transform:rotate(45deg);font-size:12px>★</span>'"></div>`,
-          className:'',iconSize:[34,34],iconAnchor:[17,34],
-          // All popups open to the RIGHT of the pin, well clear of the icon and week selector
-          popupAnchor:[140,-17]
+          className:'',iconSize:[34,34],iconAnchor:[0,0],
+          // Popup tip anchors at [0,0] = top-left of icon bounding box
+          // so popup body opens DOWN and to the RIGHT — icon stays at top-left of popup
+          popupAnchor:[18,0]
         });
 
         // Build unified popup for ALL active events
@@ -1246,53 +1247,51 @@ function renderMap(list, future=[], past=[]){
         const ticketUrl=ev.link_accion||`${TICKETS_URL}/?event=${eventParam}`;
         const hasPreventa=String(ev.preventa_disponible).toLowerCase()==='true';
 
+        const linksHtml=`
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;align-items:center">
+            ${dm&&hasPreventa?`<a class="plink" href="${ticketUrl}" target="_blank" style="background:rgba(226,185,79,0.15);border:1px solid rgba(226,185,79,0.35);border-radius:6px;padding:4px 10px;font-weight:600">🎟 Comprar entrada</a>`:''}
+            ${(dm&&!hasPreventa||!dm)&&ev.link_accion?`<a class="plink" href="${ev.link_accion}" target="_blank">Ver más →</a>`:''}
+            ${gmDir?`<a class="plink" href="${gmDir}" target="_blank" style="color:var(--ink2)">🗺 Cómo llegar</a>`:''}
+          </div>`;
+
+        const textHtml=`
+          <div class="pbody">
+            ${ev.lugar?`📍 ${ev.lugar}<br>`:''}
+            ${d?`📅 ${prettyD(d)}<br>`:''}
+            ${ev.hora&&ev.hora!=='Todo el día'?`🕐 ${ev.hora} hs<br>`:''}
+            ${ev.precio&&ev.precio!=='Consultar'?`<br><span class="pgold">${ev.precio}</span>`:''}
+            ${ev.descripcion&&!hasFlyer?`<br><span style="font-size:11px;color:#6b6150;line-height:1.5">${ev.descripcion.slice(0,110)}…</span>`:''}
+          </div>`;
+
         let pop;
         if(hasFlyer){
-          // Flyer layout: full-width image on top (natural proportions, no stretch),
-          // event info text below, links at bottom
-          pop=`<div style="width:280px;font-family:'Inter',sans-serif;padding:0">
-            <img src="${ev.imagen_url}"
-              style="width:100%;max-height:200px;object-fit:contain;object-position:top center;
-                     border-radius:8px 8px 0 0;display:block;background:#111;
-                     border-bottom:1px solid rgba(226,185,79,0.15)"
-              onerror="this.style.display='none'">
-            <div style="padding:10px 12px 4px">
-              <div class="pname" style="margin-bottom:6px">${ev.nombre||'Evento'}</div>
-              <div class="pbody">
-                ${ev.lugar?`📍 ${ev.lugar}<br>`:''}
-                ${d?`📅 ${prettyD(d)}<br>`:''}
-                ${ev.hora&&ev.hora!=='Todo el día'?`🕐 ${ev.hora} hs<br>`:''}
-                ${ev.precio&&ev.precio!=='Consultar'?`<br><span class="pgold">${ev.precio}</span>`:''}
+          // Horizontal layout: text block LEFT, flyer image RIGHT
+          // Flyer is a tall rectangle keeping natural proportions — never stretched
+          pop=`<div style="width:380px;font-family:'Inter',sans-serif">
+            <div class="pname" style="margin-bottom:8px">${ev.nombre||'Evento'}</div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div style="flex:1;min-width:0">
+                ${textHtml}
+                ${linksHtml}
               </div>
-              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;align-items:center">
-                ${dm&&hasPreventa?`<a class="plink" href="${ticketUrl}" target="_blank" style="background:rgba(226,185,79,0.15);border:1px solid rgba(226,185,79,0.35);border-radius:6px;padding:4px 10px;font-weight:600">🎟 Comprar entrada</a>`:''}
-                ${(dm&&!hasPreventa||!dm)&&ev.link_accion?`<a class="plink" href="${ev.link_accion}" target="_blank">Ver más →</a>`:''}
-                ${gmDir?`<a class="plink" href="${gmDir}" target="_blank" style="color:var(--ink2)">🗺 Cómo llegar</a>`:''}
-              </div>
+              <img src="${ev.imagen_url}"
+                style="width:140px;flex-shrink:0;height:auto;max-height:220px;
+                       object-fit:contain;object-position:top center;
+                       border-radius:8px;border:1px solid rgba(226,185,79,0.2);
+                       background:#0d0c09"
+                onerror="this.style.display='none'">
             </div>
           </div>`;
         } else {
-          // No flyer: compact text popup
           pop=`<div style="min-width:210px;max-width:270px;font-family:'Inter',sans-serif">
             <div class="pname">${ev.nombre||'Evento'}</div>
-            <div class="pbody">
-              ${ev.lugar?`📍 ${ev.lugar}<br>`:''}
-              ${d?`📅 ${prettyD(d)}<br>`:''}
-              ${ev.hora&&ev.hora!=='Todo el día'?`🕐 ${ev.hora} hs<br>`:''}
-              ${ev.precio&&ev.precio!=='Consultar'?`<br><span class="pgold">${ev.precio}</span>`:''}
-              ${ev.descripcion?`<br><span style="font-size:11px;color:#6b6150;line-height:1.6">${ev.descripcion.slice(0,110)}…</span>`:''}
-            </div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;align-items:center">
-              ${dm&&hasPreventa?`<a class="plink" href="${ticketUrl}" target="_blank" style="background:rgba(226,185,79,0.15);border:1px solid rgba(226,185,79,0.35);border-radius:6px;padding:4px 10px;font-weight:600">🎟 Comprar entrada</a>`:''}
-              ${(dm&&!hasPreventa||!dm)&&ev.link_accion?`<a class="plink" href="${ev.link_accion}" target="_blank">Ver más →</a>`:''}
-              ${gmDir?`<a class="plink" href="${gmDir}" target="_blank" style="color:var(--ink2)">🗺 Cómo llegar</a>`:''}
-            </div>
+            ${textHtml}
+            ${linksHtml}
           </div>`;
         }
 
         m=L.marker(off,{icon:li}).bindPopup(pop,{
-          maxWidth: hasFlyer ? 290 : 280,
-          // Remove default Leaflet popup padding so flyer image touches the edges
+          maxWidth: hasFlyer ? 400 : 280,
           className: hasFlyer ? 'popup-flyer' : ''
         }).addTo(map);
         m.on('click',()=>selById(ev.id,false));
@@ -1462,11 +1461,12 @@ function fitMapToEvents(){
     const group=L.featureGroup(active);
     if(group.getBounds().isValid()){
       const isMobile=window.innerWidth<=680;
-      // topPad clears the floating time-nav (desktop ~180px tall, mobile ~50px)
-      // rightPad on desktop clears the brand/add-event panel (~220px)
+      // Top padding clears the floating time-nav fully (desktop ~200px, mobile ~60px)
+      // Right padding clears the brand/add-event panel on desktop
+      // Bottom padding gives room for popups that open downward
       map.fitBounds(group.getBounds(),{
-        paddingTopLeft: [isMobile?16:30, isMobile?60:190],
-        paddingBottomRight: [isMobile?16:230, isMobile?16:60],
+        paddingTopLeft: [isMobile?16:30, isMobile?60:210],
+        paddingBottomRight: [isMobile?16:240, isMobile?100:160],
         maxZoom:15,
         animate:true
       });
