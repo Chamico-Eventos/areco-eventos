@@ -1224,37 +1224,52 @@ function renderMap(list, future=[], past=[]){
         m=L.marker(off,{icon:li,opacity:0.5}).bindPopup(pop,{maxWidth:210}).addTo(map);
 
       } else {
-        // All active events get the pulsing glow — DM gets gold, others get standard gold
+        // All active events get the pulsing glow — DM gets slightly brighter gold
         const col = dm ? '#e8c97a' : '#c9a84c';
         const glowCol = dm ? 'rgba(226,185,79,0.55)' : 'rgba(201,168,76,0.42)';
         li=L.divIcon({
           html:`<div style="width:36px;height:36px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(0,0,0,0.7);box-shadow:0 4px 16px rgba(0,0,0,0.7),0 0 14px ${glowCol},0 1px 4px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;animation:pulse 2s ease-in-out infinite;"><img src="${icon}" style="width:21px;height:21px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.outerHTML='<span style=transform:rotate(45deg);font-size:12px>★</span>'"></div>`,
-          className:'',iconSize:[34,34],iconAnchor:[17,34],popupAnchor:[1,-38]
+          className:'',iconSize:[34,34],iconAnchor:[17,34],
+          // 1b) Popup opens to the RIGHT of the pin tip, clear of the icon
+          popupAnchor:[120,-17]
         });
-        if(dm){
-          m=L.marker(off,{icon:li}).addTo(map);
-          m.on('click',()=>{ selById(ev.id,false); openSheet(ev); });
-        } else {
-          const d=parseD(ev.fecha);
-          const c2=coords(ev.lugar);
-          const gmDir=c2?`https://www.google.com/maps/dir/?api=1&destination=${c2[0]},${c2[1]}`:'';
-          const pop=`<div style="min-width:200px;max-width:260px;font-family:'Inter',sans-serif">
-            <div class="pname">${ev.nombre||'Evento'}</div>
-            <div class="pbody">
-              ${ev.lugar?`📍 ${ev.lugar}<br>`:''}
-              ${d?`📅 ${prettyD(d)}<br>`:''}
-              ${ev.hora&&ev.hora!=='Todo el día'?`🕐 ${ev.hora} hs<br>`:''}
-              ${ev.precio&&ev.precio!=='Consultar'?`<br><span class="pgold">${ev.precio}</span>`:''}
-              ${ev.descripcion?`<br><br><span style="font-size:11px;color:#6b6150;line-height:1.6">${ev.descripcion.slice(0,120)}…</span>`:''}
-            </div>
-            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
-              ${ev.link_accion?`<a class="plink" href="${ev.link_accion}" target="_blank">Ver más →</a>`:''}
-              ${gmDir?`<a class="plink" href="${gmDir}" target="_blank" style="color:var(--ink2)">🗺 Cómo llegar</a>`:''}
-            </div>
-          </div>`;
-          m=L.marker(off,{icon:li}).bindPopup(pop,{maxWidth:280}).addTo(map);
-          m.on('click',()=>selById(ev.id,false));
-        }
+
+        // Build unified popup for ALL active events (DM and regular)
+        const d=parseD(ev.fecha);
+        const c2=coords(ev.lugar);
+        const gmDir=c2?`https://www.google.com/maps/dir/?api=1&destination=${c2[0]},${c2[1]}`:'';
+        const hasFlyer = ev.imagen_url && ev.imagen_url.trim();
+        const eventParam=encodeURIComponent(ev.id||ev.nombre||'');
+        const ticketUrl=ev.link_accion||`${TICKETS_URL}/?event=${eventParam}`;
+        const hasPreventa=String(ev.preventa_disponible).toLowerCase()==='true';
+
+        // 3) Flyer layout: text left, flyer thumbnail right when image exists
+        const flyerHtml = hasFlyer
+          ? `<img src="${ev.imagen_url}" style="width:72px;height:72px;object-fit:cover;border-radius:8px;flex-shrink:0;border:1px solid rgba(226,185,79,0.2)" onerror="this.style.display='none'">`
+          : '';
+        const contentInner = `
+          <div class="pbody" style="flex:1;min-width:0">
+            ${ev.lugar?`📍 ${ev.lugar}<br>`:''}
+            ${d?`📅 ${prettyD(d)}<br>`:''}
+            ${ev.hora&&ev.hora!=='Todo el día'?`🕐 ${ev.hora} hs<br>`:''}
+            ${ev.precio&&ev.precio!=='Consultar'?`<br><span class="pgold">${ev.precio}</span>`:''}
+            ${ev.descripcion&&!hasFlyer?`<br><span style="font-size:11px;color:#6b6150;line-height:1.6">${ev.descripcion.slice(0,100)}…</span>`:''}
+          </div>
+          ${flyerHtml}`;
+
+        const pop=`<div style="min-width:220px;max-width:${hasFlyer?'320px':'280px'};font-family:'Inter',sans-serif">
+          <div class="pname">${ev.nombre||'Evento'}</div>
+          <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px">${contentInner}</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:2px;align-items:center">
+            ${dm&&hasPreventa?`<a class="plink" href="${ticketUrl}" target="_blank" style="background:rgba(226,185,79,0.15);border:1px solid rgba(226,185,79,0.35);border-radius:6px;padding:4px 10px;font-weight:600">🎟 Comprar entrada</a>`:''}
+            ${dm&&!hasPreventa&&ev.link_accion?`<a class="plink" href="${ev.link_accion}" target="_blank">Ver más →</a>`:''}
+            ${!dm&&ev.link_accion?`<a class="plink" href="${ev.link_accion}" target="_blank">Ver más →</a>`:''}
+            ${gmDir?`<a class="plink" href="${gmDir}" target="_blank" style="color:var(--ink2)">🗺 Cómo llegar</a>`:''}
+          </div>
+        </div>`;
+
+        m=L.marker(off,{icon:li}).bindPopup(pop,{maxWidth:hasFlyer?330:290}).addTo(map);
+        m.on('click',()=>selById(ev.id,false));
       }
       mkrs[ev.id]=m;
     });
@@ -1263,13 +1278,10 @@ function renderMap(list, future=[], past=[]){
 
 // ── SELECT ────────────────────────────────────────────
 function selEv(id){
-  const ev=evs.find(e=>e.id===id);
   selById(id,true);
-  if(ev&&isDM(ev)){
-    openSheet(ev);
-  } else if(mkrs[id]){
-    map.setView(mkrs[id].getLatLng(),16,{animate:true});
-    mkrs[id].openPopup();
+  if(mkrs[id]){
+    map.setView(mkrs[id].getLatLng(),15,{animate:true});
+    setTimeout(()=>mkrs[id].openPopup(),350);
   }
 }
 function selById(id,pan){
@@ -1416,22 +1428,20 @@ function updateTimeNav(count, direction, eventsList=[]){
 
 function fitMapToEvents(){
   const active=Object.values(mkrs);
-  // Fix 2: no events this week → reset to full Areco view so users see empty map
   if(active.length===0){
     map.setView(CENTER,14,{animate:true});
     return;
   }
-  // Fix 3: always ensure all active markers are visible AND not hidden under the time-nav
-  // Use generous top padding to account for the floating navigator (~110px desktop, ~80px mobile)
   try{
     const group=L.featureGroup(active);
     if(group.getBounds().isValid()){
       const isMobile=window.innerWidth<=680;
-      const topPad=isMobile?90:130; // clear the time-nav widget
+      // topPad clears the floating time-nav (desktop ~180px tall, mobile ~50px)
+      // rightPad on desktop clears the brand/add-event panel (~220px)
       map.fitBounds(group.getBounds(),{
-        paddingTopLeft:[20,topPad],
-        paddingBottomRight:[60,40],
-        maxZoom:16,
+        paddingTopLeft: [isMobile?16:30, isMobile?60:190],
+        paddingBottomRight: [isMobile?16:230, isMobile?16:60],
+        maxZoom:15,
         animate:true
       });
     }
