@@ -529,21 +529,19 @@ img.leaflet-tile{border:none !important;outline:none !important}
     flex-shrink:0;
     width:100%;
     position:relative;z-index:5;
-    /* Cover the blue OSM stripe at the map bottom edge */
-    border-bottom:2px solid var(--border);
-    box-shadow:0 2px 0 var(--bg);
   }
 
-  /* 4 — Event list: flex:1 with scroll; sb-head stays sticky at top via order */
-  /* c) Allow full-page scroll so users can scroll UP to reach the filter bar */
+  /* Cover the blue OSM stripe: thick border-top on the list sits above the map edge */
   .sb-list{
     order:4;
     flex:1;overflow-y:auto;
     background:var(--s1);
-    border-top:1px solid var(--border);
+    border-top:3px solid var(--s1);
+    outline:3px solid var(--s1);
     padding-bottom:20px;
-    /* Scroll the list, and momentum scroll lets users pull up to see filters+map */
     -webkit-overflow-scrolling:touch;
+    position:relative;
+    z-index:10;
   }
   /* Make sb-head sticky so title always visible while scrolling the list */
   .sb-head{position:sticky;top:0;z-index:20;}
@@ -835,6 +833,8 @@ img.leaflet-tile{border:none !important;outline:none !important}
           <div class="tn-status-row">
             <span class="tn-chip" id="tnChip">ESTA SEMANA</span>
             <span class="tn-count" id="tnCount">–</span>
+            <button class="tn-return-btn" id="tnReturn" aria-label="Volver a la semana actual"
+              onclick="wOff=0;render(0)" style="display:none">↩ Volver</button>
           </div>
         </div>
         <div class="tn-divider"></div>
@@ -848,10 +848,6 @@ img.leaflet-tile{border:none !important;outline:none !important}
       </div>
       <div class="tn-timeline" id="tnTimeline"></div>
       <div class="tn-strip" id="tnStrip"></div>
-      <div class="tn-return-bar" id="tnReturnBar" style="display:none">
-        <button class="tn-return-btn" id="tnReturn" aria-label="Volver a la semana actual"
-          onclick="wOff=0;render(0)">↩ Volver a esta semana</button>
-      </div>
     </nav>
     <!-- Brand + button wrapper top-right -->
     <div class="map-brand-wrapper">
@@ -1477,8 +1473,8 @@ function updateTimeNav(count, direction, eventsList=[]){
     strip.innerHTML=html;
   }
 
-  const retBar=document.getElementById('tnReturnBar');
-  if(retBar) retBar.style.display=wOff!==0?'block':'none';
+  const retBtn=document.getElementById('tnReturn');
+  if(retBtn) retBtn.style.display=wOff!==0?'inline-block':'none';
 
   const tl=document.getElementById('tnTimeline');
   if(tl){
