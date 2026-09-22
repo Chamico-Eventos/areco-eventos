@@ -947,7 +947,7 @@ function goToEventWeek(fecha){
 }
 
 // ── MAP ───────────────────────────────────────────────
-const map=L.map('map',{center:CENTER,zoom:15,zoomControl:false});
+const map=L.map('map',{center:CENTER,zoom:15,zoomControl:false,attributionControl:false});
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
   attribution:'© <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
   tileSize:512,
