@@ -1281,13 +1281,6 @@ function renderMap(list, future=[], past=[]){
           .addTo(map);
 
         m.on('click',()=>{
-          if(m.isPopupOpen()){
-            m.closePopup();
-            return;
-          }
-          // Suppress the map click that bubbles up right after this marker click
-          _suppressMapClick = true;
-          setTimeout(()=>{ _suppressMapClick = false; }, 50);
           selById(ev.id,false);
           panForPopup(m, hasFlyer);
         });
@@ -1331,20 +1324,21 @@ function panForPopup(marker, isWide){
   const dx = targetX - markerPx.x;
   const dy = targetY - markerPx.y;
 
-  // Pan map so popup clears the week navigator
   if(Math.abs(dx) > 5 || Math.abs(dy) > 5){
     map.panBy([-dx, -dy], {animate:true, duration:0.35});
+    map.once('moveend', () => marker.openPopup());
+  } else {
+    marker.openPopup();
   }
-  // Open popup after a short delay (covers both pan and no-pan cases)
-  setTimeout(() => marker.openPopup(), 380);
 }
 
-// Close popup when clicking the map background.
-// Leaflet fires marker click BEFORE map click, so we use a short guard.
-let _suppressMapClick = false;
-map.on('click', () => {
-  if(_suppressMapClick) return;
-  map.closePopup();
+// Close any open popup when user clicks the bare map (not a marker)
+map.on('click', (e) => {
+  // e.originalEvent.target is the canvas/tile element when clicking bare map
+  // Leaflet markers have class 'leaflet-marker-icon' — skip those
+  if(!e.originalEvent.target.closest('.leaflet-marker-icon, .leaflet-popup')){
+    map.closePopup();
+  }
 });
 function futureEvents(){
   const{end}=wRange(wOff);
