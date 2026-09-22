@@ -1283,11 +1283,13 @@ function renderMap(list, future=[], past=[]){
         m.on('click',()=>{
           if(m.isPopupOpen()){
             m.closePopup();
-          } else {
-            _markerJustClicked = true;
-            selById(ev.id,false);
-            panForPopup(m, hasFlyer);
+            return;
           }
+          // Suppress the map click that bubbles up right after this marker click
+          _suppressMapClick = true;
+          setTimeout(()=>{ _suppressMapClick = false; }, 50);
+          selById(ev.id,false);
+          panForPopup(m, hasFlyer);
         });
       }
       mkrs[ev.id]=m;
@@ -1315,13 +1317,10 @@ function selById(id,pan){
 }
 
 // ── PAN-TO-FIT POPUP ──────────────────────────────────
-let savedView = null;
-
 function panForPopup(marker, isWide){
   const isMobile = window.innerWidth <= 680;
   const navH  = isMobile ? 60 : 210;
   const mapEl = document.getElementById('map');
-  const mapH  = mapEl.offsetHeight;
   const mapW  = mapEl.offsetWidth;
   const popH  = isWide ? 220 : 160;
 
@@ -1332,15 +1331,19 @@ function panForPopup(marker, isWide){
   const dx = targetX - markerPx.x;
   const dy = targetY - markerPx.y;
 
-  map.once('moveend', () => marker.openPopup());
-  map.panBy([-dx, -dy], {animate:true, duration:0.35});
+  // Pan map so popup clears the week navigator
+  if(Math.abs(dx) > 5 || Math.abs(dy) > 5){
+    map.panBy([-dx, -dy], {animate:true, duration:0.35});
+  }
+  // Open popup after a short delay (covers both pan and no-pan cases)
+  setTimeout(() => marker.openPopup(), 380);
 }
 
-// Close popup when user clicks on the map background.
-// Use a flag so a marker click doesn't immediately close the popup it just opened.
-let _markerJustClicked = false;
+// Close popup when clicking the map background.
+// Leaflet fires marker click BEFORE map click, so we use a short guard.
+let _suppressMapClick = false;
 map.on('click', () => {
-  if(_markerJustClicked){ _markerJustClicked=false; return; }
+  if(_suppressMapClick) return;
   map.closePopup();
 });
 function futureEvents(){
