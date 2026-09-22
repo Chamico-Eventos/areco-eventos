@@ -1280,11 +1280,11 @@ function renderMap(list, future=[], past=[]){
           .bindPopup(popHtml,{maxWidth: hasFlyer?400:280, autoPan:false})
           .addTo(map);
 
-        m.on('click',(e)=>{
-          L.DomEvent.stopPropagation(e); // prevent map click from firing and immediately closing
+        m.on('click',()=>{
           if(m.isPopupOpen()){
             m.closePopup();
           } else {
+            _markerJustClicked = true;
             selById(ev.id,false);
             panForPopup(m, hasFlyer);
           }
@@ -1336,8 +1336,13 @@ function panForPopup(marker, isWide){
   map.panBy([-dx, -dy], {animate:true, duration:0.35});
 }
 
-// Close popup when user clicks on the map background
-map.on('click', () => map.closePopup());
+// Close popup when user clicks on the map background.
+// Use a flag so a marker click doesn't immediately close the popup it just opened.
+let _markerJustClicked = false;
+map.on('click', () => {
+  if(_markerJustClicked){ _markerJustClicked=false; return; }
+  map.closePopup();
+});
 function futureEvents(){
   const{end}=wRange(wOff);
   const cutoff=new Date(end);
