@@ -302,7 +302,7 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .mob-wn-btn{background:none;border:1px solid var(--border);border-radius:6px;color:var(--gold);font-size:16px;line-height:1;padding:3px 9px;cursor:pointer;transition:background .15s}
 .mob-wn-btn:hover{background:rgba(201,168,76,0.12)}
 .mob-wn-label{font-size:11px;font-weight:600;color:var(--ink);white-space:nowrap;min-width:70px;text-align:center}
-.mob-cat-wrap{position:relative;flex:1;min-width:0}
+.mob-cat-wrap{position:relative;min-width:80px;max-width:120px}
 .mob-cat-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:6px;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--gold2);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
 .mob-cat-arrow{font-size:10px;opacity:.7;transition:transform .15s}
 .mob-cat-btn.open .mob-cat-arrow{transform:rotate(180deg)}
@@ -495,32 +495,27 @@ img.leaflet-tile{border:none !important;outline:none !important}
   /* Sidebar dissolves into flex — children become direct shell items */
   .sidebar{display:contents}
 
-  /* 1 — Compact header: title + add-event button side by side, no subtitle */
+  /* 1 — Compact header: title left, category dropdown + add-event right */
   .sb-head{
     order:1;flex-shrink:0;
     background:var(--s1);
     border-bottom:1px solid var(--border);
     border-right:none;border-radius:0;
     padding:8px 12px;cursor:default;
-    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
   }
   .mob-handle{display:none}
   /* 4A: hide the "by DataManIAcs" subtitle on mobile */
   .brand-text small{display:none}
   .brand-text h1{font-size:17px;margin-bottom:0;line-height:1}
-  /* 4B: add-event button moves into header row */
-  .map-brand-wrapper{display:none} /* hide the map overlay wrapper on mobile */
-  .mob-add-btn-wrap{display:flex;flex-shrink:0} /* shown on mobile only */
+  /* 4B: show mob-add-btn-wrap as flex row */
+  .map-brand-wrapper{display:none}
+  .mob-add-btn-wrap{display:flex;align-items:center;gap:6px;flex-shrink:0}
 
-  /* 2 — Category filters: show mobile bar, hide desktop pills */
-  .sb-filters{
-    order:2;flex-shrink:0;
-    background:var(--s1);
-    padding:6px 12px;
-    border-bottom:1px solid var(--b2);
-  }
+  /* 2 — Category filters: hide on mobile (category moved to header, week nav is on map) */
+  .sb-filters{display:none}
   .desktop-only{display:none !important}
-  .mob-filter-bar{display:flex;align-items:center;gap:8px;width:100%}
+  .mob-filter-bar{display:none}
 
   /* 3 — Map 40% height */
   #map{
@@ -771,29 +766,22 @@ img.leaflet-tile{border:none !important;outline:none !important}
         <h1><em>Areco</em> Eventos</h1>
         <small>by DataManIAcs · San Antonio de Areco</small>
       </div>
-      <!-- Mobile-only: add-event button lives here next to the title -->
+      <!-- Mobile-only: category dropdown + add-event button in the header row -->
       <div class="mob-add-btn-wrap">
-        <button class="add-ev-btn" onclick="openSubModal()" style="padding:7px 12px;font-size:10.5px">✦ Agregá tu evento</button>
+        <div class="mob-cat-wrap" style="margin-right:6px">
+          <button class="mob-cat-btn" id="mobCatBtn" onclick="toggleMobCat(event)">
+            <span id="mobCatLabel">Todos</span> <span class="mob-cat-arrow">▾</span>
+          </button>
+          <div class="mob-cat-dropdown" id="mobCatDropdown"></div>
+        </div>
+        <button class="add-ev-btn" onclick="openSubModal()" style="padding:7px 11px;font-size:10px;white-space:nowrap">✦ Gratis</button>
       </div>
     </div>
     <div class="sb-filters">
       <!-- Desktop: label + pills row -->
       <div class="filter-hd desktop-only">Categoría</div>
       <div class="pills desktop-only" id="pills"></div>
-      <!-- Mobile: compact week nav + category dropdown in one row -->
-      <div class="mob-filter-bar">
-        <div class="mob-week-nav">
-          <button class="mob-wn-btn" id="mobWPrev" aria-label="Semana anterior">‹</button>
-          <span class="mob-wn-label" id="mobWLabel">–</span>
-          <button class="mob-wn-btn" id="mobWNext" aria-label="Semana siguiente">›</button>
-        </div>
-        <div class="mob-cat-wrap">
-          <button class="mob-cat-btn" id="mobCatBtn" onclick="toggleMobCat(event)">
-            <span id="mobCatLabel">Todos</span> <span class="mob-cat-arrow">▾</span>
-          </button>
-          <div class="mob-cat-dropdown" id="mobCatDropdown"></div>
-        </div>
-      </div>
+      <!-- Mobile: filters row now empty — week nav is on the map, category is in header -->
     </div>
     <div class="sb-list" id="list">
       <div class="empty"><strong>Cargando…</strong></div>
