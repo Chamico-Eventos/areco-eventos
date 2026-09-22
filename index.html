@@ -281,6 +281,8 @@ img.leaflet-tile{border:none !important;outline:none !important}
 /* Hide OSM attribution bar — removes the blue lines at map edges */
 .leaflet-control-attribution{display:none !important}
 .leaflet-bottom{display:none !important}
+/* Clip map container so tile edges never bleed outside the map div */
+#map{overflow:hidden}
 
 /* ── PAST EVENT CARDS ─────────────────────────────── */
 .past-card{opacity:.32;border-color:transparent!important;background:var(--bg)!important}
@@ -294,6 +296,8 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .map-brand-tagline{font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);align-self:flex-start}
 /* Mobile floating add-event button on map — hidden on desktop */
 .mob-add-ev-map{display:none}
+/* Mobile header elements — hidden on desktop */
+.mob-add-btn-wrap{display:none}
 /* Mobile filter bar hidden on desktop */
 .mob-filter-bar{display:none}
 /* desktop-only: just ensure visibility — don't override element's own display */
