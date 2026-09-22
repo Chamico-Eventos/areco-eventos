@@ -1310,65 +1310,28 @@ function selById(id,pan){
 }
 
 // ── PAN-TO-FIT POPUP ──────────────────────────────────
-// When a marker is clicked we pan+zoom so the popup appears
-// in the lower half of the map, well clear of the week selector.
-// When user closes popup or clicks map background, we restore the overview.
-
-let savedView = null; // {center, zoom} before zooming into an event
+let savedView = null;
 
 function panForPopup(marker, isWide){
   const isMobile = window.innerWidth <= 680;
-  const navH  = isMobile ? 60 : 210;  // px the week nav takes from top
+  const navH  = isMobile ? 60 : 210;
   const mapEl = document.getElementById('map');
   const mapH  = mapEl.offsetHeight;
   const mapW  = mapEl.offsetWidth;
+  const popH  = isWide ? 220 : 160;
 
-  // Popup height estimate (text only ~160px, with flyer ~220px)
-  const popH = isWide ? 220 : 160;
-  // Popup width
-  const popW = isWide ? 400 : 280;
+  // Target pixel: marker pin tip sits in the lower-left of the safe zone
+  const targetX = mapW * 0.28;
+  const targetY = navH + popH + 60;
 
-  // Save current view so we can restore it on close
-  savedView = { center: map.getCenter(), zoom: map.getZoom() };
+  const markerPx = map.latLngToContainerPoint(marker.getLatLng());
+  const dx = targetX - markerPx.x;
+  const dy = targetY - markerPx.y;
 
-  // We want the marker pin tip to sit in the left-center of the available
-  // map area below the nav. Pan so that:
-  //   marker appears at x = mapW * 0.25 (left quarter)
-  //   marker appears at y = navH + popH + 20  (popup fits above it cleanly)
-  const targetPx = L.point(mapW * 0.25, navH + popH + 50);
-  const targetLatLng = map.containerPointToLatLng(targetPx);
-  const markerLatLng = marker.getLatLng();
-
-  // Shift center so marker lands at targetPx
-  const currentCenter = map.getCenter();
-  const markerPx = map.latLngToContainerPoint(markerLatLng);
-  const dx = targetPx.x - markerPx.x;
-  const dy = targetPx.y - markerPx.y;
-  const newCenterPx = map.latLngToContainerPoint(currentCenter).subtract(L.point(dx, dy)).add(L.point(dx,dy));
-
-  // Simpler: just pan the map by the delta
-  map.once('moveend', ()=> marker.openPopup());
-  map.panBy([-dx, -dy], {animate:true, duration:0.4});
+  // Open popup after pan settles
+  map.once('moveend', () => marker.openPopup());
+  map.panBy([-dx, -dy], {animate:true, duration:0.35});
 }
-
-function restoreOverview(){
-  if(savedView){
-    map.closePopup();
-    // If we have active markers, refit; otherwise restore saved
-    const active=Object.values(mkrs);
-    if(active.length>0){
-      fitMapToEvents();
-    } else {
-      map.setView(savedView.center, savedView.zoom, {animate:true});
-    }
-    savedView=null;
-  }
-}
-
-// Restore overview when popup is closed (X button or map click)
-map.on('popupclose', ()=>{
-  if(savedView) restoreOverview();
-});
 function futureEvents(){
   const{end}=wRange(wOff);
   const cutoff=new Date(end);
@@ -1395,7 +1358,6 @@ function pastEvents(){
 // ── FULL RENDER ───────────────────────────────────────
 function render(direction=0){
   map.closePopup();
-  savedView=null;
   const list=filtered();
   renderList(list);
   renderMap(list, futureEvents(), pastEvents());
