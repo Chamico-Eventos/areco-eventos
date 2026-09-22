@@ -529,6 +529,9 @@ img.leaflet-tile{border:none !important;outline:none !important}
     flex-shrink:0;
     width:100%;
     position:relative;z-index:5;
+    /* Cover the blue OSM stripe at the map bottom edge */
+    border-bottom:2px solid var(--border);
+    box-shadow:0 2px 0 var(--bg);
   }
 
   /* 4 — Event list: flex:1 with scroll; sb-head stays sticky at top via order */
