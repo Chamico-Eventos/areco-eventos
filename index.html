@@ -88,30 +88,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 .leaflet-popup-content-wrapper{background:var(--s3) !important;border:1px solid rgba(226,185,79,0.16) !important;border-radius:14px !important;color:var(--ink) !important;box-shadow:0 16px 48px rgba(0,0,0,.8),0 4px 12px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.04) !important}
 .leaflet-popup-tip{background:var(--s1) !important}
 .leaflet-popup-close-button{color:var(--muted) !important;top:8px !important;right:8px !important}
-/* All active-event popups: use standard Leaflet popup, tip hidden, opens above */
-.popup-no-tip .leaflet-popup-tip-container{display:none !important}
-.popup-no-tip .leaflet-popup-content-wrapper{padding:0 !important;overflow:hidden !important;border-radius:14px !important}
-.popup-no-tip .leaflet-popup-content{margin:0 !important;width:auto !important}
-/* Custom event info panel — absolutely positioned over map, below-right of icon */
-#ev-panel{
-  position:absolute;
-  z-index:800;
-  display:none;
-  background:var(--s3);
-  border:1px solid rgba(226,185,79,0.18);
-  border-radius:14px;
-  box-shadow:0 16px 48px rgba(0,0,0,.85),0 4px 12px rgba(0,0,0,0.5);
-  font-family:'Inter',sans-serif;
-  overflow:hidden;
-  max-width:420px;
-  min-width:240px;
-}
-#ev-panel-close{
-  position:absolute;top:8px;right:10px;
-  background:none;border:none;color:var(--muted);
-  font-size:16px;cursor:pointer;z-index:2;line-height:1;
-}
-#ev-panel-close:hover{color:var(--ink)}
+/* All active-event popups — standard Leaflet popup, tip visible */
 .pname{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--ink);margin-bottom:8px;line-height:1.3}
 .pbody{font-size:12px;color:var(--ink2);line-height:1.7}
 .pgold{color:var(--gold);font-weight:600}
@@ -823,11 +800,6 @@ img.leaflet-tile{border:none !important;outline:none !important}
     </div>
   </aside>
   <div id="map">
-    <!-- Custom event info panel — positioned below-right of clicked marker -->
-    <div id="ev-panel">
-      <button id="ev-panel-close" onclick="closeEvPanel()">✕</button>
-      <div id="ev-panel-body"></div>
-    </div>
     <!-- Floating Time Navigator -->
     <nav class="time-nav" id="timeNav" aria-label="Navegación por semanas">
       <div class="tn-main">
@@ -1258,10 +1230,10 @@ function renderMap(list, future=[], past=[]){
         const glowCol = dm ? 'rgba(226,185,79,0.55)' : 'rgba(201,168,76,0.42)';
         li=L.divIcon({
           html:`<div style="width:36px;height:36px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(0,0,0,0.7);box-shadow:0 4px 16px rgba(0,0,0,0.7),0 0 14px ${glowCol},0 1px 4px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;animation:pulse 2s ease-in-out infinite;"><img src="${icon}" style="width:21px;height:21px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.outerHTML='<span style=transform:rotate(45deg);font-size:12px>★</span>'"></div>`,
-          className:'',iconSize:[34,34],iconAnchor:[17,34],popupAnchor:[0,-36]
+          className:'',iconSize:[34,34],iconAnchor:[17,34],
+          popupAnchor:[0,-38]
         });
 
-        // Build panel HTML
         const d=parseD(ev.fecha);
         const c2=coords(ev.lugar);
         const gmDir=c2?`https://www.google.com/maps/dir/?api=1&destination=${c2[0]},${c2[1]}`:'';
@@ -1270,48 +1242,47 @@ function renderMap(list, future=[], past=[]){
         const ticketUrl=ev.link_accion||`${TICKETS_URL}/?event=${eventParam}`;
         const hasPreventa=String(ev.preventa_disponible).toLowerCase()==='true';
 
-        const linksHtml=`
-          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;align-items:center">
-            ${dm&&hasPreventa?`<a class="plink" href="${ticketUrl}" target="_blank" style="background:rgba(226,185,79,0.15);border:1px solid rgba(226,185,79,0.35);border-radius:6px;padding:5px 12px;font-weight:600">🎟 Comprar entrada</a>`:''}
-            ${(dm&&!hasPreventa||!dm)&&ev.link_accion?`<a class="plink" href="${ev.link_accion}" target="_blank">Ver más →</a>`:''}
-            ${gmDir?`<a class="plink" href="${gmDir}" target="_blank" style="color:var(--ink2)">🗺 Cómo llegar</a>`:''}
-          </div>`;
+        const linksHtml=`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;align-items:center">
+          ${dm&&hasPreventa?`<a class="plink" href="${ticketUrl}" target="_blank" style="background:rgba(226,185,79,0.15);border:1px solid rgba(226,185,79,0.35);border-radius:6px;padding:5px 12px;font-weight:600">🎟 Comprar entrada</a>`:''}
+          ${(dm&&!hasPreventa||!dm)&&ev.link_accion?`<a class="plink" href="${ev.link_accion}" target="_blank">Ver más →</a>`:''}
+          ${gmDir?`<a class="plink" href="${gmDir}" target="_blank" style="color:var(--ink2)">🗺 Cómo llegar</a>`:''}
+        </div>`;
 
-        const textBlock=`
-          <div class="pbody" style="line-height:1.75">
-            ${ev.lugar?`📍 ${ev.lugar}<br>`:''}
-            ${d?`📅 ${prettyD(d)}<br>`:''}
-            ${ev.hora&&ev.hora!=='Todo el día'?`🕐 ${ev.hora} hs<br>`:''}
-            ${ev.precio&&ev.precio!=='Consultar'?`<br><span class="pgold">${ev.precio}</span>`:''}
-            ${ev.descripcion&&!hasFlyer?`<br><span style="font-size:11px;color:#6b6150;line-height:1.5">${ev.descripcion.slice(0,120)}…</span>`:''}
-          </div>`;
+        const textBlock=`<div class="pbody" style="line-height:1.75">
+          ${ev.lugar?`📍 ${ev.lugar}<br>`:''}
+          ${d?`📅 ${prettyD(d)}<br>`:''}
+          ${ev.hora&&ev.hora!=='Todo el día'?`🕐 ${ev.hora} hs<br>`:''}
+          ${ev.precio&&ev.precio!=='Consultar'?`<br><span class="pgold">${ev.precio}</span>`:''}
+          ${ev.descripcion&&!hasFlyer?`<br><span style="font-size:11px;color:#6b6150;line-height:1.5">${ev.descripcion.slice(0,120)}…</span>`:''}
+        </div>`;
 
-        let panelHtml;
+        let popHtml;
         if(hasFlyer){
-          panelHtml=`
-            <div style="padding:16px 18px 14px;padding-right:32px">
-              <div class="pname" style="margin-bottom:10px">${ev.nombre||'Evento'}</div>
-              <div style="display:flex;gap:14px;align-items:flex-start">
-                <div style="flex:1;min-width:130px">${textBlock}${linksHtml}</div>
-                <img src="${ev.imagen_url}"
-                  style="width:130px;flex-shrink:0;height:auto;max-height:200px;
-                         object-fit:contain;border-radius:8px;
-                         border:1px solid rgba(226,185,79,0.2);background:#0d0c09"
-                  onerror="this.style.display='none'">
-              </div>
-            </div>`;
-        } else {
-          panelHtml=`
-            <div style="padding:16px 18px 14px;padding-right:32px;min-width:220px;max-width:280px">
-              <div class="pname">${ev.nombre||'Evento'}</div>
+          popHtml=`<div style="display:flex;gap:14px;align-items:flex-start;min-width:300px;max-width:380px">
+            <div style="flex:1;min-width:0">
+              <div class="pname" style="margin-bottom:8px">${ev.nombre||'Evento'}</div>
               ${textBlock}${linksHtml}
-            </div>`;
+            </div>
+            <img src="${ev.imagen_url}"
+              style="width:120px;flex-shrink:0;height:auto;max-height:190px;
+                     object-fit:contain;border-radius:8px;
+                     border:1px solid rgba(226,185,79,0.2);background:#0d0c09"
+              onerror="this.style.display='none'">
+          </div>`;
+        } else {
+          popHtml=`<div style="min-width:210px;max-width:270px">
+            <div class="pname">${ev.nombre||'Evento'}</div>
+            ${textBlock}${linksHtml}
+          </div>`;
         }
 
-        m=L.marker(off,{icon:li}).addTo(map);
+        m=L.marker(off,{icon:li})
+          .bindPopup(popHtml,{maxWidth: hasFlyer?400:280, autoPan:false})
+          .addTo(map);
+
         m.on('click',()=>{
           selById(ev.id,false);
-          openEvPanel(m, panelHtml, hasFlyer);
+          panForPopup(m, hasFlyer);
         });
       }
       mkrs[ev.id]=m;
@@ -1321,10 +1292,13 @@ function renderMap(list, future=[], past=[]){
 
 // ── SELECT ────────────────────────────────────────────
 function selEv(id){
-  selById(id,true);
-  if(mkrs[id]){
-    map.setView(mkrs[id].getLatLng(),15,{animate:true});
-    setTimeout(()=>mkrs[id].openPopup(),350);
+  selById(id,false);
+  const m=mkrs[id];
+  if(m){
+    // Determine if this event has a flyer (check popup content width)
+    const ev=evs.find(e=>e.id===id);
+    const hasFlyer=ev&&!!(ev.imagen_url&&ev.imagen_url.trim());
+    panForPopup(m, hasFlyer);
   }
 }
 function selById(id,pan){
@@ -1332,63 +1306,68 @@ function selById(id,pan){
   document.querySelectorAll('.ecard').forEach(c=>c.classList.remove('active'));
   const c=document.querySelector(`.ecard[data-id="${id}"]`);
   if(c){c.classList.add('active');c.scrollIntoView({behavior:'smooth',block:'nearest'});}
-  if(pan&&mkrs[id])map.setView(mkrs[id].getLatLng(),16,{animate:true});
+  if(pan&&mkrs[id])map.setView(mkrs[id].getLatLng(),15,{animate:true});
 }
 
-// ── CUSTOM EVENT PANEL ────────────────────────────────
-// Positions the panel below-right of the clicked marker,
-// clamped so it never goes under the week selector or off screen.
-function openEvPanel(marker, html, isWide){
-  const panel=document.getElementById('ev-panel');
-  const body=document.getElementById('ev-panel-body');
-  body.innerHTML=html;
-  panel.style.width = isWide ? '420px' : '280px';
-  panel.style.display='block';
+// ── PAN-TO-FIT POPUP ──────────────────────────────────
+// When a marker is clicked we pan+zoom so the popup appears
+// in the lower half of the map, well clear of the week selector.
+// When user closes popup or clicks map background, we restore the overview.
 
-  // Get marker pixel position on the map container
-  const mapEl=document.getElementById('map');
-  const mapRect=mapEl.getBoundingClientRect();
-  const pt=map.latLngToContainerPoint(marker.getLatLng());
+let savedView = null; // {center, zoom} before zooming into an event
 
-  // Panel dimensions (approximate before render — use fixed estimates)
-  const panelW = isWide ? 420 : 280;
-  const panelH = isWide ? 260 : 200;
-
-  // Desired: panel top-left starts just right of and below the pin tip
-  // Pin tip is at pt (bottom-center of pin). Pin is 34px tall.
-  let left = pt.x + 10;         // 10px gap to the right of pin center
-  let top  = pt.y - 34 + 8;     // start from pin top, 8px gap below
-
-  // Week selector occupies ~200px from map top on desktop, 60px on mobile
+function panForPopup(marker, isWide){
   const isMobile = window.innerWidth <= 680;
-  const navClearance = isMobile ? 65 : 210;
-  if(top < navClearance) top = navClearance;
+  const navH  = isMobile ? 60 : 210;  // px the week nav takes from top
+  const mapEl = document.getElementById('map');
+  const mapH  = mapEl.offsetHeight;
+  const mapW  = mapEl.offsetWidth;
 
-  // Clamp so panel doesn't overflow right or bottom edge of map
-  const mapW = mapRect.width;
-  const mapH = mapRect.height;
-  if(left + panelW > mapW - 10) left = mapW - panelW - 10;
-  if(left < 10) left = 10;
-  if(top + panelH > mapH - 10) top = mapH - panelH - 10;
-  if(top < 10) top = 10;
+  // Popup height estimate (text only ~160px, with flyer ~220px)
+  const popH = isWide ? 220 : 160;
+  // Popup width
+  const popW = isWide ? 400 : 280;
 
-  panel.style.left = left + 'px';
-  panel.style.top  = top  + 'px';
+  // Save current view so we can restore it on close
+  savedView = { center: map.getCenter(), zoom: map.getZoom() };
+
+  // We want the marker pin tip to sit in the left-center of the available
+  // map area below the nav. Pan so that:
+  //   marker appears at x = mapW * 0.25 (left quarter)
+  //   marker appears at y = navH + popH + 20  (popup fits above it cleanly)
+  const targetPx = L.point(mapW * 0.25, navH + popH + 50);
+  const targetLatLng = map.containerPointToLatLng(targetPx);
+  const markerLatLng = marker.getLatLng();
+
+  // Shift center so marker lands at targetPx
+  const currentCenter = map.getCenter();
+  const markerPx = map.latLngToContainerPoint(markerLatLng);
+  const dx = targetPx.x - markerPx.x;
+  const dy = targetPx.y - markerPx.y;
+  const newCenterPx = map.latLngToContainerPoint(currentCenter).subtract(L.point(dx, dy)).add(L.point(dx,dy));
+
+  // Simpler: just pan the map by the delta
+  map.once('moveend', ()=> marker.openPopup());
+  map.panBy([-dx, -dy], {animate:true, duration:0.4});
 }
 
-function closeEvPanel(){
-  const panel=document.getElementById('ev-panel');
-  if(panel) panel.style.display='none';
+function restoreOverview(){
+  if(savedView){
+    map.closePopup();
+    // If we have active markers, refit; otherwise restore saved
+    const active=Object.values(mkrs);
+    if(active.length>0){
+      fitMapToEvents();
+    } else {
+      map.setView(savedView.center, savedView.zoom, {animate:true});
+    }
+    savedView=null;
+  }
 }
 
-// Close panel when clicking on the map background
-// (don't close when clicking inside the panel itself)
-document.addEventListener('DOMContentLoaded',()=>{
-  const mapEl=document.getElementById('map');
-  if(mapEl) mapEl.addEventListener('click',(e)=>{
-    const panel=document.getElementById('ev-panel');
-    if(panel && !panel.contains(e.target)) closeEvPanel();
-  });
+// Restore overview when popup is closed (X button or map click)
+map.on('popupclose', ()=>{
+  if(savedView) restoreOverview();
 });
 function futureEvents(){
   const{end}=wRange(wOff);
@@ -1415,7 +1394,8 @@ function pastEvents(){
 
 // ── FULL RENDER ───────────────────────────────────────
 function render(direction=0){
-  closeEvPanel();
+  map.closePopup();
+  savedView=null;
   const list=filtered();
   renderList(list);
   renderMap(list, futureEvents(), pastEvents());
