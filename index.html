@@ -120,7 +120,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 }
 .dm-sheet.open{transform:translateY(0)}
 
-/* drag handle */
 .sheet-handle{
   width:40px;height:4px;
   background:rgba(201,168,76,0.3);
@@ -132,7 +131,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 .sheet-scroll::-webkit-scrollbar{width:3px}
 .sheet-scroll::-webkit-scrollbar-thumb{background:var(--border)}
 
-/* event image */
 .sheet-img{
   width:100%;
   height:220px;
@@ -146,7 +144,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
   font-size:48px;
 }
 
-/* content */
 .sheet-body{padding:20px 22px 28px}
 
 .sheet-dm-eyebrow{
@@ -183,7 +180,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
   margin-bottom:20px;
 }
 
-/* price + CTA */
 .sheet-cta-area{
   background:var(--s2);border-radius:14px;
   border:1px solid var(--border);
@@ -233,7 +229,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 }
 .sheet-source-link:hover{color:var(--ink2)}
 
-/* close button */
 .sheet-close{
   position:absolute;top:14px;right:16px;
   width:30px;height:30px;border-radius:50%;
@@ -253,28 +248,27 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(232,201,122,.5)}50%{box-shadow:0 0 0 8px rgba(232,201,122,0)}}
 
 /* ── CAT COLOURS ──────────────────────────────────── */
-.c-musica{background:rgba(124,58,237,.16);color:#a78bfa;border:1px solid rgba(124,58,237,.3)}
-.c-tradicion{background:rgba(201,168,76,.14);color:var(--gold);border:1px solid var(--border)}
-.c-arte{background:rgba(219,39,119,.12);color:#f472b6;border:1px solid rgba(219,39,119,.25)}
-.c-teatro{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25)}
-.c-deportes{background:rgba(37,99,235,.12);color:#60a5fa;border:1px solid rgba(37,99,235,.25)}
-.c-gastro{background:rgba(245,158,11,.12);color:#fbbf24;border:1px solid rgba(245,158,11,.25)}
-.c-infantil{background:rgba(16,185,129,.12);color:#34d399;border:1px solid rgba(16,185,129,.25)}
-.c-cultural{background:rgba(20,184,166,.12);color:#2dd4bf;border:1px solid rgba(20,184,166,.25)}
-.c-feria{background:rgba(249,115,22,.12);color:#fb923c;border:1px solid rgba(249,115,22,.25)}
-.c-evento{background:rgba(107,97,80,.18);color:var(--muted);border:1px solid rgba(107,97,80,.2)}
-.c-dm{background:rgba(232,201,122,.18);color:var(--gold2);border:1px solid var(--gold)}
+/* Each category gets a distinct colour tuned for the dark background */
+.c-musica   {background:rgba(226,185,79,0.14); color:#e2b94f; border:1px solid rgba(226,185,79,0.3)}   /* gold — brand, most common */
+.c-tradicion{background:rgba(161,98,7,0.18);   color:#c17f2a; border:1px solid rgba(161,98,7,0.35)}    /* amber-brown — earthy */
+.c-arte     {background:rgba(244,63,94,0.12);  color:#f87191; border:1px solid rgba(244,63,94,0.28)}   /* coral-pink */
+.c-teatro   {background:rgba(192,132,252,0.12);color:#c084fc; border:1px solid rgba(192,132,252,0.28)} /* purple */
+.c-deportes {background:rgba(34,197,94,0.12);  color:#4ade80; border:1px solid rgba(34,197,94,0.28)}   /* green */
+.c-gastro   {background:rgba(251,146,60,0.12); color:#fb923c; border:1px solid rgba(251,146,60,0.28)}  /* amber-orange */
+.c-infantil {background:rgba(56,189,248,0.12); color:#38bdf8; border:1px solid rgba(56,189,248,0.28)}  /* sky blue */
+.c-cultural {background:rgba(167,139,250,0.12);color:#a78bfa; border:1px solid rgba(167,139,250,0.28)} /* lavender */
+.c-feria    {background:rgba(250,204,21,0.12); color:#facc15; border:1px solid rgba(250,204,21,0.28)}   /* yellow */
+.c-solidario{background:rgba(52,211,153,0.12); color:#34d399; border:1px solid rgba(52,211,153,0.28)}  /* emerald */
+.c-evento   {background:rgba(107,97,80,0.18);  color:var(--muted); border:1px solid rgba(107,97,80,0.2)} /* neutral */
+.c-dm       {background:rgba(232,201,122,0.18);color:var(--gold2); border:1px solid var(--gold)}        /* branded gold */
 
 /* ── MARKER HOVER ───────────────────────────────────── */
 .leaflet-marker-icon{transition:filter .15s}
 .leaflet-marker-icon:hover{filter:brightness(1.18) drop-shadow(0 2px 8px rgba(226,185,79,0.4));z-index:1000!important}
+
 /* ── DARK TILE INVERSION ──────────────────────────── */
-/* Inverts OSM tiles to dark. Markers/popups are in separate
-   Leaflet panes so they are NOT affected by this filter. */
 .leaflet-tile-pane{
-  /* Slightly higher contrast so streets pop on the dark background */
   filter:invert(100%) hue-rotate(180deg) brightness(95%) contrast(100%) saturate(0.75);
-  /* GPU composite — all tiles rendered as one layer, eliminates seams */
   transform:translateZ(0);
   will-change:transform;
 }
@@ -286,14 +280,17 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .past-name{text-decoration:line-through;color:var(--muted)!important}
 .past-div{opacity:.4}
 .past-tag{display:inline-block;margin-left:8px;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:rgba(107,97,80,0.2);border-radius:999px;padding:1px 6px;vertical-align:middle}
+
 /* ── MAP BRANDING ─────────────────────────────────── */
 .map-brand-wrapper{position:absolute;top:14px;right:14px;z-index:999;display:flex;flex-direction:column;gap:8px;min-width:200px}
 .map-brand{background:rgba(14,13,11,0.82);backdrop-filter:blur(10px);border:1px solid rgba(201,168,76,0.18);border-radius:12px;padding:10px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;width:100%}
 .map-brand img{width:100%;max-height:56px;object-fit:contain;mix-blend-mode:luminosity;opacity:1}
 .map-brand-tagline{font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);align-self:flex-start}
+
 /* ── ADD EVENT BUTTON ─────────────────────────────── */
 .add-ev-btn{width:100%;justify-content:center;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0d0c09;border:none;border-radius:999px;padding:10px 15px;font-family:Inter,sans-serif;font-size:11.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(226,185,79,0.2);transition:filter .2s,transform .15s,box-shadow .2s;display:flex;align-items:center;gap:6px;white-space:nowrap;box-sizing:border-box}
 .add-ev-btn:hover{filter:brightness(1.06);transform:translateY(-1px);box-shadow:0 4px 16px rgba(226,185,79,0.28)}
+
 /* ── SUBMISSION MODAL ─────────────────────────────── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(6px);z-index:3000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;padding:16px}
 .modal-overlay.open{opacity:1;pointer-events:auto}
@@ -391,6 +388,7 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .tn-chip-future{background:rgba(107,97,80,0.18);color:var(--muted);border-color:rgba(107,97,80,0.2)}
 .tn-chip-past{background:rgba(60,50,35,0.25);color:#6b6150;border-color:rgba(60,50,35,0.2)}
 .tn-count{font-size:10px;color:var(--ink2);font-weight:600}
+
 /* Seven-day strip */
 .tn-strip{
   border-top:1px solid rgba(226,185,79,0.08);
@@ -408,6 +406,7 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .tn-day-num{font-size:11px;font-weight:600;color:var(--ink2)}
 .tn-day-today{background:rgba(226,185,79,0.12)}
 .tn-day-today .tn-day-name,.tn-day-today .tn-day-num{color:var(--gold);font-weight:700}
+
 /* Timeline mood bar */
 .tn-timeline{
   display:flex;align-items:center;
@@ -425,6 +424,7 @@ img.leaflet-tile{border:none !important;outline:none !important}
 }
 .tn-tl-label{font-size:7.5px;color:var(--muted);white-space:nowrap;letter-spacing:.02em}
 .tn-tl-line{flex:1;height:1px;background:rgba(107,97,80,0.25);min-width:8px}
+
 /* Return to current week */
 .tn-return-bar{
   border-top:1px solid rgba(226,185,79,0.08);
@@ -437,39 +437,41 @@ img.leaflet-tile{border:none !important;outline:none !important}
 }
 .tn-return-btn:hover{opacity:1}
 .tn-return-btn:focus-visible{outline:2px solid var(--gold);border-radius:4px;padding:2px 4px}
+
 /* Reduced motion */
 @media(prefers-reduced-motion:reduce){
   .tn-date{transition:opacity .15s}
   .ecard{transition:border-color .15s,background .15s}
 }
+
 /* Events list heading */
 .ev-week-heading{
   font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
   color:var(--muted);padding:10px 4px 6px;
   border-bottom:1px solid var(--b2);margin-bottom:8px;
 }
-/* Day strip event dots */
+
+/* Day strip event dots — match marker colours per category */
 .tn-day-ev .tn-day-num{font-weight:800;color:var(--gold2)}
 .tn-day-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
 .tn-day-dot-e{width:4px;height:4px;flex-shrink:0;opacity:0}
-.tn-day-dot.c-musica{background:#a78bfa}
-.tn-day-dot.c-tradicion,.tn-day-dot.c-evento{background:var(--gold)}
-.tn-day-dot.c-arte{background:#f472b6}
-.tn-day-dot.c-teatro{background:#f87171}
-.tn-day-dot.c-deportes{background:#60a5fa}
-.tn-day-dot.c-gastro{background:#fbbf24}
-.tn-day-dot.c-infantil{background:#34d399}
-.tn-day-dot.c-cultural{background:#2dd4bf}
-.tn-day-dot.c-feria{background:#fb923c}
-.tn-day-dot.c-dm{background:var(--gold2)}
-/* ── MOBILE — stacked layout (header → map → list) ── */
+.tn-day-dot.c-musica   {background:#e2b94f}
+.tn-day-dot.c-tradicion{background:#c17f2a}
+.tn-day-dot.c-arte     {background:#f87191}
+.tn-day-dot.c-teatro   {background:#c084fc}
+.tn-day-dot.c-deportes {background:#4ade80}
+.tn-day-dot.c-gastro   {background:#fb923c}
+.tn-day-dot.c-infantil {background:#38bdf8}
+.tn-day-dot.c-cultural {background:#a78bfa}
+.tn-day-dot.c-feria    {background:#facc15}
+.tn-day-dot.c-solidario{background:#34d399}
+.tn-day-dot.c-evento   {background:var(--muted)}
+.tn-day-dot.c-dm       {background:var(--gold2)}
+
+/* ── MOBILE — stacked layout ── */
 @media(max-width:680px){
   .shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
-
-  /* Sidebar dissolves into flex — children become direct shell items */
   .sidebar{display:contents}
-
-  /* 1 — Compact header with week nav */
   .sb-head{
     order:1;flex-shrink:0;
     background:var(--s1);
@@ -482,16 +484,12 @@ img.leaflet-tile{border:none !important;outline:none !important}
   .wn-sub{display:none}
   .wn-btn{padding:9px 12px}
   .wn-label{font-size:12px}
-
-  /* 2 — Category filters */
   .sb-filters{
     order:2;flex-shrink:0;
     background:var(--s1);
     padding:8px 14px;
     border-bottom:1px solid var(--b2);
   }
-
-  /* 3 — Map ~30% height */
   #map{
     order:3;
     height:30vh;
@@ -499,8 +497,6 @@ img.leaflet-tile{border:none !important;outline:none !important}
     width:100%;
     position:relative;z-index:5;
   }
-
-  /* 4 — Event list fills remaining space */
   .sb-list{
     order:4;
     flex:1;overflow-y:auto;
@@ -508,23 +504,16 @@ img.leaflet-tile{border:none !important;outline:none !important}
     border-top:1px solid var(--border);
     padding-bottom:20px;
   }
-
-  /* Compact brand overlay on small map */
   .map-brand-wrapper{top:6px;right:6px;min-width:130px;gap:5px}
   .map-brand{padding:5px 10px;gap:4px}
   .map-brand img{max-height:20px}
   .map-brand-tagline{font-size:7px}
-
-  /* Move add-event button inside the map, bottom-left */
   .add-ev-btn{
     position:absolute;bottom:8px;left:8px;
     padding:8px 12px;font-size:11px;
     box-shadow:0 2px 10px rgba(201,168,76,0.35);
   }
-
   .dm-sheet{max-height:94vh}
-
-  /* Time nav on mobile: smaller, still floated on map */
   .time-nav{
     top:6px;
     max-width:calc(100% - 20px);
@@ -593,7 +582,7 @@ img.leaflet-tile{border:none !important;outline:none !important}
             <option>Música</option><option>Arte</option><option>Tradición</option>
             <option>Cultural</option><option>Gastronomía</option>
             <option>Deportes</option><option>Feria</option><option>Infantil</option>
-            <option>Evento</option>
+            <option>Teatro</option><option>Solidario</option><option>Evento</option>
           </select>
         </div>
       </div>
@@ -618,7 +607,7 @@ img.leaflet-tile{border:none !important;outline:none !important}
 
       <div class="form-group">
         <label class="form-label">Link del post de Instagram</label>
-        <input class="form-input" id="f-link" type="url" placeholder="https://www.instagram.com/p/...">
+        <input class="form-input" id="f-ig-link" type="url" placeholder="https://www.instagram.com/p/...">
         <div class="form-hint">Si ya publicaste el evento en Instagram, pegá el link acá.</div>
       </div>
 
@@ -806,14 +795,10 @@ img.leaflet-tile{border:none !important;outline:none !important}
 // ── CONFIG ────────────────────────────────────────────
 const SHEET       = '1Tmrr6lxD7n0wp3x87wUdy-vP-tuDGU8DCvMmIh9UciI';
 const TICKETS_URL = 'https://chamico-tickets.vercel.app';
-// Static JSON pushed by Apps Script — same origin, no CORS, no proxy needed
 const API_EVENTOS = '/events.json';
-const CENTER     = [-34.2455, -59.4743];
+const CENTER      = [-34.2455, -59.4743];
 
-// Coordinates from OSM via Overpass — updated from diagnosticarVenuesAreco log
-// Venues_Areco tab will override these once populated
 const FALLBACK = {
-  // Museums & cultural (Parque Criollo area, north of center)
   'museo gauchesco ricardo güiraldes': [-34.2375156, -59.4814842],
   'parque criollo r. güiraldes':       [-34.2375156, -59.4814842],
   'parque criollo':                    [-34.2375156, -59.4814842],
@@ -824,7 +809,6 @@ const FALLBACK = {
   'museo de bellas artes osvaldo gasparini': [-34.2472360, -59.4688090],
   'museo de arte la recova':           [-34.2436143, -59.4716535],
   'museo municipal de artes plásticas':[-34.2423338, -59.4749494],
-  // Restaurants & bars (town center)
   'el tokio':                          [-34.2440576, -59.4730776],
   'el tokyo':                          [-34.2440576, -59.4730776],
   'bar el tokio':                      [-34.2440576, -59.4730776],
@@ -857,7 +841,6 @@ const FALLBACK = {
   'restaurante histórico lacarra':     [-34.2592308, -59.4522913],
   'lacarra':                           [-34.2592308, -59.4522913],
   'la toldería "mercado & café"':      [-34.2586085, -59.4736853],
-  // Manual entries — not in OSM yet, need Google Maps coordinates
   'galpón chamico':                    [-34.257616294453555, -59.481367011156955],
   'plaza ruiz de arellano':            [-34.2455000, -59.4742000],
   'costanera':                         [-34.2440000, -59.4800000],
@@ -865,24 +848,28 @@ const FALLBACK = {
   'salón guerrico':                    [-34.2453000, -59.4748000],
 };
 
-const I = '/images/'; // icon base path
+const I = '/images/';
+
+// ── CATEGORY CONFIG ───────────────────────────────────
+// col = marker background colour for this category
+// glow = box-shadow glow colour
 const CAT = {
-  'Música':      {cls:'c-musica',    icon:I+'icon-musica.png'},
-  'Tradición':   {cls:'c-tradicion', icon:I+'icon-tradicion.png'},
-  'Arte':        {cls:'c-arte',      icon:I+'icon-arte.png'},
-  'Teatro':      {cls:'c-teatro',    icon:I+'icon-teatro.png'},
-  'Deportes':    {cls:'c-deportes',  icon:I+'icon-deportes.png'},
-  'Gastronomía': {cls:'c-gastro',    icon:I+'icon-gastronomia.png'},
-  'Infantil':    {cls:'c-infantil',  icon:I+'icon-infantil.png'},
-  'Cultural':    {cls:'c-cultural',  icon:I+'icon-cultural.png'},
-  'Feria':       {cls:'c-feria',     icon:I+'icon-feria.png'},
-  'Evento':      {cls:'c-evento',    icon:I+'icon-evento.png'},
+  'Música':      {cls:'c-musica',    icon:I+'icon-musica.png',     col:'#e2b94f', glow:'rgba(226,185,79,0.45)'},
+  'Tradición':   {cls:'c-tradicion', icon:I+'icon-tradicion.png',  col:'#a16207', glow:'rgba(161,98,7,0.5)'},
+  'Arte':        {cls:'c-arte',      icon:I+'icon-arte.png',       col:'#f43f5e', glow:'rgba(244,63,94,0.45)'},
+  'Teatro':      {cls:'c-teatro',    icon:I+'icon-teatro.png',     col:'#c084fc', glow:'rgba(192,132,252,0.45)'},
+  'Deportes':    {cls:'c-deportes',  icon:I+'icon-deportes.png',   col:'#22c55e', glow:'rgba(34,197,94,0.45)'},
+  'Gastronomía': {cls:'c-gastro',    icon:I+'icon-gastronomia.png',col:'#fb923c', glow:'rgba(251,146,60,0.45)'},
+  'Infantil':    {cls:'c-infantil',  icon:I+'icon-infantil.png',   col:'#38bdf8', glow:'rgba(56,189,248,0.45)'},
+  'Cultural':    {cls:'c-cultural',  icon:I+'icon-cultural.png',   col:'#a78bfa', glow:'rgba(167,139,250,0.45)'},
+  'Feria':       {cls:'c-feria',     icon:I+'icon-feria.png',      col:'#facc15', glow:'rgba(250,204,21,0.45)'},
+  'Solidario':   {cls:'c-solidario', icon:I+'icon-solidario.png',  col:'#34d399', glow:'rgba(52,211,153,0.45)'},
+  'Evento':      {cls:'c-evento',    icon:I+'icon-evento.png',     col:'#94a3b8', glow:'rgba(148,163,184,0.3)'},
 };
 
 // ── STATE ─────────────────────────────────────────────
 let evs=[],vmap={...FALLBACK},activeFilter='all',wOff=0,mkrs={},ghostMkrs={},activeId=null;
 
-// Navigate to the week containing a given MM/DD/YYYY date
 function goToEventWeek(fecha){
   const d=parseD(fecha);if(!d)return;
   const now=new Date();now.setHours(0,0,0,0);
@@ -895,11 +882,10 @@ function goToEventWeek(fecha){
 
 // ── MAP ───────────────────────────────────────────────
 const map=L.map('map',{center:CENTER,zoom:15,zoomControl:false});
-// OSM tiles with CSS inversion — best looking dark map, free, no API key
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
   attribution:'© <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
-  tileSize:512,        // render each tile at 512px instead of 256px
-  zoomOffset:-1,       // fetch z-1 tiles → labels are 2× larger, same area visible
+  tileSize:512,
+  zoomOffset:-1,
   maxNativeZoom:18,
   updateWhenIdle:false,
   keepBuffer:4,
@@ -936,14 +922,13 @@ function coords(lugar){
 }
 function isDM(ev){ return String(ev.es_datamanIAcs).toLowerCase()==='true'; }
 function catMeta(ev){
-  const base = CAT[ev.categoria]||{cls:'c-evento',icon:I+'icon-evento.png'};
-  if(isDM(ev)) return {cls:'c-dm', icon:base.icon}; // category icon + DM gold style
+  const base = CAT[ev.categoria]||{cls:'c-evento',icon:I+'icon-evento.png',col:'#94a3b8',glow:'rgba(148,163,184,0.3)'};
+  if(isDM(ev)) return {cls:'c-dm', icon:base.icon, col:'#e8c97a', glow:'rgba(226,185,79,0.5)'};
   return base;
 }
 function priceInfo(p){
   if(!p||p==='Consultar')return{cls:'p-ask',lbl:'Consultar'};
   if(p==='Gratis')return{cls:'p-free',lbl:'Gratis'};
-  // Handle raw numbers (e.g. "10000") → format as Argentine price
   const num=parseFloat(p.replace(/[^0-9.]/g,''));
   if(!isNaN(num)&&!p.includes('$')){
     return{cls:'p-paid',lbl:'$'+num.toLocaleString('es-AR')};
@@ -954,9 +939,6 @@ function priceInfo(p){
 // ── BOTTOM SHEET ──────────────────────────────────────
 function openSheet(ev){
   const d=parseD(ev.fecha);
-  const dm=isDM(ev);
-
-  // Image
   const imgEl=document.getElementById('sheetImg');
   if(ev.imagen_url&&ev.imagen_url.trim()){
     imgEl.innerHTML=`<img class="sheet-img" src="${ev.imagen_url}" alt="${ev.nombre}"
@@ -965,42 +947,28 @@ function openSheet(ev){
     const iconPath=catMeta(ev).icon;
     imgEl.innerHTML=`<div class="sheet-img-placeholder"><img src="${iconPath}" style="width:80px;height:80px;object-fit:contain;opacity:.25;mix-blend-mode:luminosity"></div>`;
   }
-
-  // Name
   document.getElementById('sheetName').textContent=ev.nombre||'Evento';
-
-  // Meta chips
   const chips=[];
   if(d) chips.push(`<div class="sheet-meta-chip">📅 ${prettyD(d)}</div>`);
   if(ev.hora&&ev.hora!=='Todo el día') chips.push(`<div class="sheet-meta-chip">🕐 ${ev.hora} hs</div>`);
   if(ev.lugar) chips.push(`<div class="sheet-meta-chip">📍 ${ev.lugar}</div>`);
   if(ev.categoria) chips.push(`<div class="sheet-meta-chip badge ${catMeta(ev).cls}">${ev.categoria}</div>`);
-  // Directions link
   const c3=coords(ev.lugar);
   if(c3){
     const gmDir=`https://www.google.com/maps/dir/?api=1&destination=${c3[0]},${c3[1]}`;
     chips.push(`<a class="sheet-meta-chip" href="${gmDir}" target="_blank" style="color:var(--gold);text-decoration:none;pointer-events:auto">🗺 Cómo llegar</a>`);
   }
   document.getElementById('sheetMeta').innerHTML=chips.join('');
-
-  // Description
   document.getElementById('sheetDesc').textContent=ev.descripcion||'';
-
-  // Price
   const prEl=document.getElementById('sheetPrice');
   const prLb=document.getElementById('sheetPriceLabel');
   if(!ev.precio||ev.precio==='Consultar'){
-    prEl.textContent='Consultar';prEl.style.color='var(--muted)';
-    prLb.textContent='';
+    prEl.textContent='Consultar';prEl.style.color='var(--muted)';prLb.textContent='';
   } else if(ev.precio==='Gratis'){
-    prEl.textContent='Gratis';prEl.style.color='#4ca87a';
-    prLb.textContent='';
+    prEl.textContent='Gratis';prEl.style.color='#4ca87a';prLb.textContent='';
   } else {
-    prEl.textContent=ev.precio;prEl.style.color='var(--gold2)';
-    prLb.textContent='por persona';
+    prEl.textContent=ev.precio;prEl.style.color='var(--gold2)';prLb.textContent='por persona';
   }
-
-  // Availability
   const avEl=document.getElementById('sheetAvail');
   if(ev.preventa_disponible==='TRUE'){
     avEl.innerHTML=`<div class="avail-dot"></div> Preventa disponible`;
@@ -1008,17 +976,12 @@ function openSheet(ev){
   } else {
     avEl.innerHTML='';
   }
-
-  // Buy button
   const btn=document.getElementById('sheetBuyBtn');
-  // Build chamico-tickets URL with event ID param (stripped hash for clean ID)
   const eventParam=encodeURIComponent(ev.id||ev.nombre||'');
   const targetUrl=ev.link_accion||`${TICKETS_URL}/?event=${eventParam}`;
   btn.href=targetUrl;
   const hasPreventa = String(ev.preventa_disponible).toLowerCase()==='true';
   btn.textContent = hasPreventa ? 'Comprá tus anticipadas →' : 'Ver más →';
-
-  // Source link (Instagram or original source)
   const srcLink=document.getElementById('sheetSourceLink');
   if(ev.fuente_url&&ev.fuente_url!==ev.link_accion){
     srcLink.href=ev.fuente_url;
@@ -1027,8 +990,6 @@ function openSheet(ev){
   } else {
     srcLink.style.display='none';
   }
-
-  // Open
   document.getElementById('sheetOverlay').classList.add('open');
   document.getElementById('dmSheet').classList.add('open');
   document.body.style.overflow='hidden';
@@ -1040,14 +1001,12 @@ function closeSheet(){
   document.body.style.overflow='';
 }
 
-// Close sheet on Esc
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();});
 
 // ── FILTER ────────────────────────────────────────────
 function filtered(){
   const{start,end}=wRange(wOff);
   return evs.filter(ev=>{
-    // Handle both uppercase and lowercase boolean strings
     if(String(ev.activo).toLowerCase()==='false')return false;
     const d=parseD(ev.fecha);if(!d)return false;
     if(d<start||d>end)return false;
@@ -1101,35 +1060,38 @@ function renderList(list){
 }
 
 // ── RENDER MAP ────────────────────────────────────────
+// Helper: build a pin HTML string for a given category/state
+function pinHTML(col, glow, icon, sz, pulse=false, iconSz){
+  const iSz = iconSz || Math.max(8, sz - 13);
+  const anim = pulse ? 'animation:pulse 2s ease-in-out infinite;' : '';
+  return `<div style="
+    width:${sz}px;height:${sz}px;
+    background:${col};
+    border-radius:50% 50% 50% 0;
+    transform:rotate(-45deg);
+    border:2px solid rgba(0,0,0,0.65);
+    box-shadow:0 4px 16px rgba(0,0,0,0.7),0 0 12px ${glow},inset 0 1px 0 rgba(255,255,255,0.13);
+    display:flex;align-items:center;justify-content:center;
+    ${anim}
+  "><img src="${icon}" style="width:${iSz}px;height:${iSz}px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.style.display='none'"></div>`;
+}
+
 function renderMap(list, future=[], past=[]){
   Object.values(mkrs).forEach(m=>map.removeLayer(m));mkrs={};
   Object.values(ghostMkrs).forEach(m=>map.removeLayer(m));ghostMkrs={};
 
-  // ── Progressive future markers (further = smaller + more transparent) ──
   const {end:wEnd}=wRange(wOff);
+
+  // ── Progressive future markers ────────────────────
   future.forEach(ev=>{
     const c=coords(ev.lugar);if(!c)return;
     const evDate=parseD(ev.fecha);
     const daysAhead=evDate?Math.max(1,Math.ceil((evDate-wEnd)/(24*60*60*1000))):7;
     const weeksAhead=Math.min(Math.ceil(daysAhead/7),5);
-    // Size: week1=24px → week2=20px → week3=17px → week4+=14px
     const sz=Math.max(14,26-weeksAhead*3);
-    // Opacity: week1=0.55 → decreasing
     const op=Math.max(0.12,0.58-weeksAhead*0.1);
-    const dm=isDM(ev);
-    const {icon:evIcon}=catMeta(ev);
-    const iconSz=Math.max(8,sz-11);
-    // SOLID background (same as active markers) so mix-blend-mode:multiply renders icon correctly.
-    // Transparency is controlled entirely by Leaflet's opacity parameter on the marker.
-    const col=dm?'#e8c97a':'#c9a84c';
-    const ghostHtml=`<div style="
-      width:${sz}px;height:${sz}px;background:${col};
-      border-radius:50% 50% 50% 0;transform:rotate(-45deg);
-      border:2px solid rgba(0,0,0,0.5);
-      box-shadow:0 2px 8px rgba(0,0,0,0.55);
-      display:flex;align-items:center;justify-content:center;
-    "><img src="${evIcon}" style="width:${iconSz}px;height:${iconSz}px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.style.display='none'"></div>`;
-    const li=L.divIcon({html:ghostHtml,className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz],popupAnchor:[0,-sz-2]});
+    const {icon:evIcon, col, glow}=catMeta(ev);
+    const li=L.divIcon({html:pinHTML(col,glow,evIcon,sz),className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz],popupAnchor:[0,-sz-2]});
     const d=parseD(ev.fecha);
     const pop=`<div style="font-family:'Inter',sans-serif;font-size:11px;max-width:200px;color:var(--muted)">
       <div style="font-family:'Playfair Display',serif;font-size:13px;color:var(--ink2);margin-bottom:4px">${ev.nombre||'Evento'}</div>
@@ -1139,7 +1101,7 @@ function renderMap(list, future=[], past=[]){
     ghostMkrs['fut_'+ev.id]=m;
   });
 
-  // ── Past event markers (last 60 days) — very faded dark gray ──
+  // ── Past event markers (last 60 days) ─────────────
   past.forEach(ev=>{
     const c=coords(ev.lugar);if(!c)return;
     const {icon:pastIcon}=catMeta(ev);
@@ -1155,19 +1117,13 @@ function renderMap(list, future=[], past=[]){
     const d=parseD(ev.fecha);
     const pop=`<div style="font-family:'Inter',sans-serif;font-size:11px;max-width:200px;color:var(--muted)">
       <div style="font-family:'Playfair Display',serif;font-size:13px;color:var(--ink2);margin-bottom:4px">${ev.nombre||'Evento'}</div>
-      <div style="line-height:1.6">
-        ${d?`📅 ${prettyD(d)}<br>`:''}
-        ${ev.lugar?`📍 ${ev.lugar}`:''}
-      </div>
-      <div style="margin-top:6px;font-size:10px;color:var(--muted);font-style:italic">Evento pasado</div>
-    </div>`;
+      <div style="line-height:1.6">${d?`📅 ${prettyD(d)}<br>`:''}${ev.lugar?`📍 ${ev.lugar}`:''}
+      </div><div style="margin-top:6px;font-size:10px;color:var(--muted);font-style:italic">Evento pasado</div></div>`;
     const m=L.marker(c,{icon:li,opacity:0.45}).bindPopup(pop,{maxWidth:210}).addTo(map);
     ghostMkrs['past_'+ev.id]=m;
   });
 
-  // (future ghosts rendered progressively above with category icons)
-
-  // ── Active markers for current week ───────────────────
+  // ── Active markers for current week ───────────────
   const TODAY=new Date();TODAY.setHours(0,0,0,0);
   const byKey={};
   list.forEach(ev=>{
@@ -1176,27 +1132,22 @@ function renderMap(list, future=[], past=[]){
     if(!byKey[k])byKey[k]={c,evs:[]};
     byKey[k].evs.push(ev);
   });
+
   Object.values(byKey).forEach(({c,evs:g})=>{
     g.forEach((ev,i)=>{
-      const dm=isDM(ev);
-      const{icon}=catMeta(ev);
+      const {icon, col, glow}=catMeta(ev);
       const evDate=parseD(ev.fecha);
       const alreadyPast=evDate&&evDate<TODAY;
       const off=g.length>1?[c[0]+(i-(g.length-1)/2)*0.00009,c[1]+(i-(g.length-1)/2)*0.00012]:c;
-
       let li, m;
 
       if(alreadyPast){
-        // Event in current week but already happened — same icon, muted
-        const {icon:apIcon}=catMeta(ev);
         const pastHtml=`<div style="
-          width:20px;height:20px;
-          background:#5a4e3a;
-          border-radius:50% 50% 50% 0;
-          transform:rotate(-45deg);
+          width:20px;height:20px;background:#5a4e3a;
+          border-radius:50% 50% 50% 0;transform:rotate(-45deg);
           border:1px solid rgba(90,78,58,0.6);
           display:flex;align-items:center;justify-content:center;
-        "><img src="${apIcon}" style="width:11px;height:11px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply;filter:grayscale(0.5)" onerror="this.style.display='none'"></div>`;
+        "><img src="${icon}" style="width:11px;height:11px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply;filter:grayscale(0.5)" onerror="this.style.display='none'"></div>`;
         li=L.divIcon({html:pastHtml,className:'',iconSize:[20,20],iconAnchor:[10,20],popupAnchor:[0,-22]});
         const d=parseD(ev.fecha);
         const pop=`<div style="font-family:'Inter',sans-serif;font-size:11px;max-width:200px;color:var(--muted)">
@@ -1205,20 +1156,19 @@ function renderMap(list, future=[], past=[]){
           </div><div style="margin-top:6px;font-size:10px;font-style:italic">Evento pasado</div></div>`;
         m=L.marker(off,{icon:li,opacity:0.5}).bindPopup(pop,{maxWidth:210}).addTo(map);
 
-      } else if(dm){
-        const col='#e8c97a';
-        const pulse='animation:pulse 2s ease-in-out infinite;';
+      } else if(isDM(ev)){
+        // DM events: branded gold + pulse
         li=L.divIcon({
-          html:`<div style="width:36px;height:36px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(0,0,0,0.7);box-shadow:0 4px 16px rgba(0,0,0,0.7),0 0 14px rgba(226,185,79,0.45),0 1px 4px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;${pulse}"><img src="${icon}" style="width:21px;height:21px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.outerHTML='<span style=transform:rotate(45deg);font-size:12px>★</span>'"></div>`,
+          html:pinHTML(col,glow,icon,36,true,21),
           className:'',iconSize:[34,34],iconAnchor:[17,34],popupAnchor:[1,-38]
         });
         m=L.marker(off,{icon:li}).addTo(map);
         m.on('click',()=>{ selById(ev.id,false); openSheet(ev); });
 
       } else {
-        const col='#c9a84c';
+        // Standard category-coloured marker
         li=L.divIcon({
-          html:`<div style="width:36px;height:36px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(0,0,0,0.7);box-shadow:0 4px 16px rgba(0,0,0,0.7),0 0 10px rgba(226,185,79,0.28),0 1px 4px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;"><img src="${icon}" style="width:21px;height:21px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.outerHTML='<span style=transform:rotate(45deg);font-size:12px>●</span>'"></div>`,
+          html:pinHTML(col,glow,icon,36,false,21),
           className:'',iconSize:[34,34],iconAnchor:[17,34],popupAnchor:[1,-38]
         });
         const d=parseD(ev.fecha);
@@ -1265,19 +1215,17 @@ function selById(id,pan){
   if(pan&&mkrs[id])map.setView(mkrs[id].getLatLng(),16,{animate:true});
 }
 
-// ── FUTURE EVENTS (ghost markers on map) ──────────────
+// ── FUTURE / PAST EVENTS ──────────────────────────────
 function futureEvents(){
   const{end}=wRange(wOff);
   const cutoff=new Date(end);
-  cutoff.setDate(cutoff.getDate()+90); // show up to 90 days ahead
+  cutoff.setDate(cutoff.getDate()+90);
   return evs.filter(ev=>{
     if(String(ev.activo).toLowerCase()==='false')return false;
     const d=parseD(ev.fecha);if(!d)return false;
     return d>end && d<=cutoff;
   });
 }
-
-// ── PAST EVENTS (faded markers — last 60 days) ────────
 function pastEvents(){
   const today=new Date();today.setHours(0,0,0,0);
   const floor=new Date(today);floor.setDate(today.getDate()-60);
@@ -1285,7 +1233,6 @@ function pastEvents(){
   return evs.filter(ev=>{
     if(String(ev.activo).toLowerCase()==='false')return false;
     const d=parseD(ev.fecha);if(!d)return false;
-    // Before current week start AND within 60 days ago AND before today
     return d<start && d>=floor && d<today;
   });
 }
@@ -1308,11 +1255,7 @@ function updateTimeNav(count, direction, eventsList=[]){
   const rNext = wRange(wOff+1);
   const today = new Date(); today.setHours(0,0,0,0);
 
-  // Main date display (large)
-  // Date in original approved format: '14 sept — 20 sept'
   const mainDate = wLabel(r);
-
-  // Animate center on direction change
   const dateEl = document.getElementById('tnDate');
   if(dateEl && direction!==0){
     const prefersReduced = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
@@ -1333,7 +1276,6 @@ function updateTimeNav(count, direction, eventsList=[]){
   }
   if(dateEl) dateEl.textContent = mainDate;
 
-  // Previous / next week ranges
   const smallFmt=(r)=>{
     const s=r.start.toLocaleDateString('es-AR',{day:'numeric',month:'short'});
     const e=r.end.toLocaleDateString('es-AR',{day:'numeric',month:'short'});
@@ -1344,7 +1286,6 @@ function updateTimeNav(count, direction, eventsList=[]){
   if(prevEl) prevEl.textContent=smallFmt(rPrev);
   if(nextEl) nextEl.textContent=smallFmt(rNext);
 
-  // Status chip
   const chip=document.getElementById('tnChip');
   if(chip){
     if(today>=r.start&&today<=r.end){
@@ -1356,11 +1297,9 @@ function updateTimeNav(count, direction, eventsList=[]){
     }
   }
 
-  // Event count
   const countEl=document.getElementById('tnCount');
   if(countEl) countEl.textContent=count+' EVENTO'+(count!==1?'S':'');
 
-  // Seven-day strip with event highlights
   const strip=document.getElementById('tnStrip');
   const evtDayMap={};
   eventsList.forEach(ev=>{
@@ -1384,11 +1323,9 @@ function updateTimeNav(count, direction, eventsList=[]){
     strip.innerHTML=html;
   }
 
-  // Return-to-current-week
   const retBar=document.getElementById('tnReturnBar');
   if(retBar) retBar.style.display=wOff!==0?'block':'none';
 
-  // Timeline mood bar — 5 weeks centered on current
   const tl=document.getElementById('tnTimeline');
   if(tl){
     const range=[-2,-1,0,1,2];
@@ -1409,19 +1346,14 @@ function updateTimeNav(count, direction, eventsList=[]){
   }
 }
 
-// Zoom only if active markers are outside current viewport
 function fitMapToEvents(){
   const active=Object.values(mkrs);
-  if(active.length===0)return; // no events — keep user's current view
-
-  // Check if all markers are already visible
+  if(active.length===0)return;
   const bounds=map.getBounds();
   const allVisible=active.every(m=>{
     try{return bounds.contains(m.getLatLng());}catch{return true;}
   });
-  if(allVisible)return; // everything in view — don't disturb user
-
-  // Some events are off screen — expand to show them all
+  if(allVisible)return;
   try{
     const group=L.featureGroup(active);
     if(group.getBounds().isValid()){
@@ -1437,7 +1369,6 @@ function initGeolocation(){
   navigator.geolocation.getCurrentPosition(pos=>{
     const lat=pos.coords.latitude, lon=pos.coords.longitude;
     if(userMarker)map.removeLayer(userMarker);
-    // Blue pulsing dot
     const html=`<div style="
       width:16px;height:16px;border-radius:50%;
       background:#4285f4;border:2px solid #fff;
@@ -1467,19 +1398,9 @@ function setF(f,el){
 document.getElementById('wPrev').onclick=(e)=>{e.stopPropagation();wOff--;render(-1);};
 document.getElementById('wNext').onclick=(e)=>{e.stopPropagation();wOff++;render(1);};
 
-// ── MOBILE SIDEBAR TOGGLE ─────────────────────────────
-function toggleMobileSidebar(){
-  // Stack layout on mobile — no toggle needed
-}
-function autoOpenMobile(){
-  // Stack layout shows list by default — no action needed
-}
-
-// ── DATA LOAD ─────────────────────────────────────────
 // ── SUBMISSION MODAL ──────────────────────────────────
 const AS_SUBMIT = 'https://script.google.com/macros/s/AKfycbyq687XCjn2YbtAjLHvrWE0RZ5u-Tyijhoa_5nWHkJorE62_G1xYLEvEmx3dTA9Zs9k/exec';
 
-// Time auto-format: user types 2130 → gets 21:30
 function autoFormatTime(input){
   let v = input.value.replace(/[^0-9]/g,'');
   if(v.length > 4) v = v.slice(0,4);
@@ -1487,7 +1408,6 @@ function autoFormatTime(input){
   input.value = v;
 }
 
-// Phone validation — Argentine format +549 + 10 digits
 function validateTelForm(){
   const input = document.getElementById('f-tel');
   const hint  = document.getElementById('tel-hint');
@@ -1506,14 +1426,12 @@ function validateTelForm(){
   }
 }
 
-// Slugify helper
 function slugify(str){
   return str.toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
     .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
 }
 
-// Generate standardized flyer filename
 function getFlyerName(ext){
   const fecha=document.getElementById('f-fecha').value;
   const lugar=document.getElementById('f-lugar').value.trim();
@@ -1524,7 +1442,6 @@ function getFlyerName(ext){
   return fecha+'_'+vs+'_'+slugify(nombre).slice(0,30)+(ext||'.jpg');
 }
 
-// Update flyer filename preview (called when form fields change)
 function updateFlyerName(){
   const name=getFlyerName();
   const preview=document.getElementById('flyer-name-preview');
@@ -1533,7 +1450,6 @@ function updateFlyerName(){
   else { preview.style.display='none'; }
 }
 
-// Handle flyer file selection — show preview + standardized filename
 function onFlyerSelected(input){
   const file=input.files[0];
   if(!file) return;
@@ -1552,7 +1468,6 @@ function onFlyerSelected(input){
   if(preview){ preview.style.display='block'; preview.textContent=name; preview.dataset.filename=name; }
 }
 
-// Wire up live filename updates
 document.addEventListener('DOMContentLoaded',()=>{
   ['f-fecha','f-lugar','f-nombre'].forEach(id=>{
     const el=document.getElementById(id);
@@ -1577,7 +1492,6 @@ async function submitEvent(){
   const errEl=document.getElementById('subError');
   errEl.style.display='none';
 
-  // Validate required fields
   const nombre  = document.getElementById('f-nombre').value.trim();
   const fecha   = document.getElementById('f-fecha').value;
   const lugar   = document.getElementById('f-lugar').value.trim();
@@ -1596,7 +1510,6 @@ async function submitEvent(){
 
   btn.disabled=true;btn.textContent='Enviando…';
 
-  // Format date from YYYY-MM-DD to MM/DD/YYYY
   const [y,m,d]=fecha.split('-');
   const fechaFmt=`${m}/${d}/${y}`;
 
@@ -1633,10 +1546,8 @@ async function submitEvent(){
       method:'POST',
       body:JSON.stringify(payload),
       headers:{'Content-Type':'application/json'},
-      mode:'no-cors', // submission doesn't need response body
+      mode:'no-cors',
     });
-    // Show success (no-cors means we can't read response, assume success)
-    // Build WhatsApp + email links for flyer sending
     const waMsg=encodeURIComponent(
       'Hola! Registré el evento "'+nombre+'" ('+fechaFmt+') en Areco Eventos.'+
       (flyerName?'\nTe envío el flyer como: '+flyerName:'')
@@ -1687,7 +1598,6 @@ async function init(){
     buildPills();
     render(0);
     initGeolocation();
-    autoOpenMobile();
   }catch(e){
     console.error('Load failed:', e);
     document.getElementById('list').innerHTML=
