@@ -291,8 +291,8 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .map-brand{background:rgba(14,13,11,0.82);backdrop-filter:blur(10px);border:1px solid rgba(201,168,76,0.18);border-radius:12px;padding:10px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;width:100%}
 .map-brand img{width:100%;max-height:56px;object-fit:contain;mix-blend-mode:luminosity;opacity:1}
 .map-brand-tagline{font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);align-self:flex-start}
-/* Mobile add-button wrapper hidden on desktop */
-.mob-add-btn-wrap{display:none}
+/* Mobile floating add-event button on map — hidden on desktop */
+.mob-add-ev-map{display:none}
 /* Mobile filter bar hidden on desktop */
 .mob-filter-bar{display:none}
 /* desktop-only: just ensure visibility — don't override element's own display */
@@ -302,7 +302,7 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .mob-wn-btn{background:none;border:1px solid var(--border);border-radius:6px;color:var(--gold);font-size:16px;line-height:1;padding:3px 9px;cursor:pointer;transition:background .15s}
 .mob-wn-btn:hover{background:rgba(201,168,76,0.12)}
 .mob-wn-label{font-size:11px;font-weight:600;color:var(--ink);white-space:nowrap;min-width:70px;text-align:center}
-.mob-cat-wrap{position:relative;min-width:80px;max-width:120px}
+.mob-cat-wrap{position:relative;flex:1;min-width:0;max-width:160px}
 .mob-cat-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:6px;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--gold2);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
 .mob-cat-arrow{font-size:10px;opacity:.7;transition:transform .15s}
 .mob-cat-btn.open .mob-cat-arrow{transform:rotate(180deg)}
@@ -542,6 +542,27 @@ img.leaflet-tile{border:none !important;outline:none !important}
 
   .dm-sheet{max-height:94vh}
 
+  /* Floating "Agregá tu evento gratis" button on the map, below the time-nav */
+  .mob-add-ev-map{
+    display:block;
+    position:absolute;
+    /* time-nav is ~46px tall + 4px top = ~54px; put button just below */
+    top:54px;
+    right:8px;
+    z-index:901;
+    background:linear-gradient(135deg,var(--gold),var(--gold2));
+    color:#0d0c09;
+    border:none;
+    border-radius:999px;
+    padding:6px 13px;
+    font-family:'Inter',sans-serif;
+    font-size:10px;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 2px 10px rgba(226,185,79,0.35);
+    white-space:nowrap;
+  }
+
   /* 4C & 4D: Time nav on mobile — very compact, just ‹ date › arrows, no strip/timeline */
   .time-nav{
     top:4px;
@@ -766,15 +787,14 @@ img.leaflet-tile{border:none !important;outline:none !important}
         <h1><em>Areco</em> Eventos</h1>
         <small>by DataManIAcs · San Antonio de Areco</small>
       </div>
-      <!-- Mobile-only: category dropdown + add-event button in the header row -->
+      <!-- Mobile-only: category dropdown in header row -->
       <div class="mob-add-btn-wrap">
-        <div class="mob-cat-wrap" style="margin-right:6px">
+        <div class="mob-cat-wrap">
           <button class="mob-cat-btn" id="mobCatBtn" onclick="toggleMobCat(event)">
             <span id="mobCatLabel">Todos</span> <span class="mob-cat-arrow">▾</span>
           </button>
           <div class="mob-cat-dropdown" id="mobCatDropdown"></div>
         </div>
-        <button class="add-ev-btn" onclick="openSubModal()" style="padding:7px 11px;font-size:10px;white-space:nowrap">✦ Gratis</button>
       </div>
     </div>
     <div class="sb-filters">
@@ -788,6 +808,8 @@ img.leaflet-tile{border:none !important;outline:none !important}
     </div>
   </aside>
   <div id="map">
+    <!-- Mobile floating add-event button — sits below the time-nav -->
+    <button class="mob-add-ev-map" onclick="openSubModal()">✦ Agregá tu evento gratis</button>
     <!-- Floating Time Navigator -->
     <nav class="time-nav" id="timeNav" aria-label="Navegación por semanas">
       <div class="tn-main">
