@@ -341,21 +341,28 @@ img.leaflet-tile{border:none !important;outline:none !important}
 }
 .tn-main{display:flex;align-items:stretch;min-height:56px}
 .tn-btn{
-  flex:0 0 auto;width:130px;
+  flex:0 0 auto;width:170px;
   background:none;border:none;cursor:pointer;
-  display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
-  padding:6px 12px;gap:2px;
+  display:flex;flex-direction:row;align-items:center;
+  padding:4px 10px;gap:8px;
   min-height:44px;color:var(--ink);
   transition:background .15s;
 }
-.tn-btn:hover{background:rgba(226,185,79,0.07)}
+.tn-btn:hover{background:rgba(226,185,79,0.06)}
 .tn-btn:focus-visible{outline:2px solid var(--gold);outline-offset:-3px;border-radius:4px}
-.tn-next{align-items:flex-end;text-align:right}
-.tn-arrow{font-size:20px;color:var(--gold);line-height:1;font-weight:300;transition:transform .15s;display:flex;align-items:center}
-.tn-btn:hover .tn-arrow{transform:translateX(-3px)}
-.tn-next:hover .tn-arrow{transform:translateX(3px)}
+.tn-next{justify-content:flex-end}
+.tn-time-icon{
+  height:46px;width:auto;object-fit:contain;flex-shrink:0;
+  mix-blend-mode:screen;
+  transition:transform .18s ease-out,filter .18s;
+  filter:drop-shadow(0 2px 6px rgba(226,185,79,0.15));
+}
+.tn-prev:hover .tn-time-icon{transform:translateX(-3px) scale(1.08);filter:drop-shadow(0 3px 14px rgba(226,185,79,0.6))}
+.tn-next:hover .tn-time-icon{transform:translateX(3px) scale(1.08);filter:drop-shadow(0 3px 14px rgba(226,185,79,0.6))}
+.tn-btn-text{display:flex;flex-direction:column;align-items:flex-start;gap:1px}
+.tn-btn-text-r{align-items:flex-end;text-align:right}
 .tn-btn-label{font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.tn-btn-range{font-size:10.5px;color:var(--ink2);margin-top:1px}
+.tn-btn-range{font-size:10.5px;color:var(--ink2);margin-top:0}
 .tn-divider{width:1px;background:rgba(226,185,79,0.1);flex-shrink:0;margin:14px 0}
 .tn-center{
   flex:1;min-width:0;
@@ -441,6 +448,20 @@ img.leaflet-tile{border:none !important;outline:none !important}
   color:var(--muted);padding:10px 4px 6px;
   border-bottom:1px solid var(--b2);margin-bottom:8px;
 }
+/* Day strip event dots */
+.tn-day-ev .tn-day-num{font-weight:800;color:var(--gold2)}
+.tn-day-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
+.tn-day-dot-e{width:4px;height:4px;flex-shrink:0;opacity:0}
+.tn-day-dot.c-musica{background:#a78bfa}
+.tn-day-dot.c-tradicion,.tn-day-dot.c-evento{background:var(--gold)}
+.tn-day-dot.c-arte{background:#f472b6}
+.tn-day-dot.c-teatro{background:#f87171}
+.tn-day-dot.c-deportes{background:#60a5fa}
+.tn-day-dot.c-gastro{background:#fbbf24}
+.tn-day-dot.c-infantil{background:#34d399}
+.tn-day-dot.c-cultural{background:#2dd4bf}
+.tn-day-dot.c-feria{background:#fb923c}
+.tn-day-dot.c-dm{background:var(--gold2)}
 /* ── MOBILE — stacked layout (header → map → list) ── */
 @media(max-width:680px){
   .shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
@@ -735,9 +756,11 @@ img.leaflet-tile{border:none !important;outline:none !important}
     <nav class="time-nav" id="timeNav" aria-label="Navegación por semanas">
       <div class="tn-main">
         <button class="tn-btn tn-prev" id="wPrev" aria-label="Ir a la semana anterior">
-          <span class="tn-arrow"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M13 4 7 10l6 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 4 2 10l6 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          <span class="tn-btn-label">Semana anterior</span>
-          <span class="tn-btn-range" id="tnPrevRange">–</span>
+          <img src="/images/areco-time-back.png" class="tn-time-icon" alt="">
+          <div class="tn-btn-text">
+            <span class="tn-btn-label">Semana anterior</span>
+            <span class="tn-btn-range" id="tnPrevRange">–</span>
+          </div>
         </button>
         <div class="tn-divider"></div>
         <div class="tn-center">
@@ -750,9 +773,11 @@ img.leaflet-tile{border:none !important;outline:none !important}
         </div>
         <div class="tn-divider"></div>
         <button class="tn-btn tn-next" id="wNext" aria-label="Ir a la semana siguiente">
-          <span class="tn-btn-range" id="tnNextRange">–</span>
-          <span class="tn-btn-label">Semana siguiente</span>
-          <span class="tn-arrow"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 4l6 6-6 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div class="tn-btn-text tn-btn-text-r">
+            <span class="tn-btn-range" id="tnNextRange">–</span>
+            <span class="tn-btn-label">Semana siguiente</span>
+          </div>
+          <img src="/images/areco-time-forward.png" class="tn-time-icon" alt="">
         </button>
       </div>
       <div class="tn-timeline" id="tnTimeline"></div>
@@ -1271,13 +1296,13 @@ function render(direction=0){
   renderList(list);
   renderMap(list, futureEvents(), pastEvents());
   fitMapToEvents();
-  updateTimeNav(list.length, direction);
+  updateTimeNav(list.length, direction, list);
 }
 
 // ── FLOATING TIME NAVIGATOR ────────────────────────────
 const DAY_NAMES = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
 
-function updateTimeNav(count, direction){
+function updateTimeNav(count, direction, eventsList=[]){
   const r     = wRange(wOff);
   const rPrev = wRange(wOff-1);
   const rNext = wRange(wOff+1);
@@ -1335,17 +1360,26 @@ function updateTimeNav(count, direction){
   const countEl=document.getElementById('tnCount');
   if(countEl) countEl.textContent=count+' EVENTO'+(count!==1?'S':'');
 
-  // Seven-day strip
+  // Seven-day strip with event highlights
   const strip=document.getElementById('tnStrip');
+  const evtDayMap={};
+  eventsList.forEach(ev=>{
+    const d=parseD(ev.fecha);if(!d)return;
+    const key=d.toDateString();
+    if(!evtDayMap[key])evtDayMap[key]=catMeta(ev).cls;
+  });
   if(strip){
     let html='';
     for(let i=0;i<7;i++){
       const d=new Date(r.start);d.setDate(r.start.getDate()+i);
       const isToday=d.getTime()===today.getTime();
-      html+='<div class="tn-day'+(isToday?' tn-day-today':'')+'">'
-        +'<span class="tn-day-name">'+DAY_NAMES[i]+'</span>'
-        +'<span class="tn-day-num">'+d.getDate()+'</span>'
-        +'</div>';
+      const evtCls=evtDayMap[d.toDateString()]||'';
+      const hasEv=!!evtCls;
+      html+='<div class="tn-day'+(isToday?' tn-day-today':'')+(hasEv?' tn-day-ev':'')+'">'+
+        '<span class="tn-day-name">'+(isToday?'HOY':DAY_NAMES[i])+'</span>'+
+        '<span class="tn-day-num">'+d.getDate()+'</span>'+
+        (hasEv?'<span class="tn-day-dot '+evtCls+'"></span>':'<span class="tn-day-dot-e"></span>')+
+        '</div>';
     }
     strip.innerHTML=html;
   }
