@@ -1281,8 +1281,12 @@ function renderMap(list, future=[], past=[]){
           .addTo(map);
 
         m.on('click',()=>{
-          selById(ev.id,false);
-          panForPopup(m, hasFlyer);
+          if(m.isPopupOpen()){
+            m.closePopup();
+          } else {
+            selById(ev.id,false);
+            panForPopup(m, hasFlyer);
+          }
         });
       }
       mkrs[ev.id]=m;
