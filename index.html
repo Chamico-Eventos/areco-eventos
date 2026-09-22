@@ -415,7 +415,7 @@ img.leaflet-tile{border:none !important;outline:none !important}
   color:var(--ink);letter-spacing:-.02em;text-align:center;line-height:1.1;
   transition:transform .22s ease-out,opacity .18s ease-out;
 }
-.tn-status-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:1px}
+.tn-status-row{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;justify-content:center;margin-top:1px;white-space:nowrap}
 .tn-chip{
   font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
   padding:2px 7px;border-radius:999px;
@@ -465,8 +465,8 @@ img.leaflet-tile{border:none !important;outline:none !important}
 }
 .tn-return-btn{
   background:none;border:none;cursor:pointer;
-  font-size:11px;font-weight:600;color:var(--gold2);
-  opacity:.75;transition:opacity .15s;letter-spacing:.02em;
+  font-size:9px;font-weight:600;color:var(--gold2);
+  opacity:.75;transition:opacity .15s;letter-spacing:.02em;white-space:nowrap;
 }
 .tn-return-btn:hover{opacity:1}
 .tn-return-btn:focus-visible{outline:2px solid var(--gold);border-radius:4px;padding:2px 4px}
