@@ -294,8 +294,11 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .map-brand{background:rgba(14,13,11,0.82);backdrop-filter:blur(10px);border:1px solid rgba(201,168,76,0.18);border-radius:12px;padding:10px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;width:100%}
 .map-brand img{width:100%;max-height:56px;object-fit:contain;mix-blend-mode:luminosity;opacity:1}
 .map-brand-tagline{font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);align-self:flex-start}
-/* Mobile return button — hidden on desktop */
-.mob-return-btn{display:none !important}
+/* Mobile return button — hidden on desktop regardless of JS */
+.mob-return-btn{display:none}
+@media(min-width:681px){
+  .mob-return-btn{display:none !important}
+}
 /* Mobile header elements — hidden on desktop */
 .mob-add-btn-wrap{display:none}
 /* Mobile filter bar hidden on desktop */
@@ -582,7 +585,6 @@ img.leaflet-tile{border:none !important;outline:none !important}
   .tn-time-icon{height:28px}
   .tn-date{font-size:12px}
   .tn-status-row{display:none} /* hide chip + count on mobile */
-  .mob-return-btn{display:none} /* JS controls this via inline style */
   .tn-divider{margin:8px 0}
   .tn-strip{display:none} /* hide 7-day strip — too wide for 40vh map */
   .tn-timeline{display:none} /* hide timeline dots */
