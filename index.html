@@ -1280,9 +1280,14 @@ function renderMap(list, future=[], past=[]){
           .bindPopup(popHtml,{maxWidth: hasFlyer?400:280, autoPan:false})
           .addTo(map);
 
-        m.on('click',()=>{
-          selById(ev.id,false);
-          panForPopup(m, hasFlyer);
+        m.on('click',(e)=>{
+          L.DomEvent.stopPropagation(e); // prevent map click from firing and immediately closing
+          if(m.isPopupOpen()){
+            m.closePopup();
+          } else {
+            selById(ev.id,false);
+            panForPopup(m, hasFlyer);
+          }
         });
       }
       mkrs[ev.id]=m;
