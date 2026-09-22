@@ -120,6 +120,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 }
 .dm-sheet.open{transform:translateY(0)}
 
+/* drag handle */
 .sheet-handle{
   width:40px;height:4px;
   background:rgba(201,168,76,0.3);
@@ -131,6 +132,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 .sheet-scroll::-webkit-scrollbar{width:3px}
 .sheet-scroll::-webkit-scrollbar-thumb{background:var(--border)}
 
+/* event image */
 .sheet-img{
   width:100%;
   height:220px;
@@ -144,6 +146,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
   font-size:48px;
 }
 
+/* content */
 .sheet-body{padding:20px 22px 28px}
 
 .sheet-dm-eyebrow{
@@ -180,6 +183,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
   margin-bottom:20px;
 }
 
+/* price + CTA */
 .sheet-cta-area{
   background:var(--s2);border-radius:14px;
   border:1px solid var(--border);
@@ -229,6 +233,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 }
 .sheet-source-link:hover{color:var(--ink2)}
 
+/* close button */
 .sheet-close{
   position:absolute;top:14px;right:16px;
   width:30px;height:30px;border-radius:50%;
@@ -248,24 +253,22 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(232,201,122,.5)}50%{box-shadow:0 0 0 8px rgba(232,201,122,0)}}
 
 /* ── CAT COLOURS ──────────────────────────────────── */
-/* Each category gets a distinct colour tuned for the dark background */
-.c-musica   {background:rgba(226,185,79,0.14); color:#e2b94f; border:1px solid rgba(226,185,79,0.3)}   /* gold — brand, most common */
-.c-tradicion{background:rgba(161,98,7,0.18);   color:#c17f2a; border:1px solid rgba(161,98,7,0.35)}    /* amber-brown — earthy */
-.c-arte     {background:rgba(244,63,94,0.12);  color:#f87191; border:1px solid rgba(244,63,94,0.28)}   /* coral-pink */
-.c-teatro   {background:rgba(192,132,252,0.12);color:#c084fc; border:1px solid rgba(192,132,252,0.28)} /* purple */
-.c-deportes {background:rgba(34,197,94,0.12);  color:#4ade80; border:1px solid rgba(34,197,94,0.28)}   /* green */
-.c-gastro   {background:rgba(251,146,60,0.12); color:#fb923c; border:1px solid rgba(251,146,60,0.28)}  /* amber-orange */
-.c-infantil {background:rgba(56,189,248,0.12); color:#38bdf8; border:1px solid rgba(56,189,248,0.28)}  /* sky blue */
-.c-cultural {background:rgba(167,139,250,0.12);color:#a78bfa; border:1px solid rgba(167,139,250,0.28)} /* lavender */
-.c-feria    {background:rgba(250,204,21,0.12); color:#facc15; border:1px solid rgba(250,204,21,0.28)}   /* yellow */
-.c-solidario{background:rgba(52,211,153,0.12); color:#34d399; border:1px solid rgba(52,211,153,0.28)}  /* emerald */
-.c-evento   {background:rgba(107,97,80,0.18);  color:var(--muted); border:1px solid rgba(107,97,80,0.2)} /* neutral */
-.c-dm       {background:rgba(232,201,122,0.18);color:var(--gold2); border:1px solid var(--gold)}        /* branded gold */
+.c-musica{background:rgba(124,58,237,.16);color:#a78bfa;border:1px solid rgba(124,58,237,.3)}
+.c-tradicion{background:rgba(201,168,76,.14);color:var(--gold);border:1px solid var(--border)}
+.c-arte{background:rgba(219,39,119,.12);color:#f472b6;border:1px solid rgba(219,39,119,.25)}
+.c-teatro{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25)}
+.c-deportes{background:rgba(37,99,235,.12);color:#60a5fa;border:1px solid rgba(37,99,235,.25)}
+.c-gastro{background:rgba(245,158,11,.12);color:#fbbf24;border:1px solid rgba(245,158,11,.25)}
+.c-infantil{background:rgba(16,185,129,.12);color:#34d399;border:1px solid rgba(16,185,129,.25)}
+.c-cultural{background:rgba(20,184,166,.12);color:#2dd4bf;border:1px solid rgba(20,184,166,.25)}
+.c-feria{background:rgba(249,115,22,.12);color:#fb923c;border:1px solid rgba(249,115,22,.25)}
+.c-solidario{background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.25)}
+.c-evento{background:rgba(107,97,80,.18);color:var(--muted);border:1px solid rgba(107,97,80,.2)}
+.c-dm{background:rgba(232,201,122,.18);color:var(--gold2);border:1px solid var(--gold)}
 
 /* ── MARKER HOVER ───────────────────────────────────── */
 .leaflet-marker-icon{transition:filter .15s}
 .leaflet-marker-icon:hover{filter:brightness(1.18) drop-shadow(0 2px 8px rgba(226,185,79,0.4));z-index:1000!important}
-
 /* ── DARK TILE INVERSION ──────────────────────────── */
 .leaflet-tile-pane{
   filter:invert(100%) hue-rotate(180deg) brightness(95%) contrast(100%) saturate(0.75);
@@ -280,17 +283,14 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .past-name{text-decoration:line-through;color:var(--muted)!important}
 .past-div{opacity:.4}
 .past-tag{display:inline-block;margin-left:8px;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:rgba(107,97,80,0.2);border-radius:999px;padding:1px 6px;vertical-align:middle}
-
 /* ── MAP BRANDING ─────────────────────────────────── */
 .map-brand-wrapper{position:absolute;top:14px;right:14px;z-index:999;display:flex;flex-direction:column;gap:8px;min-width:200px}
 .map-brand{background:rgba(14,13,11,0.82);backdrop-filter:blur(10px);border:1px solid rgba(201,168,76,0.18);border-radius:12px;padding:10px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;width:100%}
 .map-brand img{width:100%;max-height:56px;object-fit:contain;mix-blend-mode:luminosity;opacity:1}
 .map-brand-tagline{font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);align-self:flex-start}
-
 /* ── ADD EVENT BUTTON ─────────────────────────────── */
 .add-ev-btn{width:100%;justify-content:center;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0d0c09;border:none;border-radius:999px;padding:10px 15px;font-family:Inter,sans-serif;font-size:11.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(226,185,79,0.2);transition:filter .2s,transform .15s,box-shadow .2s;display:flex;align-items:center;gap:6px;white-space:nowrap;box-sizing:border-box}
 .add-ev-btn:hover{filter:brightness(1.06);transform:translateY(-1px);box-shadow:0 4px 16px rgba(226,185,79,0.28)}
-
 /* ── SUBMISSION MODAL ─────────────────────────────── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(6px);z-index:3000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;padding:16px}
 .modal-overlay.open{opacity:1;pointer-events:auto}
@@ -388,7 +388,6 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .tn-chip-future{background:rgba(107,97,80,0.18);color:var(--muted);border-color:rgba(107,97,80,0.2)}
 .tn-chip-past{background:rgba(60,50,35,0.25);color:#6b6150;border-color:rgba(60,50,35,0.2)}
 .tn-count{font-size:10px;color:var(--ink2);font-weight:600}
-
 /* Seven-day strip */
 .tn-strip{
   border-top:1px solid rgba(226,185,79,0.08);
@@ -406,7 +405,6 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .tn-day-num{font-size:11px;font-weight:600;color:var(--ink2)}
 .tn-day-today{background:rgba(226,185,79,0.12)}
 .tn-day-today .tn-day-name,.tn-day-today .tn-day-num{color:var(--gold);font-weight:700}
-
 /* Timeline mood bar */
 .tn-timeline{
   display:flex;align-items:center;
@@ -424,7 +422,6 @@ img.leaflet-tile{border:none !important;outline:none !important}
 }
 .tn-tl-label{font-size:7.5px;color:var(--muted);white-space:nowrap;letter-spacing:.02em}
 .tn-tl-line{flex:1;height:1px;background:rgba(107,97,80,0.25);min-width:8px}
-
 /* Return to current week */
 .tn-return-bar{
   border-top:1px solid rgba(226,185,79,0.08);
@@ -437,41 +434,40 @@ img.leaflet-tile{border:none !important;outline:none !important}
 }
 .tn-return-btn:hover{opacity:1}
 .tn-return-btn:focus-visible{outline:2px solid var(--gold);border-radius:4px;padding:2px 4px}
-
 /* Reduced motion */
 @media(prefers-reduced-motion:reduce){
   .tn-date{transition:opacity .15s}
   .ecard{transition:border-color .15s,background .15s}
 }
-
 /* Events list heading */
 .ev-week-heading{
   font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
   color:var(--muted);padding:10px 4px 6px;
   border-bottom:1px solid var(--b2);margin-bottom:8px;
 }
-
-/* Day strip event dots — match marker colours per category */
+/* Day strip event dots */
 .tn-day-ev .tn-day-num{font-weight:800;color:var(--gold2)}
 .tn-day-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
 .tn-day-dot-e{width:4px;height:4px;flex-shrink:0;opacity:0}
-.tn-day-dot.c-musica   {background:#e2b94f}
-.tn-day-dot.c-tradicion{background:#c17f2a}
-.tn-day-dot.c-arte     {background:#f87191}
-.tn-day-dot.c-teatro   {background:#c084fc}
-.tn-day-dot.c-deportes {background:#4ade80}
-.tn-day-dot.c-gastro   {background:#fb923c}
-.tn-day-dot.c-infantil {background:#38bdf8}
-.tn-day-dot.c-cultural {background:#a78bfa}
-.tn-day-dot.c-feria    {background:#facc15}
+.tn-day-dot.c-musica{background:#a78bfa}
+.tn-day-dot.c-tradicion,.tn-day-dot.c-evento{background:var(--gold)}
+.tn-day-dot.c-arte{background:#f472b6}
+.tn-day-dot.c-teatro{background:#f87171}
+.tn-day-dot.c-deportes{background:#60a5fa}
+.tn-day-dot.c-gastro{background:#fbbf24}
+.tn-day-dot.c-infantil{background:#34d399}
+.tn-day-dot.c-cultural{background:#2dd4bf}
+.tn-day-dot.c-feria{background:#fb923c}
 .tn-day-dot.c-solidario{background:#34d399}
-.tn-day-dot.c-evento   {background:var(--muted)}
-.tn-day-dot.c-dm       {background:var(--gold2)}
-
-/* ── MOBILE — stacked layout ── */
+.tn-day-dot.c-dm{background:var(--gold2)}
+/* ── MOBILE — stacked layout (header → map → list) ── */
 @media(max-width:680px){
   .shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+  /* Sidebar dissolves into flex — children become direct shell items */
   .sidebar{display:contents}
+
+  /* 1 — Compact header with week nav */
   .sb-head{
     order:1;flex-shrink:0;
     background:var(--s1);
@@ -484,12 +480,16 @@ img.leaflet-tile{border:none !important;outline:none !important}
   .wn-sub{display:none}
   .wn-btn{padding:9px 12px}
   .wn-label{font-size:12px}
+
+  /* 2 — Category filters */
   .sb-filters{
     order:2;flex-shrink:0;
     background:var(--s1);
     padding:8px 14px;
     border-bottom:1px solid var(--b2);
   }
+
+  /* 3 — Map ~30% height */
   #map{
     order:3;
     height:30vh;
@@ -497,6 +497,8 @@ img.leaflet-tile{border:none !important;outline:none !important}
     width:100%;
     position:relative;z-index:5;
   }
+
+  /* 4 — Event list fills remaining space */
   .sb-list{
     order:4;
     flex:1;overflow-y:auto;
@@ -504,16 +506,23 @@ img.leaflet-tile{border:none !important;outline:none !important}
     border-top:1px solid var(--border);
     padding-bottom:20px;
   }
+
+  /* Compact brand overlay on small map */
   .map-brand-wrapper{top:6px;right:6px;min-width:130px;gap:5px}
   .map-brand{padding:5px 10px;gap:4px}
   .map-brand img{max-height:20px}
   .map-brand-tagline{font-size:7px}
+
+  /* Move add-event button inside the map, bottom-left */
   .add-ev-btn{
     position:absolute;bottom:8px;left:8px;
     padding:8px 12px;font-size:11px;
     box-shadow:0 2px 10px rgba(201,168,76,0.35);
   }
+
   .dm-sheet{max-height:94vh}
+
+  /* Time nav on mobile: smaller, still floated on map */
   .time-nav{
     top:6px;
     max-width:calc(100% - 20px);
@@ -582,7 +591,7 @@ img.leaflet-tile{border:none !important;outline:none !important}
             <option>Música</option><option>Arte</option><option>Tradición</option>
             <option>Cultural</option><option>Gastronomía</option>
             <option>Deportes</option><option>Feria</option><option>Infantil</option>
-            <option>Teatro</option><option>Solidario</option><option>Evento</option>
+            <option>Solidario</option><option>Evento</option>
           </select>
         </div>
       </div>
@@ -607,7 +616,7 @@ img.leaflet-tile{border:none !important;outline:none !important}
 
       <div class="form-group">
         <label class="form-label">Link del post de Instagram</label>
-        <input class="form-input" id="f-ig-link" type="url" placeholder="https://www.instagram.com/p/...">
+        <input class="form-input" id="f-link" type="url" placeholder="https://www.instagram.com/p/...">
         <div class="form-hint">Si ya publicaste el evento en Instagram, pegá el link acá.</div>
       </div>
 
@@ -796,7 +805,7 @@ img.leaflet-tile{border:none !important;outline:none !important}
 const SHEET       = '1Tmrr6lxD7n0wp3x87wUdy-vP-tuDGU8DCvMmIh9UciI';
 const TICKETS_URL = 'https://chamico-tickets.vercel.app';
 const API_EVENTOS = '/events.json';
-const CENTER      = [-34.2455, -59.4743];
+const CENTER     = [-34.2455, -59.4743];
 
 const FALLBACK = {
   'museo gauchesco ricardo güiraldes': [-34.2375156, -59.4814842],
@@ -849,27 +858,24 @@ const FALLBACK = {
 };
 
 const I = '/images/';
-
-// ── CATEGORY CONFIG ───────────────────────────────────
-// col = marker background colour for this category
-// glow = box-shadow glow colour
 const CAT = {
-  'Música':      {cls:'c-musica',    icon:I+'icon-musica.png',     col:'#e2b94f', glow:'rgba(226,185,79,0.45)'},
-  'Tradición':   {cls:'c-tradicion', icon:I+'icon-tradicion.png',  col:'#a16207', glow:'rgba(161,98,7,0.5)'},
-  'Arte':        {cls:'c-arte',      icon:I+'icon-arte.png',       col:'#f43f5e', glow:'rgba(244,63,94,0.45)'},
-  'Teatro':      {cls:'c-teatro',    icon:I+'icon-teatro.png',     col:'#c084fc', glow:'rgba(192,132,252,0.45)'},
-  'Deportes':    {cls:'c-deportes',  icon:I+'icon-deportes.png',   col:'#22c55e', glow:'rgba(34,197,94,0.45)'},
-  'Gastronomía': {cls:'c-gastro',    icon:I+'icon-gastronomia.png',col:'#fb923c', glow:'rgba(251,146,60,0.45)'},
-  'Infantil':    {cls:'c-infantil',  icon:I+'icon-infantil.png',   col:'#38bdf8', glow:'rgba(56,189,248,0.45)'},
-  'Cultural':    {cls:'c-cultural',  icon:I+'icon-cultural.png',   col:'#a78bfa', glow:'rgba(167,139,250,0.45)'},
-  'Feria':       {cls:'c-feria',     icon:I+'icon-feria.png',      col:'#facc15', glow:'rgba(250,204,21,0.45)'},
-  'Solidario':   {cls:'c-solidario', icon:I+'icon-solidario.png',  col:'#34d399', glow:'rgba(52,211,153,0.45)'},
-  'Evento':      {cls:'c-evento',    icon:I+'icon-evento.png',     col:'#94a3b8', glow:'rgba(148,163,184,0.3)'},
+  'Música':      {cls:'c-musica',    icon:I+'icon-musica.png'},
+  'Tradición':   {cls:'c-tradicion', icon:I+'icon-tradicion.png'},
+  'Arte':        {cls:'c-arte',      icon:I+'icon-arte.png'},
+  'Teatro':      {cls:'c-teatro',    icon:I+'icon-teatro.png'},
+  'Deportes':    {cls:'c-deportes',  icon:I+'icon-deportes.png'},
+  'Gastronomía': {cls:'c-gastro',    icon:I+'icon-gastronomia.png'},
+  'Infantil':    {cls:'c-infantil',  icon:I+'icon-infantil.png'},
+  'Cultural':    {cls:'c-cultural',  icon:I+'icon-cultural.png'},
+  'Feria':       {cls:'c-feria',     icon:I+'icon-feria.png'},
+  'Solidario':   {cls:'c-solidario', icon:I+'icon-solidario.png'},
+  'Evento':      {cls:'c-evento',    icon:I+'icon-evento.png'},
 };
 
 // ── STATE ─────────────────────────────────────────────
 let evs=[],vmap={...FALLBACK},activeFilter='all',wOff=0,mkrs={},ghostMkrs={},activeId=null;
 
+// Navigate to the week containing a given MM/DD/YYYY date
 function goToEventWeek(fecha){
   const d=parseD(fecha);if(!d)return;
   const now=new Date();now.setHours(0,0,0,0);
@@ -922,8 +928,8 @@ function coords(lugar){
 }
 function isDM(ev){ return String(ev.es_datamanIAcs).toLowerCase()==='true'; }
 function catMeta(ev){
-  const base = CAT[ev.categoria]||{cls:'c-evento',icon:I+'icon-evento.png',col:'#94a3b8',glow:'rgba(148,163,184,0.3)'};
-  if(isDM(ev)) return {cls:'c-dm', icon:base.icon, col:'#e8c97a', glow:'rgba(226,185,79,0.5)'};
+  const base = CAT[ev.categoria]||{cls:'c-evento',icon:I+'icon-evento.png'};
+  if(isDM(ev)) return {cls:'c-dm', icon:base.icon};
   return base;
 }
 function priceInfo(p){
@@ -939,6 +945,8 @@ function priceInfo(p){
 // ── BOTTOM SHEET ──────────────────────────────────────
 function openSheet(ev){
   const d=parseD(ev.fecha);
+  const dm=isDM(ev);
+
   const imgEl=document.getElementById('sheetImg');
   if(ev.imagen_url&&ev.imagen_url.trim()){
     imgEl.innerHTML=`<img class="sheet-img" src="${ev.imagen_url}" alt="${ev.nombre}"
@@ -947,7 +955,9 @@ function openSheet(ev){
     const iconPath=catMeta(ev).icon;
     imgEl.innerHTML=`<div class="sheet-img-placeholder"><img src="${iconPath}" style="width:80px;height:80px;object-fit:contain;opacity:.25;mix-blend-mode:luminosity"></div>`;
   }
+
   document.getElementById('sheetName').textContent=ev.nombre||'Evento';
+
   const chips=[];
   if(d) chips.push(`<div class="sheet-meta-chip">📅 ${prettyD(d)}</div>`);
   if(ev.hora&&ev.hora!=='Todo el día') chips.push(`<div class="sheet-meta-chip">🕐 ${ev.hora} hs</div>`);
@@ -959,16 +969,22 @@ function openSheet(ev){
     chips.push(`<a class="sheet-meta-chip" href="${gmDir}" target="_blank" style="color:var(--gold);text-decoration:none;pointer-events:auto">🗺 Cómo llegar</a>`);
   }
   document.getElementById('sheetMeta').innerHTML=chips.join('');
+
   document.getElementById('sheetDesc').textContent=ev.descripcion||'';
+
   const prEl=document.getElementById('sheetPrice');
   const prLb=document.getElementById('sheetPriceLabel');
   if(!ev.precio||ev.precio==='Consultar'){
-    prEl.textContent='Consultar';prEl.style.color='var(--muted)';prLb.textContent='';
+    prEl.textContent='Consultar';prEl.style.color='var(--muted)';
+    prLb.textContent='';
   } else if(ev.precio==='Gratis'){
-    prEl.textContent='Gratis';prEl.style.color='#4ca87a';prLb.textContent='';
+    prEl.textContent='Gratis';prEl.style.color='#4ca87a';
+    prLb.textContent='';
   } else {
-    prEl.textContent=ev.precio;prEl.style.color='var(--gold2)';prLb.textContent='por persona';
+    prEl.textContent=ev.precio;prEl.style.color='var(--gold2)';
+    prLb.textContent='por persona';
   }
+
   const avEl=document.getElementById('sheetAvail');
   if(ev.preventa_disponible==='TRUE'){
     avEl.innerHTML=`<div class="avail-dot"></div> Preventa disponible`;
@@ -976,12 +992,14 @@ function openSheet(ev){
   } else {
     avEl.innerHTML='';
   }
+
   const btn=document.getElementById('sheetBuyBtn');
   const eventParam=encodeURIComponent(ev.id||ev.nombre||'');
   const targetUrl=ev.link_accion||`${TICKETS_URL}/?event=${eventParam}`;
   btn.href=targetUrl;
   const hasPreventa = String(ev.preventa_disponible).toLowerCase()==='true';
   btn.textContent = hasPreventa ? 'Comprá tus anticipadas →' : 'Ver más →';
+
   const srcLink=document.getElementById('sheetSourceLink');
   if(ev.fuente_url&&ev.fuente_url!==ev.link_accion){
     srcLink.href=ev.fuente_url;
@@ -990,6 +1008,7 @@ function openSheet(ev){
   } else {
     srcLink.style.display='none';
   }
+
   document.getElementById('sheetOverlay').classList.add('open');
   document.getElementById('dmSheet').classList.add('open');
   document.body.style.overflow='hidden';
@@ -1060,29 +1079,11 @@ function renderList(list){
 }
 
 // ── RENDER MAP ────────────────────────────────────────
-// Helper: build a pin HTML string for a given category/state
-function pinHTML(col, glow, icon, sz, pulse=false, iconSz){
-  const iSz = iconSz || Math.max(8, sz - 13);
-  const anim = pulse ? 'animation:pulse 2s ease-in-out infinite;' : '';
-  return `<div style="
-    width:${sz}px;height:${sz}px;
-    background:${col};
-    border-radius:50% 50% 50% 0;
-    transform:rotate(-45deg);
-    border:2px solid rgba(0,0,0,0.65);
-    box-shadow:0 4px 16px rgba(0,0,0,0.7),0 0 12px ${glow},inset 0 1px 0 rgba(255,255,255,0.13);
-    display:flex;align-items:center;justify-content:center;
-    ${anim}
-  "><img src="${icon}" style="width:${iSz}px;height:${iSz}px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.style.display='none'"></div>`;
-}
-
 function renderMap(list, future=[], past=[]){
   Object.values(mkrs).forEach(m=>map.removeLayer(m));mkrs={};
   Object.values(ghostMkrs).forEach(m=>map.removeLayer(m));ghostMkrs={};
 
   const {end:wEnd}=wRange(wOff);
-
-  // ── Progressive future markers ────────────────────
   future.forEach(ev=>{
     const c=coords(ev.lugar);if(!c)return;
     const evDate=parseD(ev.fecha);
@@ -1090,8 +1091,18 @@ function renderMap(list, future=[], past=[]){
     const weeksAhead=Math.min(Math.ceil(daysAhead/7),5);
     const sz=Math.max(14,26-weeksAhead*3);
     const op=Math.max(0.12,0.58-weeksAhead*0.1);
-    const {icon:evIcon, col, glow}=catMeta(ev);
-    const li=L.divIcon({html:pinHTML(col,glow,evIcon,sz),className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz],popupAnchor:[0,-sz-2]});
+    const dm=isDM(ev);
+    const {icon:evIcon}=catMeta(ev);
+    const iconSz=Math.max(8,sz-11);
+    const col=dm?'#e8c97a':'#c9a84c';
+    const ghostHtml=`<div style="
+      width:${sz}px;height:${sz}px;background:${col};
+      border-radius:50% 50% 50% 0;transform:rotate(-45deg);
+      border:2px solid rgba(0,0,0,0.5);
+      box-shadow:0 2px 8px rgba(0,0,0,0.55);
+      display:flex;align-items:center;justify-content:center;
+    "><img src="${evIcon}" style="width:${iconSz}px;height:${iconSz}px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.style.display='none'"></div>`;
+    const li=L.divIcon({html:ghostHtml,className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz],popupAnchor:[0,-sz-2]});
     const d=parseD(ev.fecha);
     const pop=`<div style="font-family:'Inter',sans-serif;font-size:11px;max-width:200px;color:var(--muted)">
       <div style="font-family:'Playfair Display',serif;font-size:13px;color:var(--ink2);margin-bottom:4px">${ev.nombre||'Evento'}</div>
@@ -1101,7 +1112,6 @@ function renderMap(list, future=[], past=[]){
     ghostMkrs['fut_'+ev.id]=m;
   });
 
-  // ── Past event markers (last 60 days) ─────────────
   past.forEach(ev=>{
     const c=coords(ev.lugar);if(!c)return;
     const {icon:pastIcon}=catMeta(ev);
@@ -1117,13 +1127,16 @@ function renderMap(list, future=[], past=[]){
     const d=parseD(ev.fecha);
     const pop=`<div style="font-family:'Inter',sans-serif;font-size:11px;max-width:200px;color:var(--muted)">
       <div style="font-family:'Playfair Display',serif;font-size:13px;color:var(--ink2);margin-bottom:4px">${ev.nombre||'Evento'}</div>
-      <div style="line-height:1.6">${d?`📅 ${prettyD(d)}<br>`:''}${ev.lugar?`📍 ${ev.lugar}`:''}
-      </div><div style="margin-top:6px;font-size:10px;color:var(--muted);font-style:italic">Evento pasado</div></div>`;
+      <div style="line-height:1.6">
+        ${d?`📅 ${prettyD(d)}<br>`:''}
+        ${ev.lugar?`📍 ${ev.lugar}`:''}
+      </div>
+      <div style="margin-top:6px;font-size:10px;color:var(--muted);font-style:italic">Evento pasado</div>
+    </div>`;
     const m=L.marker(c,{icon:li,opacity:0.45}).bindPopup(pop,{maxWidth:210}).addTo(map);
     ghostMkrs['past_'+ev.id]=m;
   });
 
-  // ── Active markers for current week ───────────────
   const TODAY=new Date();TODAY.setHours(0,0,0,0);
   const byKey={};
   list.forEach(ev=>{
@@ -1132,22 +1145,26 @@ function renderMap(list, future=[], past=[]){
     if(!byKey[k])byKey[k]={c,evs:[]};
     byKey[k].evs.push(ev);
   });
-
   Object.values(byKey).forEach(({c,evs:g})=>{
     g.forEach((ev,i)=>{
-      const {icon, col, glow}=catMeta(ev);
+      const dm=isDM(ev);
+      const{icon}=catMeta(ev);
       const evDate=parseD(ev.fecha);
       const alreadyPast=evDate&&evDate<TODAY;
       const off=g.length>1?[c[0]+(i-(g.length-1)/2)*0.00009,c[1]+(i-(g.length-1)/2)*0.00012]:c;
+
       let li, m;
 
       if(alreadyPast){
+        const {icon:apIcon}=catMeta(ev);
         const pastHtml=`<div style="
-          width:20px;height:20px;background:#5a4e3a;
-          border-radius:50% 50% 50% 0;transform:rotate(-45deg);
+          width:20px;height:20px;
+          background:#5a4e3a;
+          border-radius:50% 50% 50% 0;
+          transform:rotate(-45deg);
           border:1px solid rgba(90,78,58,0.6);
           display:flex;align-items:center;justify-content:center;
-        "><img src="${icon}" style="width:11px;height:11px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply;filter:grayscale(0.5)" onerror="this.style.display='none'"></div>`;
+        "><img src="${apIcon}" style="width:11px;height:11px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply;filter:grayscale(0.5)" onerror="this.style.display='none'"></div>`;
         li=L.divIcon({html:pastHtml,className:'',iconSize:[20,20],iconAnchor:[10,20],popupAnchor:[0,-22]});
         const d=parseD(ev.fecha);
         const pop=`<div style="font-family:'Inter',sans-serif;font-size:11px;max-width:200px;color:var(--muted)">
@@ -1156,19 +1173,20 @@ function renderMap(list, future=[], past=[]){
           </div><div style="margin-top:6px;font-size:10px;font-style:italic">Evento pasado</div></div>`;
         m=L.marker(off,{icon:li,opacity:0.5}).bindPopup(pop,{maxWidth:210}).addTo(map);
 
-      } else if(isDM(ev)){
-        // DM events: branded gold + pulse
+      } else if(dm){
+        const col='#e8c97a';
+        const pulse='animation:pulse 2s ease-in-out infinite;';
         li=L.divIcon({
-          html:pinHTML(col,glow,icon,36,true,21),
+          html:`<div style="width:36px;height:36px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(0,0,0,0.7);box-shadow:0 4px 16px rgba(0,0,0,0.7),0 0 14px rgba(226,185,79,0.45),0 1px 4px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;${pulse}"><img src="${icon}" style="width:21px;height:21px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.outerHTML='<span style=transform:rotate(45deg);font-size:12px>★</span>'"></div>`,
           className:'',iconSize:[34,34],iconAnchor:[17,34],popupAnchor:[1,-38]
         });
         m=L.marker(off,{icon:li}).addTo(map);
         m.on('click',()=>{ selById(ev.id,false); openSheet(ev); });
 
       } else {
-        // Standard category-coloured marker
+        const col='#c9a84c';
         li=L.divIcon({
-          html:pinHTML(col,glow,icon,36,false,21),
+          html:`<div style="width:36px;height:36px;background:${col};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(0,0,0,0.7);box-shadow:0 4px 16px rgba(0,0,0,0.7),0 0 10px rgba(226,185,79,0.28),0 1px 4px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;"><img src="${icon}" style="width:21px;height:21px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply" onerror="this.outerHTML='<span style=transform:rotate(45deg);font-size:12px>●</span>'"></div>`,
           className:'',iconSize:[34,34],iconAnchor:[17,34],popupAnchor:[1,-38]
         });
         const d=parseD(ev.fecha);
@@ -1215,7 +1233,7 @@ function selById(id,pan){
   if(pan&&mkrs[id])map.setView(mkrs[id].getLatLng(),16,{animate:true});
 }
 
-// ── FUTURE / PAST EVENTS ──────────────────────────────
+// ── FUTURE EVENTS ─────────────────────────────────────
 function futureEvents(){
   const{end}=wRange(wOff);
   const cutoff=new Date(end);
@@ -1226,6 +1244,8 @@ function futureEvents(){
     return d>end && d<=cutoff;
   });
 }
+
+// ── PAST EVENTS ───────────────────────────────────────
 function pastEvents(){
   const today=new Date();today.setHours(0,0,0,0);
   const floor=new Date(today);floor.setDate(today.getDate()-60);
@@ -1256,6 +1276,7 @@ function updateTimeNav(count, direction, eventsList=[]){
   const today = new Date(); today.setHours(0,0,0,0);
 
   const mainDate = wLabel(r);
+
   const dateEl = document.getElementById('tnDate');
   if(dateEl && direction!==0){
     const prefersReduced = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
@@ -1398,7 +1419,11 @@ function setF(f,el){
 document.getElementById('wPrev').onclick=(e)=>{e.stopPropagation();wOff--;render(-1);};
 document.getElementById('wNext').onclick=(e)=>{e.stopPropagation();wOff++;render(1);};
 
-// ── SUBMISSION MODAL ──────────────────────────────────
+// ── MOBILE SIDEBAR TOGGLE ─────────────────────────────
+function toggleMobileSidebar(){}
+function autoOpenMobile(){}
+
+// ── DATA LOAD ─────────────────────────────────────────
 const AS_SUBMIT = 'https://script.google.com/macros/s/AKfycbyq687XCjn2YbtAjLHvrWE0RZ5u-Tyijhoa_5nWHkJorE62_G1xYLEvEmx3dTA9Zs9k/exec';
 
 function autoFormatTime(input){
@@ -1598,6 +1623,7 @@ async function init(){
     buildPills();
     render(0);
     initGeolocation();
+    autoOpenMobile();
   }catch(e){
     console.error('Load failed:', e);
     document.getElementById('list').innerHTML=
