@@ -1787,7 +1787,6 @@ async function submitEvent(){
       method:'POST',
       body:JSON.stringify(payload),
       headers:{'Content-Type':'application/json'},
-      // No mode:'no-cors' — we need to read the response
     });
 
     let result={status:'ok',imagen_url:''};
@@ -1816,6 +1815,12 @@ async function submitEvent(){
         <button class="form-submit" style="margin-top:16px;max-width:200px;margin-left:auto;margin-right:auto" onclick="closeSubModal()">Cerrar</button>
       </div>`;
 
+  }catch(err){
+    btn.disabled=false;btn.textContent='Enviar mi evento →';
+    errEl.textContent='Error al enviar. Verificá tu conexión e intentá de nuevo.';
+    errEl.style.display='block';
+  }
+}
 
 // ── INIT ──────────────────────────────────────────────
 async function init(){
