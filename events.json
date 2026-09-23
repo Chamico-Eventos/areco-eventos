@@ -544,5 +544,26 @@
     "tipo_fuente": "Scrape",
     "ultima_actualizacion": "09/22/2026",
     "validacion": ""
+  },
+  {
+    "id": "sub_muel8oj4",
+    "fecha": "09/24/2026",
+    "hora": "21:30",
+    "nombre": "fwefwefwef",
+    "categoria": "Música",
+    "lugar": "Galpon chamico",
+    "descripcion": "wefwe\n[Contacto: sdvsdvsdv · tomas.araguz@gmail.com · +5492326421909]",
+    "precio": "$2.000",
+    "es_datamanIAcs": "false",
+    "preventa_disponible": "false",
+    "link_accion": "sdsdff",
+    "fuente_nombre": "Formulario web",
+    "fuente_url": "sdsdff",
+    "imagen_url": "/images/2026-09-24_galpon-chamico_fwefwefwef.jpg",
+    "activo": "false",
+    "fecha_scrape": "",
+    "tipo_fuente": "Manual",
+    "ultima_actualizacion": "09/23/2026",
+    "validacion": "Publicado"
   }
 ]
