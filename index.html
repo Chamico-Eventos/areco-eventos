@@ -638,7 +638,14 @@ img.leaflet-tile{border:none !important;outline:none !important}
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Lugar / Venue <span>*</span></label>
-          <input class="form-input" id="f-lugar" placeholder="Ej: Galpón Chamico">
+          <select class="form-select" id="f-lugar-sel" onchange="onVenueChange(this)">
+            <option value="">Seleccioná un venue...</option>
+          </select>
+          <input class="form-input" id="f-lugar-otro" placeholder="Nombre del venue"
+            style="display:none;margin-top:6px" oninput="updateFlyerName()">
+          <div class="form-hint" id="f-lugar-hint" style="display:none;color:#e07a3a">
+            ⚠️ Venue nuevo — lo agregaremos al mapa próximamente.
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label">Categoría <span>*</span></label>
@@ -989,12 +996,17 @@ function prettyD(d){
   if(!d)return'';
   return d.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
 }
+function normalize(s){
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+}
 function coords(lugar){
   if(!lugar)return null;
-  const k=lugar.toLowerCase().trim();
-  if(vmap[k])return vmap[k];
-  for(const[key,val]of Object.entries(vmap))
-    if(k.includes(key)||key.includes(k))return val;
+  const k=normalize(lugar);
+  // Build normalized version of vmap keys for comparison
+  for(const[key,val]of Object.entries(vmap)){
+    const nk=normalize(key);
+    if(k===nk||k.includes(nk)||nk.includes(k))return val;
+  }
   return null;
 }
 function isDM(ev){ return String(ev.es_datamanIAcs).toLowerCase()==='true'; }
@@ -1628,6 +1640,45 @@ function autoOpenMobile(){}
 // ── DATA LOAD ─────────────────────────────────────────
 const AS_SUBMIT = 'https://script.google.com/macros/s/AKfycbyq687XCjn2YbtAjLHvrWE0RZ5u-Tyijhoa_5nWHkJorE62_G1xYLEvEmx3dTA9Zs9k/exec';
 
+// ── VENUE DROPDOWN ────────────────────────────────────────────
+function toTitleCase(str){
+  return str.replace(/(?:^|\s)\S/g, c => c.toUpperCase());
+}
+
+function populateVenueDropdown(){
+  const sel = document.getElementById('f-lugar-sel');
+  if(!sel) return;
+  const seen = new Set();
+  const venues = Object.keys(FALLBACK)
+    .map(k => toTitleCase(k))
+    .filter(v => { if(seen.has(v)) return false; seen.add(v); return true; })
+    .sort();
+  venues.forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v; opt.textContent = v;
+    sel.appendChild(opt);
+  });
+  const otro = document.createElement('option');
+  otro.value = '__otro__'; otro.textContent = '✦ Otro venue...';
+  sel.appendChild(otro);
+}
+
+function onVenueChange(sel){
+  const otroInput = document.getElementById('f-lugar-otro');
+  const hint      = document.getElementById('f-lugar-hint');
+  const isOtro    = sel.value === '__otro__';
+  if(otroInput) otroInput.style.display = isOtro ? 'block' : 'none';
+  if(hint)      hint.style.display      = isOtro ? 'block' : 'none';
+  updateFlyerName();
+}
+
+function getLugar(){
+  const sel = document.getElementById('f-lugar-sel');
+  if(!sel) return '';
+  if(sel.value === '__otro__') return (document.getElementById('f-lugar-otro')?.value||'').trim();
+  return sel.value;
+}
+
 function autoFormatTime(input){
   let v = input.value.replace(/[^0-9]/g,'');
   if(v.length > 4) v = v.slice(0,4);
@@ -1661,7 +1712,7 @@ function slugify(str){
 
 function getFlyerName(ext){
   const fecha=document.getElementById('f-fecha').value;
-  const lugar=document.getElementById('f-lugar').value.trim();
+  const lugar=getLugar();
   const nombre=document.getElementById('f-nombre').value.trim();
   if(!fecha||!lugar||!nombre) return null;
   const vp=lugar.split(' ');
@@ -1696,10 +1747,16 @@ function onFlyerSelected(input){
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
-  ['f-fecha','f-lugar','f-nombre'].forEach(id=>{
+  populateVenueDropdown();
+  ['f-fecha','f-nombre'].forEach(id=>{
     const el=document.getElementById(id);
-    if(el) el.addEventListener('input',()=>{updateFlyerName();});
+    if(el) el.addEventListener('input',()=>updateFlyerName());
   });
+  // venue dropdown also triggers filename update
+  const sel=document.getElementById('f-lugar-sel');
+  if(sel) sel.addEventListener('change',()=>updateFlyerName());
+  const otro=document.getElementById('f-lugar-otro');
+  if(otro) otro.addEventListener('input',()=>updateFlyerName());
 });
 
 function openSubModal(){
@@ -1721,7 +1778,7 @@ async function submitEvent(){
 
   const nombre  = document.getElementById('f-nombre').value.trim();
   const fecha   = document.getElementById('f-fecha').value;
-  const lugar   = document.getElementById('f-lugar').value.trim();
+  const lugar   = getLugar();
   const cat     = document.getElementById('f-cat').value;
   const contacto= document.getElementById('f-contacto').value.trim();
   const email   = document.getElementById('f-email').value.trim();
@@ -1783,7 +1840,7 @@ async function submitEvent(){
     contacto_email:       email,
     contacto_tel:         tel ? '+549'+tel : '',
     interes_tickets:      document.getElementById('f-tickets').checked?'Sí':'No',
-    flyer_nombre_sugerido:flyerName,
+    venue_nuevo:          document.getElementById('f-lugar-sel')?.value === '__otro__' ? 'TRUE' : 'FALSE',
     flyer_base64:         flyerBase64,
     flyer_mime:           flyerMime,
     fecha_envio:          new Date().toLocaleDateString('es-AR'),
