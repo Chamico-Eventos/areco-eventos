@@ -332,7 +332,7 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .modal-overlay.open{opacity:1;pointer-events:auto}
 .modal-box{background:var(--s1);border:1px solid var(--border);border-radius:18px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.8)}
 .modal-box::-webkit-scrollbar{width:3px}.modal-box::-webkit-scrollbar-thumb{background:var(--border)}
-.modal-head{padding:22px 24px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;background:linear-gradient(180deg,rgba(201,168,76,0.07) 0%,transparent 100%);position:sticky;top:0;z-index:1;border-radius:18px 18px 0 0}
+.modal-head{padding:22px 24px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;background:linear-gradient(180deg,rgba(201,168,76,0.07) 0%,transparent 100%);border-radius:18px 18px 0 0}
 .modal-title{font-family:Playfair Display,serif;font-size:21px;font-weight:700;color:var(--ink);line-height:1.2}
 .modal-subtitle{font-size:12px;color:var(--muted);margin-top:4px}
 .modal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0 4px;line-height:1}
@@ -1741,7 +1741,7 @@ async function submitEvent(){
   const fechaFmt=`${m}/${d}/${y}`;
 
   const hora=document.getElementById('f-hora').value||'';
-  const horaFmt=hora?hora.slice(0,5)+' hs':'Todo el día';
+  const horaFmt=hora?hora.slice(0,5):'Todo el día';
 
   const tel=document.getElementById('f-tel').value.trim();
   const flyerName=document.getElementById('flyer-name-preview')?.dataset?.filename||'';
@@ -1777,13 +1777,13 @@ async function submitEvent(){
     });
     const waMsg=encodeURIComponent(
       'Hola! Registré el evento "'+nombre+'" ('+fechaFmt+') en Areco Eventos.'+
-      (flyerName?'\nTe envío el flyer como: '+flyerName:'')
+      (flyerName?'\nTe envío el flyer con el nombre: '+flyerName+'\n(adjuntalo a este mensaje)':'')
     );
     const waUrl='https://wa.me/5492326421909?text='+waMsg;
     const mailSubj=encodeURIComponent('Flyer evento: '+nombre);
     const mailBody=encodeURIComponent(
       'Hola!\n\nRegistré el evento "'+nombre+'" ('+fechaFmt+') en Areco Eventos.\n'+
-      (flyerName?'\nAdjunto el flyer con el nombre: '+flyerName:'')+'\n\nSaludos'
+      (flyerName?'\nAdjunto el flyer con el nombre: '+flyerName+'\n(adjuntar el archivo a este email)':'')+'\n\nSaludos'
     );
     const mailUrl='mailto:eventos@datamaniacs.ar?subject='+mailSubj+'&body='+mailBody;
 
@@ -1796,10 +1796,10 @@ async function submitEvent(){
         ${flyerName?`
         <div style="background:rgba(201,168,76,0.08);border:1px solid var(--border);border-radius:10px;padding:14px;margin:14px 0;text-align:left">
           <div style="font-size:11px;font-weight:600;color:var(--gold);margin-bottom:6px">📎 ENVIANOS TU FLYER</div>
-          <code style="font-size:11px;color:var(--gold2);word-break:break-all;display:block;margin-bottom:6px">${flyerName}</code>
-          <div style="font-size:10px;color:var(--muted);margin-bottom:12px">1080×1080px · JPG o PNG</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px">Guardá el flyer con este nombre y adjuntalo:</div>
+          <code style="font-size:11px;color:var(--gold2);word-break:break-all;display:block;margin-bottom:12px;background:rgba(0,0,0,0.2);padding:6px 8px;border-radius:6px">${flyerName}</code>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <a href="${waUrl}" target="_blank" style="flex:1;min-width:120px;background:#25D366;color:#fff;border:none;border-radius:8px;padding:10px;font-size:12px;font-weight:700;text-decoration:none;text-align:center;display:block">📱 WhatsApp</a>
+            <a href="${waUrl}" style="flex:1;min-width:120px;background:#25D366;color:#fff;border:none;border-radius:8px;padding:10px;font-size:12px;font-weight:700;text-decoration:none;text-align:center;display:block">📱 WhatsApp</a>
             <a href="${mailUrl}" style="flex:1;min-width:120px;background:var(--s2);color:var(--gold);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:12px;font-weight:700;text-decoration:none;text-align:center;display:block">📧 Email</a>
           </div>
         </div>`:''}
