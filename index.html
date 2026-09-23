@@ -1745,16 +1745,27 @@ async function submitEvent(){
   const flyerName=document.getElementById('flyer-name-preview')?.dataset?.filename||'';
 
   // Read flyer as base64 if one was selected
-  let flyerBase64='', flyerMime='';
+  let flyerBase64='', flyerMime='image/jpeg';
   const flyerInput=document.getElementById('f-flyer');
   if(flyerInput&&flyerInput.files&&flyerInput.files[0]){
     const file=flyerInput.files[0];
-    flyerMime=file.type||'image/jpeg';
+    // Compress via canvas to keep payload small (target ~800px, quality 0.82)
     flyerBase64=await new Promise((res,rej)=>{
-      const reader=new FileReader();
-      reader.onload=e=>res(e.target.result.split(',')[1]); // strip data:...;base64,
-      reader.onerror=()=>rej(new Error('No se pudo leer el flyer'));
-      reader.readAsDataURL(file);
+      const img=new Image();
+      const url=URL.createObjectURL(file);
+      img.onload=()=>{
+        const MAX=1200;
+        let w=img.width, h=img.height;
+        if(w>MAX||h>MAX){ const r=Math.min(MAX/w,MAX/h); w=Math.round(w*r); h=Math.round(h*r); }
+        const canvas=document.createElement('canvas');
+        canvas.width=w; canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        const dataUrl=canvas.toDataURL('image/jpeg',0.82);
+        URL.revokeObjectURL(url);
+        res(dataUrl.split(',')[1]);
+      };
+      img.onerror=()=>rej(new Error('No se pudo leer el flyer'));
+      img.src=url;
     });
   }
 
