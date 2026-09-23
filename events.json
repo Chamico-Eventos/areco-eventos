@@ -483,27 +483,6 @@
     "validacion": ""
   },
   {
-    "id": "sub_mu4q4rs6",
-    "fecha": "09/18/2026",
-    "hora": "21:30 hs",
-    "nombre": "wfqf",
-    "categoria": "Música",
-    "lugar": "Galpon Chamico",
-    "descripcion": "wfwefwef\n[Contacto: efwfwef · tomas.araguz@gmail.com · +5497873743737]",
-    "precio": "$10.000",
-    "es_datamanIAcs": "false",
-    "preventa_disponible": "false",
-    "link_accion": "wdqwqwd",
-    "fuente_nombre": "Formulario web",
-    "fuente_url": "wdqwqwd",
-    "imagen_url": "/images/2026-09-18_galpon-chamico_wfqf.png",
-    "activo": "false",
-    "fecha_scrape": "",
-    "tipo_fuente": "Manual",
-    "ultima_actualizacion": "09/16/2026",
-    "validacion": "Pendiente"
-  },
-  {
     "id": "ea240d86d289",
     "fecha": "10/02/2026",
     "hora": "09:45",
@@ -565,5 +544,26 @@
     "tipo_fuente": "Scrape",
     "ultima_actualizacion": "09/22/2026",
     "validacion": ""
+  },
+  {
+    "id": "sub_muej1y1e",
+    "fecha": "09/23/2026",
+    "hora": "21:30",
+    "nombre": "wfqf",
+    "categoria": "Música",
+    "lugar": "Galpón Chamico",
+    "descripcion": "wefwefwefwef\n[Contacto: efwefwef · tomas.araguz@gmail.com · +5492326421909]",
+    "precio": "$2.000",
+    "es_datamanIAcs": "false",
+    "preventa_disponible": "false",
+    "link_accion": "asfasfaf",
+    "fuente_nombre": "Formulario web",
+    "fuente_url": "asfasfaf",
+    "imagen_url": "/images/2026-09-23_galpon-chamico_wfqf.jpg",
+    "activo": "true",
+    "fecha_scrape": "",
+    "tipo_fuente": "Manual",
+    "ultima_actualizacion": "09/23/2026",
+    "validacion": "Publicado"
   }
 ]
