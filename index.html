@@ -1799,13 +1799,16 @@ async function submitEvent(){
   const hora=document.getElementById('f-hora').value||'';
   const horaFmt=hora?hora.slice(0,5):'Todo el día';
   const tel=document.getElementById('f-tel').value.trim();
-  const flyerName=document.getElementById('flyer-name-preview')?.dataset?.filename||'';
+  const flyerInput=document.getElementById('f-flyer');
+  const flyerFile=flyerInput&&flyerInput.files&&flyerInput.files[0]?flyerInput.files[0]:null;
+  const flyerExt=flyerFile&&flyerFile.name.toLowerCase().endsWith('.png')?'.png':'.jpg';
+  // Always compute fresh name at submit time so venue+event name are current
+  const flyerName=flyerFile ? (getFlyerName(flyerExt)||flyerFile.name) : '';
 
   // Read flyer as base64 if one was selected
   let flyerBase64='', flyerMime='image/jpeg';
-  const flyerInput=document.getElementById('f-flyer');
-  if(flyerInput&&flyerInput.files&&flyerInput.files[0]){
-    const file=flyerInput.files[0];
+  if(flyerFile){
+    const file=flyerFile;
     // Compress via canvas to keep payload small (target ~800px, quality 0.82)
     flyerBase64=await new Promise((res,rej)=>{
       const img=new Image();
@@ -1841,6 +1844,7 @@ async function submitEvent(){
     contacto_tel:         tel ? '+549'+tel : '',
     interes_tickets:      document.getElementById('f-tickets').checked?'Sí':'No',
     venue_nuevo:          document.getElementById('f-lugar-sel')?.value === '__otro__' ? 'TRUE' : 'FALSE',
+    flyer_nombre_sugerido:flyerName,
     flyer_base64:         flyerBase64,
     flyer_mime:           flyerMime,
     fecha_envio:          new Date().toLocaleDateString('es-AR'),
