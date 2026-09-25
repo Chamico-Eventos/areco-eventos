@@ -609,7 +609,7 @@
     "fuente_nombre": "Formulario web",
     "fuente_url": "acsf",
     "imagen_url": "/images/2026-09-26_el-tokio_hola.jpg",
-    "activo": "true",
+    "activo": "false",
     "fecha_scrape": "",
     "tipo_fuente": "Manual",
     "ultima_actualizacion": "09/25/2026",
