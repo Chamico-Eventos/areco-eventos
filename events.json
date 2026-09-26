@@ -316,7 +316,7 @@
     "lugar": "Parque Criollo R. Güiraldes",
     "venue_nuevo": "",
     "descripcion": "Te esperamos el día sábado, al finalizar la primer etapa de la clasificatoria a Jesús María 2027 en la “Pulpería la Blanqueada”, para disfrutar una noche de",
-    "precio": "$10",
+    "precio": "$10.000",
     "es_datamanIAcs": "false",
     "preventa_disponible": "false",
     "link_accion": "https://www.sanantoniodeareco.com/eventos/pena-al-fogon",
@@ -595,7 +595,7 @@
   },
   {
     "id": "man_yamil_elucidarlo_250926",
-    "fecha": "09/26/2026",
+    "fecha": "09/25/2026",
     "hora": "23:00",
     "nombre": "Elucidarlo + Show en Vivo de Yamil Full Band",
     "categoria": "Música",
