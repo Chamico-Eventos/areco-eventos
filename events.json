@@ -572,28 +572,6 @@
     "validacion": ""
   },
   {
-    "id": "man_no_me_muero_101026",
-    "fecha": "10/10/2026",
-    "hora": "20:00",
-    "nombre": "No Me Muero — Julieta Carrera",
-    "categoria": "Teatro",
-    "lugar": "Galpón Chamico",
-    "venue_nuevo": "true",
-    "descripcion": "La gran actriz Julieta Carrera se presenta con su aclamada obra \"No Me Muero\" para vivir una noche a pura emoción y teatro.",
-    "precio": "$25.000",
-    "es_datamanIAcs": "false",
-    "preventa_disponible": "false",
-    "link_accion": "https://www.instagram.com/p/DdsERR7TxgC/",
-    "fuente_nombre": "Instagram @galponchamico",
-    "fuente_url": "https://www.instagram.com/p/DdsERR7TxgC/",
-    "imagen_url": "",
-    "activo": "true",
-    "fecha_scrape": "",
-    "tipo_fuente": "Manual",
-    "ultima_actualizacion": "09/25/2026",
-    "validacion": "Publicado"
-  },
-  {
     "id": "man_yamil_elucidarlo_250926",
     "fecha": "09/25/2026",
     "hora": "23:00",
