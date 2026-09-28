@@ -1622,9 +1622,10 @@ function slugify(str){
 }
 
 function getFlyerName(ext){
-  const fecha=document.getElementById('f-fecha')?.value || wData.fecha || '';
-  const lugar=getLugar() || wData.lugar || '';
-  const nombre=(document.getElementById('f-nombre')?.value||wData.nombre||'').trim();
+  // In wizard mode wData has the data; in simple mode read from form inputs
+  const fecha=wData.fecha || document.getElementById('f-fecha')?.value || '';
+  const lugar=wData.lugar || getLugar() || '';
+  const nombre=(wData.nombre || document.getElementById('f-nombre')?.value || '').trim();
   if(!fecha||!lugar||!nombre) return null;
   const vp=lugar.split(' ');
   const vs=slugify(vp.length>2?vp.slice(-2).join(' '):lugar);
@@ -2485,14 +2486,14 @@ async function submitWizard(){
     venue_nuevo:wData.venue_nuevo||'FALSE',
     categoria:wData.categoria,
     descripcion:wData.descripcion,
-    precio:`$${parseFloat(wData.precio_entrada).toLocaleString('es-AR',{maximumFractionDigits:0})}`,
+    precio:`$${Math.round(parseFloat(wData.precio_entrada)).toLocaleString('es-AR')}`,
     link_fuente:wData.link_fuente||'',
     contacto_nombre:wData.contacto_nombre,
     contacto_email:wData.contacto_email,
     contacto_tel:wData.contacto_tel,
     interes_tickets:'Sí',
     ticket_service:'TRUE',
-    precio_entrada:wData.precio_entrada,
+    precio_entrada:String(Math.round(parseFloat(wData.precio_entrada))),
     stock_entradas:wData.stock_entradas,
     mp_email:wData.mp_email,
     mp_alias:wData.mp_alias,
