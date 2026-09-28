@@ -1622,9 +1622,9 @@ function slugify(str){
 }
 
 function getFlyerName(ext){
-  const fecha=document.getElementById('f-fecha').value;
-  const lugar=getLugar();
-  const nombre=document.getElementById('f-nombre').value.trim();
+  const fecha=document.getElementById('f-fecha')?.value || wData.fecha || '';
+  const lugar=getLugar() || wData.lugar || '';
+  const nombre=(document.getElementById('f-nombre')?.value||wData.nombre||'').trim();
   if(!fecha||!lugar||!nombre) return null;
   const vp=lugar.split(' ');
   const vs=slugify(vp.length>2?vp.slice(-2).join(' '):lugar);
@@ -1727,27 +1727,50 @@ function renderStep(){
 function renderChoice(f){
   setModalTitle('Agregá tu evento','San Antonio de Areco · DataManIAcs');
   f.innerHTML=`
-    <div style="margin-bottom:6px;font-size:13px;color:var(--ink2);line-height:1.6">
-      ¿Querés usar el servicio de venta de entradas de DataManIAcs?
+    <div style="font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:16px">
+      ¿Cómo querés gestionar las entradas de tu evento?
     </div>
-    <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
+    <div style="display:flex;flex-direction:column;gap:12px">
+
       <div class="choice-card" id="choiceYes" onclick="selectChoice('tickets')">
-        <div class="choice-card-icon">🎟</div>
-        <div class="choice-card-title">Sí, quiero vender entradas</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <div class="choice-card-icon" style="font-size:22px;margin:0">🎟</div>
+          <div>
+            <div class="choice-card-title" style="margin-bottom:0">Vender entradas con DataManIAcs</div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)">RECOMENDADO · 6% cargo al comprador</div>
+          </div>
+        </div>
         <div class="choice-card-desc">
-          Usamos Mercado Pago. Vos fijás el precio, el comprador paga un 5% de cargo por servicio,
-          y vos recibís el 94% directo en tu cuenta.<br>
-          <strong style="color:var(--gold)">Necesitás una cuenta de Mercado Pago.</strong>
+          <strong style="color:var(--ink)">Te hacemos la vida más fácil:</strong><br>
+          ✅ Nosotros gestionamos la venta en nuestra plataforma<br>
+          ✅ Evitás rastrear y confirmar cada compra manualmente<br>
+          ✅ Recibís la lista de compradores antes del evento<br>
+          ✅ El dinero va directo a tu Mercado Pago (94% del precio)<br>
+          <div style="margin-top:8px;font-size:11px;color:var(--muted)">
+            Requiere cuenta de Mercado Pago · El comprador paga el cargo por servicio
+          </div>
         </div>
       </div>
+
       <div class="choice-card" id="choiceNo" onclick="selectChoice('simple')">
-        <div class="choice-card-icon">📍</div>
-        <div class="choice-card-title">No, solo publicar el evento</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <div class="choice-card-icon" style="font-size:22px;margin:0">📍</div>
+          <div>
+            <div class="choice-card-title" style="margin-bottom:0">Publicar sin servicio de entradas</div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#4ca87a">SIEMPRE GRATIS</div>
+          </div>
+        </div>
         <div class="choice-card-desc">
-          Tu evento aparece en el mapa en menos de 24hs tras revisión.<br>
-          <strong style="color:var(--green)">Completamente gratis.</strong>
+          <strong style="color:var(--ink)">Vos manejás todo:</strong><br>
+          📌 Ponemos tu alias o link de pago en el evento<br>
+          📌 Manejás las finanzas y la lista de asistentes<br>
+          📌 Ideal para eventos gratuitos o con cobro propio<br>
+          <div style="margin-top:8px;font-size:11px;color:var(--muted)">
+            Implica mayor esfuerzo de gestión · Recomendado para eventos sin cobro de entrada
+          </div>
         </div>
       </div>
+
     </div>`;
 }
 
@@ -2254,12 +2277,22 @@ function renderW4(f){
       </div>
       <div class="form-group">
         <label class="form-label">CUIT / CUIL <span>*</span></label>
-        <input class="form-input" id="w-mp-cuit" placeholder="20-12345678-9" value="${wData.mp_cuit||''}">
+        <input class="form-input" id="w-mp-cuit" placeholder="20-12345678-9" maxlength="13"
+          oninput="fmtCuit(this)" value="${wData.mp_cuit||''}">
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">Teléfono de contacto MP <span>*</span></label>
-      <input class="form-input" id="w-mp-tel" type="tel" placeholder="1145678901" value="${wData.mp_telefono||''}">
+      <div style="display:flex;align-items:center;background:var(--s2);border:1px solid var(--b2);border-radius:8px;overflow:hidden" id="mp-tel-wrap">
+        <span style="padding:10px;font-size:13px;color:var(--muted);border-right:1px solid var(--b2);white-space:nowrap;flex-shrink:0">📱 +549</span>
+        <input id="w-mp-tel" type="tel" inputmode="numeric" maxlength="10" placeholder="11 1234 5678"
+          style="background:none;border:none;outline:none;padding:10px 12px;color:var(--ink);font-size:13px;width:100%;font-family:Inter,sans-serif"
+          oninput="this.value=this.value.replace(/[^0-9]/g,'');validateMpTel()"
+          onblur="validateMpTel()"
+          onfocus="document.getElementById('mp-tel-wrap').style.borderColor='rgba(201,168,76,0.4)'"
+          value="${(wData.mp_telefono||'').replace('+549','')}">
+      </div>
+      <div id="mp-tel-hint" style="font-size:10px;color:var(--muted);margin-top:3px;min-height:14px;font-style:italic"></div>
     </div>
     ${errDiv()}
     <div class="step-nav">
@@ -2280,6 +2313,23 @@ function calcFee(){
     prev.textContent='';
   }
 }
+function fmtCuit(input){
+  // Format as XX-XXXXXXXX-X
+  let v=input.value.replace(/[^0-9]/g,'');
+  if(v.length>11)v=v.slice(0,11);
+  if(v.length>9) v=v.slice(0,2)+'-'+v.slice(2,10)+'-'+v.slice(10);
+  else if(v.length>2) v=v.slice(0,2)+'-'+v.slice(2);
+  input.value=v;
+}
+function validateMpTel(){
+  const input=document.getElementById('w-mp-tel');
+  const hint=document.getElementById('mp-tel-hint');
+  if(!input||!hint)return;
+  const v=input.value.replace(/[^0-9]/g,'');
+  if(v.length===10) hint.innerHTML='<span style="color:#4ca87a">✓ Número completo</span>';
+  else if(v.length>0) hint.textContent=v.length+'/10 dígitos';
+  else hint.textContent='';
+}
 function w4Next(){
   const precio=document.getElementById('w-precio')?.value;
   const stock=document.getElementById('w-stock')?.value;
@@ -2287,17 +2337,18 @@ function w4Next(){
   const mpAlias=document.getElementById('w-mp-alias')?.value.trim();
   const mpTitular=document.getElementById('w-mp-titular')?.value.trim();
   const mpCuit=document.getElementById('w-mp-cuit')?.value.trim();
-  const mpTel=document.getElementById('w-mp-tel')?.value.trim();
-  if(!precio||!stock||!mpEmail||!mpAlias||!mpTitular||!mpCuit||!mpTel){
+  const mpTelRaw=document.getElementById('w-mp-tel')?.value.trim();
+  if(!precio||!stock||!mpEmail||!mpAlias||!mpTitular||!mpCuit||!mpTelRaw){
     wErr('Por favor completá todos los campos');return;
   }
+  if(mpTelRaw.length<10){wErr('El teléfono de MP debe tener 10 dígitos');return;}
   wData.precio_entrada=precio;
   wData.stock_entradas=stock;
   wData.mp_email=mpEmail;
   wData.mp_alias=mpAlias;
   wData.mp_titular=mpTitular;
   wData.mp_cuit=mpCuit;
-  wData.mp_telefono=mpTel;
+  wData.mp_telefono='+549'+mpTelRaw;
   wizardStep=5;renderStep();
 }
 
@@ -2333,8 +2384,14 @@ function renderW5(f){
     </div>
     <div class="step-nav">
       <button class="btn-back" onclick="wizardStep=4;renderStep()">← Atrás</button>
-      <button class="btn-next" onclick="wizardStep=6;renderStep()">Siguiente →</button>
+      <button class="btn-next" onclick="w5Next()">Siguiente →</button>
     </div>`;
+  // Trigger filename update now that wizard data is available
+  setTimeout(()=>updateFlyerName(), 50);
+}
+function w5Next(){
+  wData.ig_link=document.getElementById('f-ig-link')?.value?.trim()||'';
+  wizardStep=6;renderStep();
 }
 
 // Step 6 — Publicar / Resumen
@@ -2426,7 +2483,7 @@ async function submitWizard(){
     venue_nuevo:wData.venue_nuevo||'FALSE',
     categoria:wData.categoria,
     descripcion:wData.descripcion,
-    precio:`$${parseFloat(wData.precio_entrada).toLocaleString('es-AR')}`,
+    precio:`$${parseFloat(wData.precio_entrada).toLocaleString('es-AR',{maximumFractionDigits:0})}`,
     link_fuente:wData.link_fuente||'',
     contacto_nombre:wData.contacto_nombre,
     contacto_email:wData.contacto_email,
@@ -2468,130 +2525,6 @@ async function submitWizard(){
   }
 }
 
-async function submitEvent(){
-  const btn=document.getElementById('subSubmit');
-  const errEl=document.getElementById('subError');
-  errEl.style.display='none';
-
-  const nombre  = document.getElementById('f-nombre').value.trim();
-  const fecha   = document.getElementById('f-fecha').value;
-  const lugar   = getLugar();
-  const cat     = document.getElementById('f-cat').value;
-  const contacto= document.getElementById('f-contacto').value.trim();
-  const email   = document.getElementById('f-email').value.trim();
-
-  if(!nombre||!fecha||!lugar||!cat||!contacto||!email){
-    errEl.textContent='Por favor completá los campos obligatorios (*)';
-    errEl.style.display='block';return;
-  }
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-    errEl.textContent='El email no parece válido';
-    errEl.style.display='block';return;
-  }
-
-  btn.disabled=true;btn.textContent='Enviando…';
-
-  const [y,m,d]=fecha.split('-');
-  const fechaFmt=`${m}/${d}/${y}`;
-  const hora=document.getElementById('f-hora').value||'';
-  const horaFmt=hora?hora.slice(0,5):'Todo el día';
-  const tel=document.getElementById('f-tel').value.trim();
-  const flyerInput=document.getElementById('f-flyer');
-  const flyerFile=flyerInput&&flyerInput.files&&flyerInput.files[0]?flyerInput.files[0]:null;
-  const flyerExt=flyerFile&&flyerFile.name.toLowerCase().endsWith('.png')?'.png':'.jpg';
-  // Always compute fresh name at submit time so venue+event name are current
-  const flyerName=flyerFile ? (getFlyerName(flyerExt)||flyerFile.name) : '';
-
-  // Read flyer as base64 if one was selected
-  let flyerBase64='', flyerMime='image/jpeg';
-  if(flyerFile){
-    const file=flyerFile;
-    // Compress via canvas to keep payload small (target ~800px, quality 0.82)
-    flyerBase64=await new Promise((res,rej)=>{
-      const img=new Image();
-      const url=URL.createObjectURL(file);
-      img.onload=()=>{
-        const MAX=1200;
-        let w=img.width, h=img.height;
-        if(w>MAX||h>MAX){ const r=Math.min(MAX/w,MAX/h); w=Math.round(w*r); h=Math.round(h*r); }
-        const canvas=document.createElement('canvas');
-        canvas.width=w; canvas.height=h;
-        canvas.getContext('2d').drawImage(img,0,0,w,h);
-        const dataUrl=canvas.toDataURL('image/jpeg',0.82);
-        URL.revokeObjectURL(url);
-        res(dataUrl.split(',')[1]);
-      };
-      img.onerror=()=>rej(new Error('No se pudo leer el flyer'));
-      img.src=url;
-    });
-  }
-
-  const payload={
-    source:               'event_submission',
-    nombre,
-    fecha:                fechaFmt,
-    hora:                 horaFmt,
-    lugar,
-    categoria:            cat,
-    descripcion:          document.getElementById('f-desc').value.trim().slice(0,300),
-    precio:               document.getElementById('f-precio').value.trim()||'Consultar',
-    link_fuente:          document.getElementById('f-link').value.trim(),
-    contacto_nombre:      contacto,
-    contacto_email:       email,
-    contacto_tel:         tel ? '+549'+tel : '',
-    interes_tickets:      document.getElementById('f-tickets').checked?'Sí':'No',
-    venue_nuevo:          document.getElementById('f-lugar-sel')?.value === '__otro__' ? 'TRUE' : 'FALSE',
-    flyer_nombre_sugerido:flyerName,
-    flyer_base64:         flyerBase64,
-    flyer_mime:           flyerMime,
-    fecha_envio:          new Date().toLocaleDateString('es-AR'),
-    validacion:           'Pendiente',
-    activo:               'FALSE',
-    tipo_fuente:          'Manual',
-  };
-
-  try{
-    btn.textContent='Subiendo flyer…';
-    // Use no-cors — Apps Script doesn't support CORS preflight for POST.
-    // We send the full payload including flyer base64 and trust the server.
-    // A separate lightweight ping checks if the submission landed.
-    await fetch(AS_SUBMIT,{
-      method:'POST',
-      body:JSON.stringify(payload),
-      headers:{'Content-Type':'text/plain'},
-      mode:'no-cors',
-    });
-
-    // no-cors gives opaque response — assume success if no network error thrown
-    const flyerOk = !!flyerBase64; // optimistic: if they uploaded a file, assume it went through
-
-    document.getElementById('subForm').innerHTML=`
-      <div class="form-success">
-        <div class="form-success-icon">🎉</div>
-        <h3>¡Evento recibido!</h3>
-        <p>Revisamos tu evento y lo publicamos en el mapa en menos de 24 horas.<br>
-        Te avisamos a <strong>${email}</strong> cuando esté activo.</p>
-        ${flyerBase64&&flyerOk
-          ? `<div style="background:rgba(42,122,80,0.12);border:1px solid rgba(42,122,80,0.3);border-radius:10px;padding:12px 14px;margin:14px 0;font-size:13px;color:#4ca87a">
-               ✅ Flyer subido correctamente — aparecerá en el mapa cuando aprobemos el evento.
-             </div>`
-          : flyerBase64&&!flyerOk
-          ? `<div style="background:rgba(192,90,74,0.1);border:1px solid rgba(192,90,74,0.25);border-radius:10px;padding:12px 14px;margin:14px 0;font-size:12px;color:var(--muted)">
-               ⚠️ El evento fue registrado pero el flyer no se pudo subir. Podés enviárnoslo por
-               <a href="https://wa.me/5492326421909" style="color:var(--gold)">WhatsApp</a> o a
-               <a href="mailto:eventos@datamaniacs.ar" style="color:var(--gold)">eventos@datamaniacs.ar</a>.
-             </div>`
-          : ''}
-        ${document.getElementById('f-tickets').checked?'<p style="font-size:12px;color:var(--gold2);margin-top:10px">⭐ ¡Nos contactamos sobre la venta de entradas!</p>':''}
-        <button class="form-submit" style="margin-top:16px;max-width:200px;margin-left:auto;margin-right:auto" onclick="closeSubModal()">Cerrar</button>
-      </div>`;
-
-  }catch(err){
-    btn.disabled=false;btn.textContent='Enviar mi evento →';
-    errEl.textContent='Error al enviar. Verificá tu conexión e intentá de nuevo.';
-    errEl.style.display='block';
-  }
-}
 
 // ── INIT ──────────────────────────────────────────────
 async function init(){
