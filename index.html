@@ -356,6 +356,49 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .form-success h3{font-family:Playfair Display,serif;font-size:22px;color:var(--gold);margin-bottom:10px}
 .form-success p{font-size:13px;color:var(--ink2);line-height:1.7}
 
+/* ── WIZARD STEPS ─────────────────────────────────── */
+.step-dots{display:flex;align-items:center;gap:6px;justify-content:center;margin-bottom:10px}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--s3);border:1px solid var(--border);transition:all .2s}
+.step-dot.active{background:var(--gold);border-color:var(--gold);width:22px;border-radius:4px}
+.step-dot.done{background:rgba(42,122,80,0.5);border-color:rgba(42,122,80,0.6)}
+.step-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:14px}
+/* Choice cards */
+.choice-card{
+  border:1.5px solid var(--border);border-radius:16px;padding:20px;cursor:pointer;
+  transition:all .2s;background:var(--s2);
+}
+.choice-card:hover{border-color:var(--gold);background:var(--s3)}
+.choice-card.selected{border-color:var(--gold);background:rgba(201,168,76,0.08)}
+.choice-card-icon{font-size:28px;margin-bottom:8px}
+.choice-card-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.choice-card-desc{font-size:12px;color:var(--ink2);line-height:1.5}
+/* Fee box */
+.fee-box{
+  background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);
+  border-radius:12px;padding:14px 16px;font-size:12px;line-height:1.7;color:var(--ink2);
+  margin:14px 0;
+}
+.fee-box strong{color:var(--gold)}
+.fee-example{
+  background:var(--s2);border-radius:8px;padding:10px 12px;
+  margin-top:10px;font-size:11px;line-height:1.8;
+}
+/* Nav buttons */
+.step-nav{display:flex;gap:10px;margin-top:20px}
+.btn-back{
+  flex:0 0 auto;padding:13px 20px;border-radius:10px;
+  border:1px solid var(--border);background:var(--s2);
+  color:var(--ink2);font-size:13px;font-weight:600;cursor:pointer;
+}
+.btn-back:hover{background:var(--s3);color:var(--ink)}
+.btn-next{
+  flex:1;padding:13px;border-radius:10px;border:none;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#0e0d0b;font-size:14px;font-weight:700;cursor:pointer;
+}
+.btn-next:hover{filter:brightness(1.07)}
+.btn-next:disabled{opacity:.4;cursor:not-allowed}
+
 /* ── FLOATING TIME NAVIGATOR ─────────────────────── */
 .time-nav{
   position:absolute;
@@ -608,157 +651,25 @@ img.leaflet-tile{border:none !important;outline:none !important}
 <!-- Submission modal -->
 <div class="modal-overlay" id="subOverlay" onclick="if(event.target===this)closeSubModal()">
   <div class="modal-box">
-    <div class="modal-head">
+    <div class="modal-head" id="modalHead">
       <div>
-        <div class="modal-title">Agregá tu evento</div>
-        <div class="modal-subtitle">Gratis · Aparece en el mapa en menos de 24hs tras revisión</div>
+        <div class="modal-title" id="modalTitle">Agregá tu evento</div>
+        <div class="modal-subtitle" id="modalSubtitle">San Antonio de Areco · DataManIAcs</div>
       </div>
       <button class="modal-close" onclick="closeSubModal()">✕</button>
     </div>
-    <div class="modal-body" id="subForm">
 
-      <div class="form-section">Datos del evento</div>
-
-      <div class="form-group">
-        <label class="form-label">Nombre del evento <span>*</span></label>
-        <input class="form-input" id="f-nombre" placeholder="Ej: Jazz en La Blanqueada" maxlength="120">
+    <!-- Step indicator (hidden on choice screen) -->
+    <div id="stepBar" style="display:none;padding:14px 24px 0;border-bottom:1px solid var(--b2)">
+      <div style="display:flex;align-items:center;gap:0;margin-bottom:10px">
+        <!-- Steps filled by JS -->
       </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Fecha <span>*</span></label>
-          <input class="form-input" id="f-fecha" type="date">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Hora</label>
-          <input class="form-input" id="f-hora" type="text" placeholder="21:30" maxlength="5" oninput="autoFormatTime(this)">
-        </div>
+      <div style="height:3px;background:var(--s2);border-radius:999px;overflow:hidden;margin-bottom:0">
+        <div id="stepProgress" style="height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:999px;transition:width .3s ease"></div>
       </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Lugar / Venue <span>*</span></label>
-          <select class="form-select" id="f-lugar-sel" onchange="onVenueChange(this)">
-            <option value="">Seleccioná un venue...</option>
-          </select>
-          <input class="form-input" id="f-lugar-otro" placeholder="Nombre del venue"
-            style="display:none;margin-top:6px" oninput="updateFlyerName()">
-          <div class="form-hint" id="f-lugar-hint" style="display:none;color:#e07a3a">
-            ⚠️ Venue nuevo — lo agregaremos al mapa próximamente.
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Categoría <span>*</span></label>
-          <select class="form-select" id="f-cat">
-            <option value="">Seleccioná...</option>
-            <option>Música</option><option>Arte</option><option>Tradición</option>
-            <option>Cultural</option><option>Gastronomía</option>
-            <option>Deportes</option><option>Feria</option><option>Infantil</option>
-            <option>Solidario</option><option>Evento</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Descripción breve</label>
-        <textarea class="form-textarea" id="f-desc" placeholder="Contanos de qué se trata tu evento (máx. 300 caracteres)" maxlength="300"></textarea>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Precio</label>
-          <input class="form-input" id="f-precio" placeholder="Gratis · $5.000 · Consultar">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Link de más info</label>
-          <input class="form-input" id="f-link" type="url" placeholder="Instagram, Facebook...">
-        </div>
-      </div>
-
-      <div class="form-section">Flyer del evento</div>
-
-      <div class="form-group">
-        <label class="form-label">Link del post de Instagram</label>
-        <input class="form-input" id="f-link" type="url" placeholder="https://www.instagram.com/p/...">
-        <div class="form-hint">Si ya publicaste el evento en Instagram, pegá el link acá.</div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Adjuntá tu flyer</label>
-        <label id="flyer-drop" style="
-          display:flex;flex-direction:column;align-items:center;justify-content:center;
-          background:var(--s2);border:1.5px dashed rgba(201,168,76,0.3);border-radius:10px;
-          padding:20px;cursor:pointer;text-align:center;gap:6px;transition:border-color .2s;
-        " onmouseenter="this.style.borderColor='rgba(201,168,76,0.6)'"
-           onmouseleave="this.style.borderColor='rgba(201,168,76,0.3)'">
-          <div id="flyer-placeholder">
-            <div style="font-size:28px;margin-bottom:4px">🖼</div>
-            <div style="font-size:12px;font-weight:600;color:var(--ink2)">Tocá para seleccionar tu flyer</div>
-            <div style="font-size:10px;color:var(--muted);margin-top:2px">JPG o PNG · máx. 2MB</div>
-          </div>
-          <img id="flyer-preview" src="" alt="" style="display:none;max-width:100%;max-height:200px;border-radius:8px;object-fit:contain">
-          <input type="file" id="f-flyer" accept="image/jpeg,image/png" style="display:none" onchange="onFlyerSelected(this)">
-        </label>
-        <div id="flyer-name-preview" style="
-          display:none;margin-top:8px;
-          background:var(--s2);border:1px solid var(--border);border-radius:8px;
-          padding:8px 12px;font-size:11px;font-family:'Courier New',monospace;
-          color:var(--gold2);word-break:break-all;
-        "></div>
-        <div class="form-hint" style="margin-top:6px">
-          📐 Tamaño recomendado: <strong style="color:var(--ink2)">1080 × 1080 px</strong> (cuadrado)<br>
-          📩 El archivo nos llega por WhatsApp o email — te indicamos cómo al finalizar.
-        </div>
-      </div>
-
-      <div class="form-section">Tus datos</div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Tu nombre <span>*</span></label>
-          <input class="form-input" id="f-contacto" placeholder="Nombre del organizador">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Email <span>*</span></label>
-          <input class="form-input" id="f-email" type="email" placeholder="tu@email.com">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">WhatsApp / Teléfono</label>
-        <div style="display:flex;align-items:center;gap:0;background:var(--s2);border:1px solid var(--b2);border-radius:8px;overflow:hidden;transition:border-color .15s" id="tel-wrap">
-          <span style="padding:10px 10px;font-size:13px;color:var(--muted);border-right:1px solid var(--b2);white-space:nowrap;flex-shrink:0">📱 +549</span>
-          <input id="f-tel" type="tel" inputmode="numeric" maxlength="10"
-            placeholder="11 1234 5678"
-            style="background:none;border:none;outline:none;padding:10px 12px;color:var(--ink);font-size:13px;width:100%;font-family:Inter,sans-serif"
-            oninput="this.value=this.value.replace(/[^0-9]/g,'');validateTelForm()"
-            onblur="validateTelForm()"
-            onfocus="document.getElementById('tel-wrap').style.borderColor='rgba(201,168,76,0.4)'">
-        </div>
-        <div id="tel-hint" style="font-size:10px;color:var(--muted);margin-top:3px;min-height:14px;font-style:italic"></div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer">
-          <input type="checkbox" id="f-tickets" style="accent-color:var(--gold)">
-          <span style="font-size:12px;color:var(--ink2);text-transform:none;letter-spacing:0">
-            Me interesa vender entradas online con DataManIAcs
-          </span>
-        </label>
-      </div>
-
-      <div id="subError" style="font-size:12px;color:#c05a4a;display:none"></div>
-
-      <button class="form-submit" id="subSubmit" onclick="submitEvent()">
-        Enviar mi evento →
-      </button>
-
-      <div style="font-size:10px;color:var(--muted);text-align:center;line-height:1.5">
-        Tu evento se revisa y se publica en el mapa en menos de 24 horas.<br>
-        El listado es gratuito. 🎉
-      </div>
-
     </div>
+
+    <div class="modal-body" id="subForm"></div>
   </div>
 </div>
 
@@ -1759,9 +1670,21 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(otro) otro.addEventListener('input',()=>updateFlyerName());
 });
 
+// ── SUBMISSION WIZARD ─────────────────────────────────────────
+// State
+let wizardMode = null; // 'tickets' | 'simple'
+let wizardStep = 0;    // 0=choice, 1-6=wizard steps, 1=simple
+const wData = {};      // collected form data
+
+const WIZARD_STEPS = ['Personal','Evento','Función','Tickets','Imagen','Publicar'];
+const SIMPLE_STEPS = ['Tu evento','Imagen'];
+
 function openSubModal(){
   document.getElementById('subOverlay').classList.add('open');
   document.body.style.overflow='hidden';
+  wizardMode=null; wizardStep=0;
+  Object.keys(wData).forEach(k=>delete wData[k]);
+  renderStep();
 }
 function closeSubModal(){
   document.getElementById('subOverlay').classList.remove('open');
@@ -1770,6 +1693,780 @@ function closeSubModal(){
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closeSheet();closeSubModal();}
 });
+
+function setModalTitle(title, subtitle){
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalSubtitle').textContent=subtitle;
+}
+
+function updateStepBar(){
+  const bar=document.getElementById('stepBar');
+  const prog=document.getElementById('stepProgress');
+  if(!wizardMode||wizardStep===0){ bar.style.display='none'; return; }
+  bar.style.display='block';
+  const steps=wizardMode==='tickets'?WIZARD_STEPS:SIMPLE_STEPS;
+  const pct=Math.round((wizardStep/steps.length)*100);
+  prog.style.width=pct+'%';
+  // Dots
+  const dotsWrap=bar.querySelector('div');
+  dotsWrap.innerHTML=steps.map((s,i)=>{
+    const cls=i+1<wizardStep?'done':i+1===wizardStep?'active':'';
+    return`<div class="step-dot ${cls}" title="${s}"></div>`;
+  }).join('')+`<span style="font-size:10px;color:var(--muted);margin-left:8px;font-weight:600">${steps[wizardStep-1]||''} ${wizardStep}/${steps.length}</span>`;
+}
+
+function renderStep(){
+  updateStepBar();
+  const f=document.getElementById('subForm');
+  if(wizardStep===0) return renderChoice(f);
+  if(wizardMode==='simple') return renderSimpleStep(f, wizardStep);
+  return renderWizardStep(f, wizardStep);
+}
+
+// ── SCREEN 0: Choice ──────────────────────────────────────────
+function renderChoice(f){
+  setModalTitle('Agregá tu evento','San Antonio de Areco · DataManIAcs');
+  f.innerHTML=`
+    <div style="margin-bottom:6px;font-size:13px;color:var(--ink2);line-height:1.6">
+      ¿Querés usar el servicio de venta de entradas de DataManIAcs?
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
+      <div class="choice-card" id="choiceYes" onclick="selectChoice('tickets')">
+        <div class="choice-card-icon">🎟</div>
+        <div class="choice-card-title">Sí, quiero vender entradas</div>
+        <div class="choice-card-desc">
+          Usamos Mercado Pago. Vos fijás el precio, el comprador paga un 5% de cargo por servicio,
+          y vos recibís el 94% directo en tu cuenta.<br>
+          <strong style="color:var(--gold)">Necesitás una cuenta de Mercado Pago.</strong>
+        </div>
+      </div>
+      <div class="choice-card" id="choiceNo" onclick="selectChoice('simple')">
+        <div class="choice-card-icon">📍</div>
+        <div class="choice-card-title">No, solo publicar el evento</div>
+        <div class="choice-card-desc">
+          Tu evento aparece en el mapa en menos de 24hs tras revisión.<br>
+          <strong style="color:var(--green)">Completamente gratis.</strong>
+        </div>
+      </div>
+    </div>`;
+}
+
+function selectChoice(mode){
+  wizardMode=mode;
+  wizardStep=1;
+  renderStep();
+}
+
+// ── SIMPLE FLOW (NO path) ─────────────────────────────────────
+function renderSimpleStep(f, step){
+  if(step===1){
+    setModalTitle('Tu evento','Gratis · Aparece en el mapa en menos de 24hs');
+    f.innerHTML=`
+      <div class="form-group">
+        <label class="form-label">Nombre del evento <span>*</span></label>
+        <input class="form-input" id="f-nombre" placeholder="Ej: Jazz en La Blanqueada" maxlength="120" value="${wData.nombre||''}">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Fecha <span>*</span></label>
+          <input class="form-input" id="f-fecha" type="date" value="${wData.fecha||''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hora</label>
+          <input class="form-input" id="f-hora" type="text" placeholder="21:30" maxlength="5" oninput="autoFormatTime(this)" value="${wData.hora||''}">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Lugar / Venue <span>*</span></label>
+          <select class="form-select" id="f-lugar-sel" onchange="onVenueChange(this)">
+            <option value="">Seleccioná un venue...</option>
+          </select>
+          <input class="form-input" id="f-lugar-otro" placeholder="Nombre del venue" style="display:none;margin-top:6px">
+          <div class="form-hint" id="f-lugar-hint" style="display:none;color:#e07a3a">⚠️ Venue nuevo — lo agregaremos al mapa próximamente.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Categoría <span>*</span></label>
+          <select class="form-select" id="f-cat">
+            <option value="">Seleccioná...</option>
+            <option>Música</option><option>Arte</option><option>Tradición</option>
+            <option>Cultural</option><option>Gastronomía</option><option>Deportes</option>
+            <option>Feria</option><option>Infantil</option><option>Solidario</option>
+            <option>Teatro</option><option>Evento</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descripción breve</label>
+        <textarea class="form-textarea" id="f-desc" placeholder="Contanos de qué se trata (máx. 300 caracteres)" maxlength="300">${wData.descripcion||''}</textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Precio</label>
+          <input class="form-input" id="f-precio" placeholder="Gratis · $5.000 · Consultar" value="${wData.precio||''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Link de más info</label>
+          <input class="form-input" id="f-link" type="url" placeholder="Instagram, Facebook..." value="${wData.link_fuente||''}">
+        </div>
+      </div>
+      <div class="form-section">Tus datos</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Tu nombre <span>*</span></label>
+          <input class="form-input" id="f-contacto" placeholder="Nombre del organizador" value="${wData.contacto_nombre||''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email <span>*</span></label>
+          <input class="form-input" id="f-email" type="email" placeholder="tu@email.com" value="${wData.contacto_email||''}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">WhatsApp / Teléfono</label>
+        <div style="display:flex;align-items:center;background:var(--s2);border:1px solid var(--b2);border-radius:8px;overflow:hidden" id="tel-wrap">
+          <span style="padding:10px;font-size:13px;color:var(--muted);border-right:1px solid var(--b2);white-space:nowrap;flex-shrink:0">📱 +549</span>
+          <input id="f-tel" type="tel" inputmode="numeric" maxlength="10" placeholder="11 1234 5678"
+            style="background:none;border:none;outline:none;padding:10px 12px;color:var(--ink);font-size:13px;width:100%;font-family:Inter,sans-serif"
+            oninput="this.value=this.value.replace(/[^0-9]/g,'');validateTelForm()"
+            onblur="validateTelForm()" value="${wData.contacto_tel||''}">
+        </div>
+        <div id="tel-hint" style="font-size:10px;color:var(--muted);margin-top:3px;min-height:14px;font-style:italic"></div>
+      </div>
+      <div id="subError" style="font-size:12px;color:#c05a4a;display:none;margin-top:8px"></div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="wizardStep=0;renderStep()">← Atrás</button>
+        <button class="btn-next" onclick="simpleNext()">Siguiente →</button>
+      </div>
+      <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.5">
+        Tu evento se revisa y se publica en el mapa en menos de 24 horas. El listado es gratuito. 🎉
+      </div>`;
+    setTimeout(()=>{
+      populateVenueDropdown();
+      if(wData.lugar){
+        const sel=document.getElementById('f-lugar-sel');
+        if(sel){
+          // try to pre-select
+          for(let o of sel.options) if(o.value===wData.lugar){o.selected=true;break;}
+        }
+      }
+    },50);
+
+  } else if(step===2){
+    setModalTitle('Flyer del evento','Opcional · Se muestra en el mapa');
+    f.innerHTML=`
+      <div class="form-group">
+        <label class="form-label">Link del post de Instagram</label>
+        <input class="form-input" id="f-ig-link" type="url" placeholder="https://www.instagram.com/p/..." value="${wData.ig_link||''}">
+        <div class="form-hint">Si ya publicaste el evento en Instagram, pegá el link acá.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Adjuntá tu flyer</label>
+        <label id="flyer-drop" style="
+          display:flex;flex-direction:column;align-items:center;justify-content:center;
+          background:var(--s2);border:1.5px dashed rgba(201,168,76,0.3);border-radius:10px;
+          padding:20px;cursor:pointer;text-align:center;gap:6px;transition:border-color .2s"
+          onmouseenter="this.style.borderColor='rgba(201,168,76,0.6)'"
+          onmouseleave="this.style.borderColor='rgba(201,168,76,0.3)'">
+          <div id="flyer-placeholder">
+            <div style="font-size:28px;margin-bottom:4px">🖼</div>
+            <div style="font-size:12px;font-weight:600;color:var(--ink2)">Tocá para seleccionar tu flyer</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px">JPG o PNG · máx. 2MB</div>
+          </div>
+          <img id="flyer-preview" src="" alt="" style="display:none;max-width:100%;max-height:200px;border-radius:8px;object-fit:contain">
+          <input type="file" id="f-flyer" accept="image/jpeg,image/png" style="display:none" onchange="onFlyerSelected(this)">
+        </label>
+        <div id="flyer-name-preview" style="display:none;margin-top:8px;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:11px;font-family:'Courier New',monospace;color:var(--gold2);word-break:break-all"></div>
+        <div class="form-hint" style="margin-top:6px">
+          📐 Tamaño recomendado: <strong style="color:var(--ink2)">1080 × 1080 px</strong> (cuadrado)
+        </div>
+      </div>
+      <div id="subError" style="font-size:12px;color:#c05a4a;display:none;margin-top:8px"></div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="wizardStep=1;renderStep()">← Atrás</button>
+        <button class="btn-next" id="subSubmit" onclick="submitSimple()">Enviar mi evento →</button>
+      </div>`;
+  }
+}
+
+function simpleNext(){
+  const errEl=document.getElementById('subError');
+  const nombre=document.getElementById('f-nombre')?.value.trim();
+  const fecha=document.getElementById('f-fecha')?.value;
+  const lugar=getLugar();
+  const cat=document.getElementById('f-cat')?.value;
+  const contacto=document.getElementById('f-contacto')?.value.trim();
+  const email=document.getElementById('f-email')?.value.trim();
+  if(!nombre||!fecha||!lugar||!cat||!contacto||!email){
+    if(errEl){errEl.textContent='Por favor completá los campos obligatorios (*)';errEl.style.display='block';}
+    return;
+  }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    if(errEl){errEl.textContent='El email no parece válido';errEl.style.display='block';}
+    return;
+  }
+  // Save data
+  wData.nombre=nombre;
+  wData.fecha=fecha;
+  wData.hora=document.getElementById('f-hora')?.value||'';
+  wData.lugar=lugar;
+  wData.venue_nuevo=document.getElementById('f-lugar-sel')?.value==='__otro__'?'TRUE':'FALSE';
+  wData.categoria=cat;
+  wData.descripcion=document.getElementById('f-desc')?.value.trim().slice(0,300)||'';
+  wData.precio=document.getElementById('f-precio')?.value.trim()||'Consultar';
+  wData.link_fuente=document.getElementById('f-link')?.value.trim()||'';
+  wData.contacto_nombre=contacto;
+  wData.contacto_email=email;
+  const tel=document.getElementById('f-tel')?.value.trim();
+  wData.contacto_tel=tel?'+549'+tel:'';
+  wizardStep=2;
+  renderStep();
+}
+
+async function submitSimple(){
+  const btn=document.getElementById('subSubmit');
+  const errEl=document.getElementById('subError');
+  if(errEl) errEl.style.display='none';
+  if(btn){btn.disabled=true;btn.textContent='Subiendo…';}
+
+  wData.ig_link=document.getElementById('f-ig-link')?.value.trim()||'';
+
+  const flyerInput=document.getElementById('f-flyer');
+  const flyerFile=flyerInput&&flyerInput.files&&flyerInput.files[0]?flyerInput.files[0]:null;
+  const flyerExt=flyerFile&&flyerFile.name.toLowerCase().endsWith('.png')?'.png':'.jpg';
+  const flyerName=flyerFile?(getFlyerName(flyerExt)||flyerFile.name):'';
+  let flyerBase64='', flyerMime='image/jpeg';
+  if(flyerFile){
+    flyerBase64=await new Promise((res,rej)=>{
+      const img=new Image();
+      const url=URL.createObjectURL(flyerFile);
+      img.onload=()=>{
+        const MAX=1200;let w=img.width,h=img.height;
+        if(w>MAX||h>MAX){const r=Math.min(MAX/w,MAX/h);w=Math.round(w*r);h=Math.round(h*r);}
+        const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        URL.revokeObjectURL(url);res(canvas.toDataURL('image/jpeg',0.82).split(',')[1]);
+      };
+      img.onerror=()=>rej(new Error('Error leyendo imagen'));img.src=url;
+    });
+  }
+
+  const [y,m,d]=(wData.fecha||'--').split('-');
+  const fechaFmt=`${m}/${d}/${y}`;
+  const horaFmt=wData.hora?wData.hora.slice(0,5):'Todo el día';
+
+  const payload={
+    source:'event_submission',
+    nombre:wData.nombre,
+    fecha:fechaFmt,
+    hora:horaFmt,
+    lugar:wData.lugar,
+    venue_nuevo:wData.venue_nuevo||'FALSE',
+    categoria:wData.categoria,
+    descripcion:wData.descripcion,
+    precio:wData.precio,
+    link_fuente:wData.link_fuente,
+    contacto_nombre:wData.contacto_nombre,
+    contacto_email:wData.contacto_email,
+    contacto_tel:wData.contacto_tel,
+    interes_tickets:'No',
+    ticket_service:'FALSE',
+    flyer_nombre_sugerido:flyerName,
+    flyer_base64:flyerBase64,
+    flyer_mime:flyerMime,
+    validacion:'Pendiente',activo:'FALSE',tipo_fuente:'Manual',
+  };
+
+  try{
+    await fetch(AS_SUBMIT,{method:'POST',body:JSON.stringify(payload),headers:{'Content-Type':'text/plain'},mode:'no-cors'});
+    const flyerOk=!!flyerBase64;
+    document.getElementById('subForm').innerHTML=`
+      <div class="form-success">
+        <div class="form-success-icon">🎉</div>
+        <h3>¡Evento recibido!</h3>
+        <p>Revisamos tu evento y lo publicamos en el mapa en menos de 24 horas.<br>
+        Te avisamos a <strong>${wData.contacto_email}</strong> cuando esté activo.</p>
+        ${flyerOk?'<div style="background:rgba(42,122,80,0.12);border:1px solid rgba(42,122,80,0.3);border-radius:10px;padding:12px 14px;margin:14px 0;font-size:13px;color:#4ca87a">✅ Flyer subido correctamente.</div>':''}
+        <button class="form-submit" style="margin-top:16px;max-width:200px;margin-left:auto;margin-right:auto" onclick="closeSubModal()">Cerrar</button>
+      </div>`;
+  }catch(err){
+    if(btn){btn.disabled=false;btn.textContent='Enviar mi evento →';}
+    if(errEl){errEl.textContent='Error al enviar. Verificá tu conexión e intentá de nuevo.';errEl.style.display='block';}
+  }
+}
+
+// ── WIZARD FLOW (YES path — 6 steps) ─────────────────────────
+function renderWizardStep(f, step){
+  const steps={
+    1:renderW1, 2:renderW2, 3:renderW3,
+    4:renderW4, 5:renderW5, 6:renderW6
+  };
+  if(steps[step]) steps[step](f);
+}
+
+function wNav(f, backFn, nextFn, nextLabel='Siguiente →'){
+  const nav=document.createElement('div');
+  nav.className='step-nav';
+  nav.innerHTML=`
+    <button class="btn-back" onclick="(${backFn.toString()})()">← Atrás</button>
+    <button class="btn-next" id="wizNext">${nextLabel}</button>`;
+  f.appendChild(nav);
+  document.getElementById('wizNext').onclick=nextFn;
+}
+
+function wErr(msg){
+  const e=document.getElementById('wErr');
+  if(e){e.textContent=msg;e.style.display=msg?'block':'none';}
+}
+
+function errDiv(){
+  return`<div id="wErr" style="font-size:12px;color:#c05a4a;display:none;margin-top:8px"></div>`;
+}
+
+// Step 1 — Personal
+function renderW1(f){
+  setModalTitle('Paso 1 · Personal','Tus datos como organizador');
+  f.innerHTML=`
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Tu nombre <span>*</span></label>
+        <input class="form-input" id="w-contacto" placeholder="Nombre completo" value="${wData.contacto_nombre||''}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email <span>*</span></label>
+        <input class="form-input" id="w-email" type="email" placeholder="tu@email.com" value="${wData.contacto_email||''}">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">WhatsApp / Teléfono <span>*</span></label>
+      <div style="display:flex;align-items:center;background:var(--s2);border:1px solid var(--b2);border-radius:8px;overflow:hidden" id="tel-wrap">
+        <span style="padding:10px;font-size:13px;color:var(--muted);border-right:1px solid var(--b2);white-space:nowrap;flex-shrink:0">📱 +549</span>
+        <input id="f-tel" type="tel" inputmode="numeric" maxlength="10" placeholder="11 1234 5678"
+          style="background:none;border:none;outline:none;padding:10px 12px;color:var(--ink);font-size:13px;width:100%;font-family:Inter,sans-serif"
+          oninput="this.value=this.value.replace(/[^0-9]/g,'');validateTelForm()" onblur="validateTelForm()" value="${wData.contacto_tel||''}">
+      </div>
+      <div id="tel-hint" style="font-size:10px;color:var(--muted);margin-top:3px;min-height:14px;font-style:italic"></div>
+    </div>
+    ${errDiv()}
+    <div class="step-nav">
+      <button class="btn-back" onclick="wizardStep=0;renderStep()">← Atrás</button>
+      <button class="btn-next" onclick="w1Next()">Siguiente →</button>
+    </div>`;
+}
+function w1Next(){
+  const contacto=document.getElementById('w-contacto')?.value.trim();
+  const email=document.getElementById('w-email')?.value.trim();
+  const tel=document.getElementById('f-tel')?.value.trim();
+  if(!contacto||!email||!tel||tel.length<10){wErr('Por favor completá todos los campos');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){wErr('El email no parece válido');return;}
+  wData.contacto_nombre=contacto;wData.contacto_email=email;wData.contacto_tel='+549'+tel;
+  wizardStep=2;renderStep();
+}
+
+// Step 2 — Evento
+function renderW2(f){
+  setModalTitle('Paso 2 · Evento','Datos del evento');
+  f.innerHTML=`
+    <div class="form-group">
+      <label class="form-label">Nombre del evento <span>*</span></label>
+      <input class="form-input" id="w-nombre" placeholder="Ej: No Me Muero — Julieta Carrera" maxlength="120" value="${wData.nombre||''}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Subtítulo</label>
+      <input class="form-input" id="w-subtitulo" placeholder="Ej: Teatro contemporáneo" maxlength="120" value="${wData.subtitulo||''}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descripción <span>*</span></label>
+      <textarea class="form-textarea" id="w-desc" placeholder="Contanos de qué se trata el evento (máx. 300 caracteres)" maxlength="300">${wData.descripcion||''}</textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Lugar / Venue <span>*</span></label>
+        <select class="form-select" id="f-lugar-sel" onchange="onVenueChange(this)">
+          <option value="">Seleccioná un venue...</option>
+        </select>
+        <input class="form-input" id="f-lugar-otro" placeholder="Nombre del venue" style="display:none;margin-top:6px">
+        <div class="form-hint" id="f-lugar-hint" style="display:none;color:#e07a3a">⚠️ Venue nuevo — lo agregaremos al mapa próximamente.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Categoría <span>*</span></label>
+        <select class="form-select" id="w-cat" onchange="checkMultiFuncion()">
+          <option value="">Seleccioná...</option>
+          <option>Música</option><option>Arte</option><option>Tradición</option>
+          <option>Cultural</option><option>Gastronomía</option><option>Deportes</option>
+          <option>Feria</option><option>Infantil</option><option>Solidario</option>
+          <option>Teatro</option><option>Stand Up</option><option>Evento</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Link de más info</label>
+      <input class="form-input" id="w-link" type="url" placeholder="Instagram, Facebook..." value="${wData.link_fuente||''}">
+    </div>
+    ${errDiv()}
+    <div class="step-nav">
+      <button class="btn-back" onclick="wizardStep=1;renderStep()">← Atrás</button>
+      <button class="btn-next" onclick="w2Next()">Siguiente →</button>
+    </div>`;
+  setTimeout(()=>{
+    populateVenueDropdown();
+    if(wData.lugar){
+      const sel=document.getElementById('f-lugar-sel');
+      if(sel) for(let o of sel.options) if(o.value===wData.lugar){o.selected=true;break;}
+    }
+    if(wData.categoria){
+      const sel=document.getElementById('w-cat');
+      if(sel) for(let o of sel.options) if(o.value===wData.categoria){o.selected=true;break;}
+    }
+  },50);
+}
+function checkMultiFuncion(){
+  const cat=document.getElementById('w-cat')?.value;
+  wData._multiFuncion=(cat==='Teatro'||cat==='Stand Up');
+}
+function w2Next(){
+  const nombre=document.getElementById('w-nombre')?.value.trim();
+  const desc=document.getElementById('w-desc')?.value.trim();
+  const lugar=getLugar();
+  const cat=document.getElementById('w-cat')?.value;
+  if(!nombre||!desc||!lugar||!cat){wErr('Por favor completá los campos obligatorios');return;}
+  wData.nombre=nombre;
+  wData.subtitulo=document.getElementById('w-subtitulo')?.value.trim()||'';
+  wData.descripcion=desc;
+  wData.lugar=lugar;
+  wData.venue_nuevo=document.getElementById('f-lugar-sel')?.value==='__otro__'?'TRUE':'FALSE';
+  wData.categoria=cat;
+  wData.link_fuente=document.getElementById('w-link')?.value.trim()||'';
+  wData._multiFuncion=(cat==='Teatro'||cat==='Stand Up');
+  wizardStep=3;renderStep();
+}
+
+// Step 3 — Función
+function renderW3(f){
+  setModalTitle('Paso 3 · Función','Fecha y horario');
+  const showMulti=wData._multiFuncion;
+  f.innerHTML=`
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Fecha de inicio <span>*</span></label>
+        <input class="form-input" id="w-fecha-ini" type="date" value="${wData.fecha||''}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Hora de inicio <span>*</span></label>
+        <input class="form-input" id="w-hora-ini" type="text" placeholder="21:00" maxlength="5" oninput="autoFormatTime(this)" value="${wData.hora||''}">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Fecha de fin</label>
+        <input class="form-input" id="w-fecha-fin" type="date" value="${wData.fecha_fin||''}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Hora de fin</label>
+        <input class="form-input" id="w-hora-fin" type="text" placeholder="02:00" maxlength="5" oninput="autoFormatTime(this)" value="${wData.hora_fin||''}">
+      </div>
+    </div>
+    ${showMulti?`
+    <div style="background:rgba(201,168,76,0.07);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:4px">
+      <div style="font-size:11px;font-weight:600;color:var(--gold);margin-bottom:8px">📅 FUNCIONES ADICIONALES (OPCIONAL)</div>
+      <div id="funciones-extra-list"></div>
+      <button class="addbtn" type="button" onclick="addFuncion()" style="margin-top:6px;width:100%">+ Agregar otra función</button>
+      <div class="form-hint" style="margin-top:6px">Para Teatro y Stand Up podés cargar múltiples funciones.</div>
+    </div>`:''}
+    ${errDiv()}
+    <div class="step-nav">
+      <button class="btn-back" onclick="wizardStep=2;renderStep()">← Atrás</button>
+      <button class="btn-next" onclick="w3Next()">Siguiente →</button>
+    </div>`;
+  if(showMulti) renderFuncionesExtra();
+}
+let funcionesExtra=[];
+function renderFuncionesExtra(){
+  const list=document.getElementById('funciones-extra-list');
+  if(!list)return;
+  list.innerHTML=funcionesExtra.map((fn,i)=>`
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+      <input class="form-input" style="flex:1" type="date" value="${fn.fecha}" onchange="funcionesExtra[${i}].fecha=this.value">
+      <input class="form-input" style="width:90px" type="text" placeholder="20:00" maxlength="5" value="${fn.hora}" oninput="autoFormatTime(this);funcionesExtra[${i}].hora=this.value">
+      <button onclick="funcionesExtra.splice(${i},1);renderFuncionesExtra()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:0 4px">×</button>
+    </div>`).join('');
+}
+function addFuncion(){
+  funcionesExtra.push({fecha:'',hora:''});
+  renderFuncionesExtra();
+}
+function w3Next(){
+  const fechaIni=document.getElementById('w-fecha-ini')?.value;
+  const horaIni=document.getElementById('w-hora-ini')?.value;
+  if(!fechaIni||!horaIni){wErr('La fecha y hora de inicio son obligatorias');return;}
+  wData.fecha=fechaIni;
+  wData.hora=horaIni;
+  wData.fecha_fin=document.getElementById('w-fecha-fin')?.value||'';
+  wData.hora_fin=document.getElementById('w-hora-fin')?.value||'';
+  const fmtDT=(f,h)=>f&&h?`${f.split('-').reverse().join('/')} ${h}`:'';
+  wData.funcion_inicio=fmtDT(fechaIni,horaIni);
+  wData.funcion_fin=fmtDT(wData.fecha_fin,wData.hora_fin);
+  wData.funciones_extra=funcionesExtra.length?JSON.stringify(funcionesExtra):'';
+  wizardStep=4;renderStep();
+}
+
+// Step 4 — Tickets + MP
+function renderW4(f){
+  setModalTitle('Paso 4 · Tickets y Mercado Pago','Configurá tus entradas');
+  f.innerHTML=`
+    <div class="fee-box">
+      <strong>Cómo funciona el servicio</strong><br>
+      Vos fijás el precio de la entrada. El comprador paga un 5% adicional de cargo por servicio
+      que cobra DataManIAcs directamente. Vos recibís el <strong>94% del precio que fijaste</strong>
+      directo en tu cuenta de Mercado Pago.<br>
+      Los 10 días de espera son la política de Mercado Pago — nosotros no retenemos nada.
+      <div class="fee-example">
+        <strong style="color:var(--gold)">Ejemplo:</strong> Precio entrada $15.000<br>
+        🧾 El comprador paga <strong>$15.750</strong> (incluye 5% cargo por servicio)<br>
+        💰 Vos recibís <strong>$14.100</strong> (94% de $15.000) en tu cuenta MP
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Precio de la entrada (ARS) <span>*</span></label>
+        <input class="form-input" id="w-precio" type="number" min="0" placeholder="15000" value="${wData.precio_entrada||''}" oninput="calcFee()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Stock de entradas <span>*</span></label>
+        <input class="form-input" id="w-stock" type="number" min="1" placeholder="200" value="${wData.stock_entradas||''}">
+      </div>
+    </div>
+    <div id="fee-preview" style="font-size:12px;color:var(--muted);margin-top:-8px;margin-bottom:8px;min-height:18px"></div>
+    <div class="form-section">Datos de Mercado Pago para el pago</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Email de Mercado Pago <span>*</span></label>
+        <input class="form-input" id="w-mp-email" type="email" placeholder="tu@email.com" value="${wData.mp_email||''}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Alias o CBU <span>*</span></label>
+        <input class="form-input" id="w-mp-alias" placeholder="juan.eventos.mp" value="${wData.mp_alias||''}">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Nombre del titular <span>*</span></label>
+        <input class="form-input" id="w-mp-titular" placeholder="Juan García" value="${wData.mp_titular||''}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">CUIT / CUIL <span>*</span></label>
+        <input class="form-input" id="w-mp-cuit" placeholder="20-12345678-9" value="${wData.mp_cuit||''}">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Teléfono de contacto MP <span>*</span></label>
+      <input class="form-input" id="w-mp-tel" type="tel" placeholder="1145678901" value="${wData.mp_telefono||''}">
+    </div>
+    ${errDiv()}
+    <div class="step-nav">
+      <button class="btn-back" onclick="wizardStep=3;renderStep()">← Atrás</button>
+      <button class="btn-next" onclick="w4Next()">Siguiente →</button>
+    </div>`;
+  calcFee();
+}
+function calcFee(){
+  const precio=parseFloat(document.getElementById('w-precio')?.value)||0;
+  const prev=document.getElementById('fee-preview');
+  if(!prev)return;
+  if(precio>0){
+    const comprador=(precio*1.05).toLocaleString('es-AR',{maximumFractionDigits:0});
+    const recibis=(precio*0.94).toLocaleString('es-AR',{maximumFractionDigits:0});
+    prev.innerHTML=`🧾 Comprador paga <strong style="color:var(--ink)">$${comprador}</strong> · Vos recibís <strong style="color:#4ca87a">$${recibis}</strong>`;
+  } else {
+    prev.textContent='';
+  }
+}
+function w4Next(){
+  const precio=document.getElementById('w-precio')?.value;
+  const stock=document.getElementById('w-stock')?.value;
+  const mpEmail=document.getElementById('w-mp-email')?.value.trim();
+  const mpAlias=document.getElementById('w-mp-alias')?.value.trim();
+  const mpTitular=document.getElementById('w-mp-titular')?.value.trim();
+  const mpCuit=document.getElementById('w-mp-cuit')?.value.trim();
+  const mpTel=document.getElementById('w-mp-tel')?.value.trim();
+  if(!precio||!stock||!mpEmail||!mpAlias||!mpTitular||!mpCuit||!mpTel){
+    wErr('Por favor completá todos los campos');return;
+  }
+  wData.precio_entrada=precio;
+  wData.stock_entradas=stock;
+  wData.mp_email=mpEmail;
+  wData.mp_alias=mpAlias;
+  wData.mp_titular=mpTitular;
+  wData.mp_cuit=mpCuit;
+  wData.mp_telefono=mpTel;
+  wizardStep=5;renderStep();
+}
+
+// Step 5 — Imagen
+function renderW5(f){
+  setModalTitle('Paso 5 · Imagen','Flyer del evento');
+  f.innerHTML=`
+    <div class="form-group">
+      <label class="form-label">Link del post de Instagram</label>
+      <input class="form-input" id="f-ig-link" type="url" placeholder="https://www.instagram.com/p/..." value="${wData.ig_link||''}">
+      <div class="form-hint">Si ya publicaste el evento en Instagram, pegá el link acá.</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Adjuntá tu flyer</label>
+      <label id="flyer-drop" style="
+        display:flex;flex-direction:column;align-items:center;justify-content:center;
+        background:var(--s2);border:1.5px dashed rgba(201,168,76,0.3);border-radius:10px;
+        padding:20px;cursor:pointer;text-align:center;gap:6px;transition:border-color .2s"
+        onmouseenter="this.style.borderColor='rgba(201,168,76,0.6)'"
+        onmouseleave="this.style.borderColor='rgba(201,168,76,0.3)'">
+        <div id="flyer-placeholder">
+          <div style="font-size:28px;margin-bottom:4px">🖼</div>
+          <div style="font-size:12px;font-weight:600;color:var(--ink2)">Tocá para seleccionar tu flyer</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">JPG o PNG · máx. 2MB</div>
+        </div>
+        <img id="flyer-preview" src="" alt="" style="display:none;max-width:100%;max-height:200px;border-radius:8px;object-fit:contain">
+        <input type="file" id="f-flyer" accept="image/jpeg,image/png" style="display:none" onchange="onFlyerSelected(this)">
+      </label>
+      <div id="flyer-name-preview" style="display:none;margin-top:8px;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:11px;font-family:'Courier New',monospace;color:var(--gold2);word-break:break-all"></div>
+      <div class="form-hint" style="margin-top:6px">
+        📐 Tamaño recomendado: <strong style="color:var(--ink2)">1080 × 1080 px</strong> (cuadrado)
+      </div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="wizardStep=4;renderStep()">← Atrás</button>
+      <button class="btn-next" onclick="wizardStep=6;renderStep()">Siguiente →</button>
+    </div>`;
+}
+
+// Step 6 — Publicar / Resumen
+function renderW6(f){
+  setModalTitle('Paso 6 · Publicar','Revisá y enviá tu evento');
+  const precio=parseFloat(wData.precio_entrada)||0;
+  const comprador=(precio*1.05).toLocaleString('es-AR',{maximumFractionDigits:0});
+  const recibis=(precio*0.94).toLocaleString('es-AR',{maximumFractionDigits:0});
+
+  // Save flyer data from step 5
+  wData.ig_link=document.getElementById('f-ig-link')?.value?.trim()||wData.ig_link||'';
+
+  f.innerHTML=`
+    <div style="background:var(--s2);border-radius:12px;padding:16px;margin-bottom:16px;font-size:13px;line-height:1.8">
+      <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Resumen del evento</div>
+      <div>🎟 <strong>${wData.nombre||'-'}</strong></div>
+      <div>📍 ${wData.lugar||'-'} · ${wData.categoria||'-'}</div>
+      <div>📅 ${wData.funcion_inicio||'-'}</div>
+      <div>💰 Entrada $${(precio).toLocaleString('es-AR')} · Stock ${wData.stock_entradas||'-'}</div>
+      <div style="margin-top:6px;font-size:11px;color:var(--muted)">
+        Comprador paga $${comprador} · Vos recibís $${recibis}
+      </div>
+    </div>
+    <div class="fee-box">
+      <strong>Publicación gratuita.</strong> DataManIAcs cobra el 5% únicamente sobre cada entrada vendida,
+      directamente al comprador. No hay costo de publicación ni comisión adicional para vos.
+    </div>
+    <div class="form-group" style="margin-top:12px">
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:12px;color:var(--ink2)">
+        <input type="checkbox" id="w-terminos" style="accent-color:var(--gold);margin-top:2px;flex-shrink:0">
+        Acepto que DataManIAcs cobre el cargo por servicio del 5% al comprador, y que recibiré
+        el 94% del precio de cada entrada en mi cuenta de Mercado Pago según los tiempos de
+        acreditación de MP.
+      </label>
+    </div>
+    ${errDiv()}
+    <div class="step-nav">
+      <button class="btn-back" onclick="wizardStep=5;renderStep()">← Atrás</button>
+      <button class="btn-next" id="subSubmit" onclick="submitWizard()">Publicar mi evento →</button>
+    </div>`;
+}
+
+async function submitWizard(){
+  if(!document.getElementById('w-terminos')?.checked){
+    wErr('Debés aceptar los términos para continuar');return;
+  }
+  const btn=document.getElementById('subSubmit');
+  const errEl=document.getElementById('wErr');
+  if(btn){btn.disabled=true;btn.textContent='Enviando…';}
+
+  // Flyer
+  const flyerInput=document.getElementById('f-flyer');
+  const flyerFile=flyerInput&&flyerInput.files&&flyerInput.files[0]?flyerInput.files[0]:null;
+  const flyerExt=flyerFile&&flyerFile.name.toLowerCase().endsWith('.png')?'.png':'.jpg';
+  const flyerName=flyerFile?(getFlyerName(flyerExt)||flyerFile.name):'';
+  let flyerBase64='',flyerMime='image/jpeg';
+  if(flyerFile){
+    flyerBase64=await new Promise((res,rej)=>{
+      const img=new Image();const url=URL.createObjectURL(flyerFile);
+      img.onload=()=>{
+        const MAX=1200;let w=img.width,h=img.height;
+        if(w>MAX||h>MAX){const r=Math.min(MAX/w,MAX/h);w=Math.round(w*r);h=Math.round(h*r);}
+        const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        URL.revokeObjectURL(url);res(canvas.toDataURL('image/jpeg',0.82).split(',')[1]);
+      };
+      img.onerror=()=>rej(new Error('Error'));img.src=url;
+    });
+  }
+
+  const [y,m,d]=(wData.fecha||'--').split('-');
+  const fechaFmt=`${m}/${d}/${y}`;
+  const horaFmt=wData.hora?wData.hora.slice(0,5):'Todo el día';
+
+  // Build funcion_inicio / funcion_fin as full datetime strings
+  const fmtDT=(fecha,hora)=>{
+    if(!fecha||!hora)return'';
+    const [fy,fm,fd]=fecha.split('-');
+    return`${fm}/${fd}/${fy} ${hora.slice(0,5)}`;
+  };
+
+  const payload={
+    source:'event_submission',
+    nombre:wData.nombre,
+    subtitulo:wData.subtitulo||'',
+    fecha:fechaFmt,
+    hora:horaFmt,
+    lugar:wData.lugar,
+    venue_nuevo:wData.venue_nuevo||'FALSE',
+    categoria:wData.categoria,
+    descripcion:wData.descripcion,
+    precio:`$${parseFloat(wData.precio_entrada).toLocaleString('es-AR')}`,
+    link_fuente:wData.link_fuente||'',
+    contacto_nombre:wData.contacto_nombre,
+    contacto_email:wData.contacto_email,
+    contacto_tel:wData.contacto_tel,
+    interes_tickets:'Sí',
+    ticket_service:'TRUE',
+    precio_entrada:wData.precio_entrada,
+    stock_entradas:wData.stock_entradas,
+    mp_email:wData.mp_email,
+    mp_alias:wData.mp_alias,
+    mp_titular:wData.mp_titular,
+    mp_cuit:wData.mp_cuit,
+    mp_telefono:wData.mp_telefono,
+    funcion_inicio:wData.funcion_inicio||'',
+    funcion_fin:wData.funcion_fin||'',
+    funciones_extra:wData.funciones_extra||'',
+    tipo_evento:'Presencial',
+    flyer_nombre_sugerido:flyerName,
+    flyer_base64:flyerBase64,
+    flyer_mime:flyerMime,
+    validacion:'Pendiente',activo:'FALSE',tipo_fuente:'Manual',
+  };
+
+  try{
+    await fetch(AS_SUBMIT,{method:'POST',body:JSON.stringify(payload),headers:{'Content-Type':'text/plain'},mode:'no-cors'});
+    document.getElementById('subForm').innerHTML=`
+      <div class="form-success">
+        <div class="form-success-icon">🎉</div>
+        <h3>¡Evento recibido!</h3>
+        <p>Revisamos tu evento y te contactamos en menos de 24 horas para confirmar el servicio de entradas.<br>
+        Te escribimos a <strong>${wData.contacto_email}</strong>.</p>
+        ${flyerBase64?'<div style="background:rgba(42,122,80,0.12);border:1px solid rgba(42,122,80,0.3);border-radius:10px;padding:12px 14px;margin:14px 0;font-size:13px;color:#4ca87a">✅ Flyer subido correctamente.</div>':''}
+        <button class="form-submit" style="margin-top:16px;max-width:200px;margin-left:auto;margin-right:auto" onclick="closeSubModal()">Cerrar</button>
+      </div>`;
+    document.getElementById('stepBar').style.display='none';
+  }catch(err){
+    if(btn){btn.disabled=false;btn.textContent='Publicar mi evento →';}
+    if(errEl){errEl.textContent='Error al enviar. Verificá tu conexión.';errEl.style.display='block';}
+  }
+}
 
 async function submitEvent(){
   const btn=document.getElementById('subSubmit');
