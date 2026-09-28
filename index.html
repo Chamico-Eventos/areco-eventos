@@ -989,7 +989,8 @@ function openSheet(ev){
 
   const btn=document.getElementById('sheetBuyBtn');
   const eventParam=encodeURIComponent(ev.id||ev.nombre||'');
-  const targetUrl=ev.link_accion||`${TICKETS_URL}/?event=${eventParam}`;
+  const isValidUrl=u=>!!u&&(u.startsWith('http://')||u.startsWith('https://'));
+  const targetUrl=isValidUrl(ev.link_accion)?ev.link_accion:`${TICKETS_URL}/?event=${eventParam}`;
   btn.href=targetUrl;
   const hasPreventa = String(ev.preventa_disponible).toLowerCase()==='true';
   btn.textContent = hasPreventa ? 'Comprá tus anticipadas →' : 'Ver más →';
@@ -1183,12 +1184,13 @@ function renderMap(list, future=[], past=[]){
         const gmDir=c2?`https://www.google.com/maps/dir/?api=1&destination=${c2[0]},${c2[1]}`:'';
         const hasFlyer = !!(ev.imagen_url && ev.imagen_url.trim());
         const eventParam=encodeURIComponent(ev.id||ev.nombre||'');
-        const ticketUrl=ev.link_accion||`${TICKETS_URL}/?event=${eventParam}`;
+        const isValidUrl=u=>!!u&&(u.startsWith('http://')||u.startsWith('https://'));
+        const ticketUrl=isValidUrl(ev.link_accion)?ev.link_accion:`${TICKETS_URL}/?event=${eventParam}`;
         const hasPreventa=String(ev.preventa_disponible).toLowerCase()==='true';
 
         const linksHtml=`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;align-items:center">
           ${dm&&hasPreventa?`<a class="plink" href="${ticketUrl}" target="_blank" style="background:rgba(226,185,79,0.15);border:1px solid rgba(226,185,79,0.35);border-radius:6px;padding:5px 12px;font-weight:600">🎟 Comprar entrada</a>`:''}
-          ${(dm&&!hasPreventa||!dm)&&ev.link_accion?`<a class="plink" href="${ev.link_accion}" target="_blank">Ver más →</a>`:''}
+          ${(dm&&!hasPreventa||!dm)&&isValidUrl(ev.link_accion)?`<a class="plink" href="${ev.link_accion}" target="_blank">Ver más →</a>`:''}
           ${gmDir?`<a class="plink" href="${gmDir}" target="_blank" style="color:var(--ink2)">🗺 Cómo llegar</a>`:''}
         </div>`;
 
