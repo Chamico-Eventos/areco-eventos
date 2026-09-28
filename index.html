@@ -1643,7 +1643,7 @@ function updateFlyerName(){
 function onFlyerSelected(input){
   const file=input.files[0];
   if(!file) return;
-  if(file.size>2*1024*1024){ alert('El flyer es demasiado grande. Máximo 2MB.'); input.value=''; return; }
+  if(file.size>4*1024*1024){ alert('El flyer es demasiado grande. Máximo 4MB.'); input.value=''; return; }
   // Show preview
   const reader=new FileReader();
   reader.onload=e=>{
