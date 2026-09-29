@@ -1880,7 +1880,7 @@ function renderSimpleStep(f, step){
     },50);
 
   } else if(step===2){
-    setModalTitle('Flyer del evento','Opcional · Se muestra en el mapa');
+    setModalTitle('Flyer del evento','Obligatorio · Se muestra en el mapa');
     f.innerHTML=`
       <div class="form-group">
         <label class="form-label">Link del post de Instagram</label>
@@ -1888,7 +1888,7 @@ function renderSimpleStep(f, step){
         <div class="form-hint">Si ya publicaste el evento en Instagram, pegá el link acá.</div>
       </div>
       <div class="form-group">
-        <label class="form-label">Adjuntá tu flyer</label>
+        <label class="form-label">Adjuntá tu flyer <span style="color:var(--danger,#c05a4a)">*</span></label>
         <label id="flyer-drop" style="
           display:flex;flex-direction:column;align-items:center;justify-content:center;
           background:var(--s2);border:1.5px dashed rgba(201,168,76,0.3);border-radius:10px;
@@ -1954,12 +1954,16 @@ async function submitSimple(){
   const btn=document.getElementById('subSubmit');
   const errEl=document.getElementById('subError');
   if(errEl) errEl.style.display='none';
-  if(btn){btn.disabled=true;btn.textContent='Subiendo…';}
 
   wData.ig_link=document.getElementById('f-ig-link')?.value.trim()||'';
 
   const flyerInput=document.getElementById('f-flyer');
   const flyerFile=flyerInput&&flyerInput.files&&flyerInput.files[0]?flyerInput.files[0]:null;
+  if(!flyerFile){
+    if(errEl){errEl.textContent='El flyer es obligatorio — subí una imagen para continuar';errEl.style.display='block';}
+    return;
+  }
+  if(btn){btn.disabled=true;btn.textContent='Subiendo…';}
   const flyerExt=flyerFile&&flyerFile.name.toLowerCase().endsWith('.png')?'.png':'.jpg';
   const flyerName=flyerFile?(getFlyerName(flyerExt)||flyerFile.name):'';
   let flyerBase64='', flyerMime='image/jpeg';
@@ -2400,7 +2404,7 @@ function renderW5(f){
       <div class="form-hint">Si ya publicaste el evento en Instagram, pegá el link acá.</div>
     </div>
     <div class="form-group">
-      <label class="form-label">Adjuntá tu flyer</label>
+      <label class="form-label">Adjuntá tu flyer <span style="color:var(--danger,#c05a4a)">*</span></label>
       <label id="flyer-drop" style="
         display:flex;flex-direction:column;align-items:center;justify-content:center;
         background:var(--s2);border:1.5px dashed rgba(201,168,76,0.3);border-radius:10px;
@@ -2429,9 +2433,10 @@ function renderW5(f){
 }
 async function w5Next(){
   wData.ig_link=document.getElementById('f-ig-link')?.value?.trim()||'';
-  // Capture the file NOW before step 6 replaces the DOM
+  // Require flyer
   const flyerInput=document.getElementById('f-flyer');
   const flyerFile=flyerInput&&flyerInput.files&&flyerInput.files[0]?flyerInput.files[0]:null;
+  if(!flyerFile){wErr('El flyer es obligatorio — subí una imagen para continuar');return;}
   if(flyerFile){
     const flyerExt=flyerFile.name.toLowerCase().endsWith('.png')?'.png':'.jpg';
     wData._flyerName=getFlyerName(flyerExt)||flyerFile.name;
