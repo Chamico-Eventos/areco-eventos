@@ -1681,7 +1681,7 @@ let wizardMode = null; // 'tickets' | 'simple'
 let wizardStep = 0;    // 0=choice, 1-6=wizard steps, 1=simple
 const wData = {};      // collected form data
 
-const WIZARD_STEPS = ['Personal','Evento','Función','Tickets','Imagen','Publicar'];
+const WIZARD_STEPS = ['Personal','Evento','Función','Tickets','Conectar MP','Imagen','Publicar'];
 const SIMPLE_STEPS = ['Tu evento','Imagen'];
 
 function openSubModal(){
@@ -2030,7 +2030,7 @@ async function submitSimple(){
 function renderWizardStep(f, step){
   const steps={
     1:renderW1, 2:renderW2, 3:renderW3,
-    4:renderW4, 5:renderW5, 6:renderW6
+    4:renderW4, 5:renderW5mp, 6:renderW6, 7:renderW7
   };
   if(steps[step]) steps[step](f);
 }
@@ -2387,12 +2387,126 @@ function w4Next(){
   wData.mp_titular=mpTitular;
   wData.mp_cuit=mpCuit;
   wData.mp_telefono='+549'+mpTelRaw;
-  wizardStep=5;renderStep();
+  wizardStep=5;renderStep(); // → Step 5: Conectar MP
 }
 
-// Step 5 — Imagen
-function renderW5(f){
-  setModalTitle('Paso 5 · Imagen','Flyer del evento');
+// Step 5 — Conectar Mercado Pago (OAuth)
+function renderW5mp(f){
+  setModalTitle('Paso 5 · Conectar MP','Autorización de Mercado Pago');
+  const connected = wData._mpConnected || false;
+  const mpEmail   = wData._mpEmail    || '';
+  f.innerHTML=`
+    <div class="fee-box" style="margin-bottom:16px">
+      <strong>¿Para qué necesitamos esto?</strong><br>
+      Para que el dinero de cada venta llegue <strong>automáticamente</strong> a tu cuenta de
+      Mercado Pago, necesitamos que nos autorices a procesar pagos en tu nombre.<br><br>
+      <span style="color:var(--muted);font-size:12px">
+        Esto <strong style="color:var(--ink2)">no nos da acceso</strong> a tu cuenta ni podemos
+        retirar dinero. Solo le dice a Mercado Pago adónde enviar tu parte de cada venta (94% del
+        precio que fijaste, a los 10 días).
+      </span>
+    </div>
+
+    <div id="mp-connect-status" style="
+      background:var(--s2);border:1px solid ${connected?'rgba(42,122,80,0.4)':'var(--b2)'};
+      border-radius:12px;padding:20px;text-align:center;margin-bottom:16px">
+      ${connected ? `
+        <div style="font-size:32px;margin-bottom:8px">✅</div>
+        <div style="font-weight:600;color:#4ca87a;margin-bottom:4px">Cuenta conectada</div>
+        <div style="font-size:12px;color:var(--muted)">${mpEmail}</div>
+      ` : `
+        <div style="font-size:32px;margin-bottom:8px">🔗</div>
+        <div style="font-weight:600;color:var(--ink2);margin-bottom:12px">
+          Todavía no conectaste tu cuenta de Mercado Pago
+        </div>
+        <button onclick="connectMP()" style="
+          padding:12px 24px;border-radius:10px;border:none;
+          background:linear-gradient(135deg,#009ee3,#00b1f7);
+          color:#fff;font-family:Inter,sans-serif;font-size:14px;font-weight:600;
+          cursor:pointer;display:inline-flex;align-items:center;gap:8px">
+          <img src="https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/5.22.1/mercadopago/logo__small@2x.png"
+               style="width:20px;height:20px;object-fit:contain" onerror="this.style.display='none'">
+          Conectar mi cuenta de Mercado Pago →
+        </button>
+        <div style="font-size:11px;color:var(--muted);margin-top:10px">
+          Se abrirá una ventana de Mercado Pago — iniciá sesión y aceptá los permisos.
+        </div>
+      `}
+    </div>
+
+    ${errDiv()}
+    <div class="step-nav">
+      <button class="btn-back" onclick="wizardStep=4;renderStep()">← Atrás</button>
+      <button class="btn-next" id="w5mp-next" onclick="w5mpNext()"
+        ${connected?'':'disabled style="opacity:0.3;cursor:not-allowed"'}>
+        Siguiente →
+      </button>
+    </div>`;
+}
+
+// Generate a session state and open MP OAuth popup
+async function connectMP(){
+  try {
+    // state = venueSlug:sessionId so callback knows which venue to update
+    const sessionId = Date.now().toString(36);
+    wData._oauthState = 'chamico:' + sessionId; // TODO: dynamic venue slug
+
+    const r    = await fetch('/api/mp-oauth-url?state=' + encodeURIComponent(wData._oauthState));
+    const data = await r.json();
+    if (!data.url) { wErr('No se pudo generar el link de MP'); return; }
+
+    // Open MP in popup
+    const popup = window.open(data.url, 'mp_oauth',
+      'width=600,height=700,scrollbars=yes,resizable=yes');
+
+    // Listen for the result from the callback page
+    const handler = (event) => {
+      if (!event.data || event.data.type !== 'mp_oauth_result') return;
+      window.removeEventListener('message', handler);
+      if (popup && !popup.closed) { try { popup.close(); } catch(e){} }
+      if (event.data.ok) {
+        wData._mpConnected = true;
+        wData._mpEmail     = event.data.mpEmail || '';
+        // Re-render step to show connected state
+        const f = document.getElementById('subForm');
+        if (f) renderW5mp(f);
+      } else {
+        wErr('Error al conectar: ' + (event.data.message || 'Intentá de nuevo'));
+      }
+    };
+    window.addEventListener('message', handler);
+
+    // Fallback: poll every 2s in case postMessage doesn't fire
+    const poll = setInterval(() => {
+      if (popup && popup.closed) {
+        clearInterval(poll);
+        window.removeEventListener('message', handler);
+        // If connected flag was set by message handler, great.
+        // If not, check manually (user might have completed it)
+        if (!wData._mpConnected) {
+          wErr('Si ya conectaste tu cuenta, tocá "Siguiente →" para continuar.');
+          const btn = document.getElementById('w5mp-next');
+          if (btn) { btn.disabled=false; btn.style.opacity='1'; btn.style.cursor='pointer'; }
+        }
+      }
+    }, 2000);
+
+  } catch(err) {
+    wErr('Error al conectar con Mercado Pago: ' + err.message);
+  }
+}
+
+function w5mpNext(){
+  if (!wData._mpConnected) {
+    wErr('Conectá tu cuenta de Mercado Pago para continuar');
+    return;
+  }
+  wizardStep=6;renderStep();
+}
+
+// Step 6 — Imagen
+function renderW6(f){
+  setModalTitle('Paso 6 · Imagen','Flyer del evento');
   f.innerHTML=`
     <div class="form-group">
       <label class="form-label">Link del post de Instagram</label>
@@ -2421,13 +2535,13 @@ function renderW5(f){
       </div>
     </div>
     <div class="step-nav">
-      <button class="btn-back" onclick="wizardStep=4;renderStep()">← Atrás</button>
-      <button class="btn-next" onclick="w5Next()">Siguiente →</button>
+      <button class="btn-back" onclick="wizardStep=5;renderStep()">← Atrás</button>
+      <button class="btn-next" onclick="w6Next()">Siguiente →</button>
     </div>`;
   // Trigger filename update now that wizard data is available
   setTimeout(()=>updateFlyerName(), 50);
 }
-async function w5Next(){
+async function w6Next(){
   wData.ig_link=document.getElementById('f-ig-link')?.value?.trim()||'';
   // Require flyer
   const flyerInput=document.getElementById('f-flyer');
@@ -2453,12 +2567,12 @@ async function w5Next(){
   } else {
     wData._flyerName='';wData._flyerBase64='';wData._flyerMime='image/jpeg';
   }
-  wizardStep=6;renderStep();
+  wizardStep=7;renderStep();
 }
 
-// Step 6 — Publicar / Resumen
-function renderW6(f){
-  setModalTitle('Paso 6 · Publicar','Revisá y enviá tu evento');
+// Step 7 — Publicar / Resumen
+function renderW7(f){
+  setModalTitle('Paso 7 · Publicar','Revisá y enviá tu evento');
   const precio=parseFloat(wData.precio_entrada)||0;
   const comprador=(precio*1.05).toLocaleString('es-AR',{maximumFractionDigits:0});
   const recibis=(precio*0.94).toLocaleString('es-AR',{maximumFractionDigits:0});
@@ -2491,7 +2605,7 @@ function renderW6(f){
     </div>
     ${errDiv()}
     <div class="step-nav">
-      <button class="btn-back" onclick="wizardStep=5;renderStep()">← Atrás</button>
+      <button class="btn-back" onclick="wizardStep=6;renderStep()">← Atrás</button>
       <button class="btn-next" id="subSubmit" onclick="submitWizard()">Publicar mi evento →</button>
     </div>`;
 }
@@ -2544,6 +2658,7 @@ async function submitWizard(){
     mp_titular:wData.mp_titular,
     mp_cuit:wData.mp_cuit,
     mp_telefono:wData.mp_telefono,
+    mp_conectado:wData._mpConnected?'TRUE':'FALSE',
     funcion_inicio:wData.funcion_inicio||'',
     funcion_fin:wData.funcion_fin||'',
     funciones_extra:wData.funciones_extra||'',
