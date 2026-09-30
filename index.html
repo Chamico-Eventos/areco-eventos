@@ -2451,7 +2451,7 @@ async function connectMP(){
     const sessionId = Date.now().toString(36);
     wData._oauthState = 'chamico:' + sessionId; // TODO: dynamic venue slug
 
-    const r    = await fetch('/api/mp-oauth-url?state=' + encodeURIComponent(wData._oauthState));
+    const r = await fetch('https://entradas.datamaniacs.com.ar/api/mp-oauth-url?state=' + encodeURIComponent(wData._oauthState));
     const data = await r.json();
     if (!data.url) { wErr('No se pudo generar el link de MP'); return; }
 
