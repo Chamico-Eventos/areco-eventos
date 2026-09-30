@@ -2451,9 +2451,10 @@ async function connectMP(){
     const sessionId = Date.now().toString(36);
     wData._oauthState = 'chamico:' + sessionId; // TODO: dynamic venue slug
 
-    const r = await fetch('https://entradas.datamaniacs.com.ar/api/mp-oauth-url?state=' + encodeURIComponent(wData._oauthState));
-    const data = await r.json();
-    if (!data.url) { wErr('No se pudo generar el link de MP'); return; }
+    const clientId   = '5778829558994003';
+    const redirectUri = encodeURIComponent('https://entradas.datamaniacs.com.ar/mp-connect');
+    const state      = encodeURIComponent(wData._oauthState);
+    const data = { url: `https://auth.mercadopago.com.ar/authorization?client_id=${clientId}&response_type=code&platform_id=mp&redirect_uri=${redirectUri}&state=${state}` };
 
     // Open MP in popup
     const popup = window.open(data.url, 'mp_oauth',
