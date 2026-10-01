@@ -2456,9 +2456,11 @@ async function connectMP(){
     const state      = encodeURIComponent(wData._oauthState);
     const data = { url: `https://auth.mercadopago.com.ar/authorization?client_id=${clientId}&response_type=code&platform_id=mp&redirect_uri=${redirectUri}&state=${state}` };
 
-    // Open MP in popup
-    const popup = window.open(data.url, 'mp_oauth',
-      'width=600,height=700,scrollbars=yes,resizable=yes');
+    // Save wizard state before redirect
+    sessionStorage.setItem('wData_backup', JSON.stringify(wData));
+    sessionStorage.setItem('wizardStep_backup', '5');
+    // Full page redirect to MP
+    window.location.href = data.url;
 
     // Listen for the result from the callback page
     const handler = (event) => {
