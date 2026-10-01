@@ -1456,6 +1456,7 @@ function fitMapToEvents(){
 // ── YOU ARE HERE ──────────────────────────────────────
 let userMarker=null;
 function initGeolocation(){
+  if(window._skipGeolocation) return;
   if(!navigator.geolocation)return;
   navigator.geolocation.getCurrentPosition(pos=>{
     const lat=pos.coords.latitude, lon=pos.coords.longitude;
@@ -2734,6 +2735,7 @@ init().then(() => {
         wData._mpEmail = decodeURIComponent(params.get('mp_email') || '');
         wizardMode = 'tickets';
         wizardStep = 5;
+        window._skipGeolocation = true; // don't re-ask location on OAuth return
         renderStep();
       }
     } catch(e) {
