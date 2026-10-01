@@ -2717,21 +2717,24 @@ init().then(() => {
   // ── Check if returning from MP OAuth ──────────────────
   const params = new URLSearchParams(window.location.search);
   if (params.get('mp_connected') === 'true') {
-    // Restore wizard state
     try {
       const backup = sessionStorage.getItem('wData_backup');
-      const step   = sessionStorage.getItem('wizardStep_backup');
       if (backup) {
-        wData = JSON.parse(backup);
-        wData._mpConnected = true;
-        wData._mpEmail     = decodeURIComponent(params.get('mp_email') || '');
+        const restored = JSON.parse(backup);
         sessionStorage.removeItem('wData_backup');
         sessionStorage.removeItem('wizardStep_backup');
         // Clean URL without reloading
         window.history.replaceState({}, '', window.location.pathname);
-        // Re-open wizard at step 5 showing connected state
+        // Open modal UI (this clears wData internally)
+        document.getElementById('subOverlay').classList.add('open');
+        document.body.style.overflow = 'hidden';
+        // Now restore wData AFTER modal opens
+        Object.assign(wData, restored);
+        wData._mpConnected = true;
+        wData._mpEmail = decodeURIComponent(params.get('mp_email') || '');
+        wizardMode = 'tickets';
         wizardStep = 5;
-        openModal();
+        renderStep();
       }
     } catch(e) {
       console.error('MP restore error:', e);
