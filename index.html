@@ -293,9 +293,28 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .map-brand-wrapper{position:absolute;top:14px;right:14px;z-index:999;display:flex;flex-direction:column;gap:8px;min-width:200px}
 .map-brand{background:rgba(14,13,11,0.82);backdrop-filter:blur(10px);border:1px solid rgba(201,168,76,0.18);border-radius:12px;padding:10px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;width:100%}
 .map-brand img{width:100%;max-height:56px;object-fit:contain;mix-blend-mode:luminosity;opacity:1}
-.map-brand-tagline{font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);align-self:flex-start}
-/* Mobile return button — hidden on desktop regardless of JS */
+.map-brand-tagline{font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);align-self:flex-start}/* Mobile return button — hidden on desktop regardless of JS */
 .mob-return-btn{display:none}
+@media(min-width:681px) and (max-width:1024px){
+  /* Tablet: move brand to bottom-left of map, away from time-nav */
+  .map-brand-wrapper{
+    top:auto;
+    bottom:14px;
+    left:14px;
+    right:auto;
+    min-width:160px;
+    flex-direction:column-reverse; /* button on top, brand below */
+    gap:8px;
+  }
+  .map-brand img{max-height:40px}
+  .map-brand{padding:8px 12px}
+  /* Button sits below the time-nav on tablet — push it right */
+  .add-ev-btn{
+    font-size:10.5px;
+    padding:8px 12px;
+  }
+}
+
 @media(min-width:681px){
   .mob-return-btn{display:none !important}
 }
@@ -1456,7 +1475,6 @@ function fitMapToEvents(){
 // ── YOU ARE HERE ──────────────────────────────────────
 let userMarker=null;
 function initGeolocation(){
-  if(window._skipGeolocation) return;
   if(!navigator.geolocation)return;
   navigator.geolocation.getCurrentPosition(pos=>{
     const lat=pos.coords.latitude, lon=pos.coords.longitude;
@@ -2718,25 +2736,21 @@ init().then(() => {
   // ── Check if returning from MP OAuth ──────────────────
   const params = new URLSearchParams(window.location.search);
   if (params.get('mp_connected') === 'true') {
+    // Restore wizard state
     try {
       const backup = sessionStorage.getItem('wData_backup');
+      const step   = sessionStorage.getItem('wizardStep_backup');
       if (backup) {
-        const restored = JSON.parse(backup);
+        wData = JSON.parse(backup);
+        wData._mpConnected = true;
+        wData._mpEmail     = decodeURIComponent(params.get('mp_email') || '');
         sessionStorage.removeItem('wData_backup');
         sessionStorage.removeItem('wizardStep_backup');
         // Clean URL without reloading
         window.history.replaceState({}, '', window.location.pathname);
-        // Open modal UI (this clears wData internally)
-        document.getElementById('subOverlay').classList.add('open');
-        document.body.style.overflow = 'hidden';
-        // Now restore wData AFTER modal opens
-        Object.assign(wData, restored);
-        wData._mpConnected = true;
-        wData._mpEmail = decodeURIComponent(params.get('mp_email') || '');
-        wizardMode = 'tickets';
+        // Re-open wizard at step 5 showing connected state
         wizardStep = 5;
-        window._skipGeolocation = true; // don't re-ask location on OAuth return
-        renderStep();
+        openModal();
       }
     } catch(e) {
       console.error('MP restore error:', e);
