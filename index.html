@@ -293,28 +293,9 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .map-brand-wrapper{position:absolute;top:14px;right:14px;z-index:999;display:flex;flex-direction:column;gap:8px;min-width:200px}
 .map-brand{background:rgba(14,13,11,0.82);backdrop-filter:blur(10px);border:1px solid rgba(201,168,76,0.18);border-radius:12px;padding:10px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;width:100%}
 .map-brand img{width:100%;max-height:56px;object-fit:contain;mix-blend-mode:luminosity;opacity:1}
-.map-brand-tagline{font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);align-self:flex-start}/* Mobile return button — hidden on desktop regardless of JS */
+.map-brand-tagline{font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);align-self:flex-start}
+/* Mobile return button — hidden on desktop regardless of JS */
 .mob-return-btn{display:none}
-@media(min-width:681px) and (max-width:1024px){
-  /* Tablet: move brand to bottom-left of map, away from time-nav */
-  .map-brand-wrapper{
-    top:auto;
-    bottom:14px;
-    left:14px;
-    right:auto;
-    min-width:160px;
-    flex-direction:column-reverse; /* button on top, brand below */
-    gap:8px;
-  }
-  .map-brand img{max-height:40px}
-  .map-brand{padding:8px 12px}
-  /* Button sits below the time-nav on tablet — push it right */
-  .add-ev-btn{
-    font-size:10.5px;
-    padding:8px 12px;
-  }
-}
-
 @media(min-width:681px){
   .mob-return-btn{display:none !important}
 }
@@ -1696,12 +1677,13 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 // ── SUBMISSION WIZARD ─────────────────────────────────────────
 // State
-let wizardMode = null; // 'tickets' | 'simple'
-let wizardStep = 0;    // 0=choice, 1-6=wizard steps, 1=simple
+let wizardMode = null; // 'mp' | 'transferencia' | 'free'
+let wizardStep = 0;    // 0=choice, 1-N=steps
 const wData = {};      // collected form data
 
-const WIZARD_STEPS = ['Personal','Evento','Función','Tickets','Conectar MP','Imagen','Publicar'];
-const SIMPLE_STEPS = ['Tu evento','Imagen'];
+const WIZARD_STEPS_MP   = ['Personal','Evento','Función','Tickets MP','Imagen','Publicar'];
+const WIZARD_STEPS_TRF  = ['Personal','Evento','Función','Pago','Imagen','Publicar'];
+const SIMPLE_STEPS      = ['Tu evento','Imagen'];
 
 function openSubModal(){
   document.getElementById('subOverlay').classList.add('open');
@@ -1728,7 +1710,7 @@ function updateStepBar(){
   const prog=document.getElementById('stepProgress');
   if(!wizardMode||wizardStep===0){ bar.style.display='none'; return; }
   bar.style.display='block';
-  const steps=wizardMode==='tickets'?WIZARD_STEPS:SIMPLE_STEPS;
+  const steps=wizardMode==='mp'?WIZARD_STEPS_MP:wizardMode==='transferencia'?WIZARD_STEPS_TRF:SIMPLE_STEPS;
   const pct=Math.round((wizardStep/steps.length)*100);
   prog.style.width=pct+'%';
   // Dots
@@ -1743,7 +1725,7 @@ function renderStep(){
   updateStepBar();
   const f=document.getElementById('subForm');
   if(wizardStep===0) return renderChoice(f);
-  if(wizardMode==='simple') return renderSimpleStep(f, wizardStep);
+  if(wizardMode==='free') return renderSimpleStep(f, wizardStep);
   return renderWizardStep(f, wizardStep);
 }
 
@@ -1751,47 +1733,72 @@ function renderStep(){
 function renderChoice(f){
   setModalTitle('Agregá tu evento','San Antonio de Areco · DataManIAcs');
   f.innerHTML=`
-    <div style="font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:16px">
-      ¿Cómo querés gestionar las entradas de tu evento?
+    <div style="font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:4px">
+      Agregar tu evento es <strong style="color:var(--gold)">gratis</strong>. Elegí cómo querés gestionar las entradas:
     </div>
-    <div style="display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
 
-      <div class="choice-card" id="choiceYes" onclick="selectChoice('tickets')">
+      <!-- OPTION 1: MP -->
+      <div class="choice-card" onclick="selectChoice('mp')">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-          <div class="choice-card-icon" style="font-size:22px;margin:0">🎟</div>
+          <div style="font-size:22px">🎟</div>
           <div>
-            <div class="choice-card-title" style="margin-bottom:0">Vender entradas con DataManIAcs</div>
-            <div style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)">RECOMENDADO · 5% cargo al comprador</div>
+            <div class="choice-card-title" style="margin-bottom:2px">Vender con Mercado Pago</div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)">RECOMENDADO · Automático · Sin esfuerzo</div>
           </div>
         </div>
         <div class="choice-card-desc">
-          <strong style="color:var(--ink)">Te hacemos la vida más fácil:</strong><br>
-          ✅ Nosotros gestionamos la venta en nuestra plataforma<br>
-          ✅ Evitás rastrear y confirmar cada compra manualmente<br>
-          ✅ Recibís la lista de compradores antes del evento<br>
-          ✅ El dinero va directo a tu Mercado Pago (94% del precio)<br>
-          <div style="margin-top:8px;font-size:11px;color:var(--muted)">
-            Requiere cuenta de Mercado Pago · El comprador paga el cargo por servicio · Los 10 días de espera son política de MP, no retenemos nada
+          ✅ Los compradores pagan online — vos no tocás nada<br>
+          ✅ Recibís la lista de asistentes antes del evento<br>
+          ✅ QR en la puerta para ventas sin efectivo<br>
+          ✅ El dinero llega directo a tu cuenta MP en 10 días hábiles
+          <div style="margin-top:9px;padding:8px 10px;background:rgba(201,168,76,0.07);border-radius:7px;border:1px solid rgba(201,168,76,0.15);font-size:11px;line-height:1.7">
+            <strong style="color:var(--ink)">Ejemplo entrada $10.000:</strong><br>
+            🧾 Comprador paga <strong style="color:var(--ink)">$10.500</strong> <span style="color:var(--muted)">(+5% cargo por servicio al comprador)</span><br>
+            💰 Vos recibís <strong style="color:#4ca87a">$9.400</strong> <span style="color:var(--muted)">(−6% cargo DM del precio fijado)</span>
           </div>
+          <div style="margin-top:7px;font-size:11px;color:var(--muted)">Requiere cuenta de Mercado Pago activa · Los 10 días son política de MP, no retenemos nada</div>
         </div>
       </div>
 
-      <div class="choice-card" id="choiceNo" onclick="selectChoice('simple')">
+      <!-- OPTION 2: TRANSFER -->
+      <div class="choice-card" onclick="selectChoice('transferencia')">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-          <div class="choice-card-icon" style="font-size:22px;margin:0">📍</div>
+          <div style="font-size:22px">🏦</div>
           <div>
-            <div class="choice-card-title" style="margin-bottom:0">Publicar sin servicio de entradas</div>
+            <div class="choice-card-title" style="margin-bottom:2px">Vender con transferencia bancaria</div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#5a9fd4">SIMPLE · DM TRACKEA TODO</div>
+          </div>
+        </div>
+        <div class="choice-card-desc">
+          ✅ Los compradores transfieren al alias de DataManIAcs<br>
+          ✅ DM verifica cada comprobante y te mantiene informado<br>
+          ✅ QR en la puerta — el ingresador solo mira el comprobante<br>
+          ✅ Al día siguiente del evento recibís tu parte en tu alias
+          <div style="margin-top:9px;padding:8px 10px;background:rgba(90,159,212,0.07);border-radius:7px;border:1px solid rgba(90,159,212,0.15);font-size:11px;line-height:1.7">
+            <strong style="color:var(--ink)">Ejemplo entrada $10.000:</strong><br>
+            🧾 Comprador paga <strong style="color:var(--ink)">$10.300</strong> <span style="color:var(--muted)">(+3% cargo por servicio al comprador)</span><br>
+            💰 Vos recibís <strong style="color:#4ca87a">$9.600</strong> <span style="color:var(--muted)">(−4% cargo DM del precio fijado)</span>
+          </div>
+          <div style="margin-top:7px;font-size:11px;color:var(--muted)">Sin MP necesario · DM trackea manualmente · Pago al día siguiente del evento</div>
+          <div style="margin-top:5px;font-size:11px;color:rgba(232,156,45,0.7)">⚠ En la puerta cada ingresador verifica el comprobante de transferencia manualmente — puede generar demoras en eventos con mucha gente</div>
+        </div>
+      </div>
+
+      <!-- OPTION 3: FREE -->
+      <div class="choice-card" onclick="selectChoice('free')">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <div style="font-size:22px">📍</div>
+          <div>
+            <div class="choice-card-title" style="margin-bottom:2px">Solo publicar el evento</div>
             <div style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#4ca87a">SIEMPRE GRATIS</div>
           </div>
         </div>
         <div class="choice-card-desc">
-          <strong style="color:var(--ink)">Vos manejás todo:</strong><br>
-          📌 Ponemos tu alias o link de pago en el evento<br>
-          📌 Manejás las finanzas y la lista de asistentes<br>
-          📌 Ideal para eventos gratuitos o con cobro propio<br>
-          <div style="margin-top:8px;font-size:11px;color:var(--muted)">
-            Implica mayor esfuerzo de gestión · Recomendado para eventos sin cobro de entrada
-          </div>
+          📌 Tu evento aparece en el mapa con tu link o alias propio<br>
+          📌 Ideal para eventos gratuitos o con cobro ya gestionado<br>
+          📌 DM no interviene en la venta ni en el seguimiento
+          <div style="margin-top:7px;font-size:11px;color:var(--muted)">⚠ Implica mayor esfuerzo: vos manejás la venta, los comprobantes y la lista de asistentes · No recomendado si tenés cobro de entrada</div>
         </div>
       </div>
 
@@ -1927,6 +1934,7 @@ function renderSimpleStep(f, step){
           📐 Tamaño recomendado: <strong style="color:var(--ink2)">1080 × 1080 px</strong> (cuadrado)
         </div>
       </div>
+      ${colaboracionBlock()}
       <div id="subError" style="font-size:12px;color:#c05a4a;display:none;margin-top:8px"></div>
       <div class="step-nav">
         <button class="btn-back" onclick="wizardStep=1;renderStep()">← Atrás</button>
@@ -2021,6 +2029,9 @@ async function submitSimple(){
     contacto_tel:wData.contacto_tel,
     interes_tickets:'No',
     ticket_service:'FALSE',
+    mp_conectado:'FALSE',
+    modelo_venta:'free',
+    colaboracion:document.getElementById('w-colab')?.checked?'yes':'no',
     flyer_nombre_sugerido:flyerName,
     flyer_base64:flyerBase64,
     flyer_mime:flyerMime,
@@ -2045,11 +2056,12 @@ async function submitSimple(){
   }
 }
 
-// ── WIZARD FLOW (YES path — 6 steps) ─────────────────────────
+// ── WIZARD FLOW (MP + Transfer — 6 steps) ────────────────────
 function renderWizardStep(f, step){
   const steps={
     1:renderW1, 2:renderW2, 3:renderW3,
-    4:renderW4, 5:renderW5mp, 6:renderW6, 7:renderW7
+    4:wizardMode==='transferencia'?renderW4Transfer:renderW4,
+    5:renderW5, 6:renderW6
   };
   if(steps[step]) steps[step](f);
 }
@@ -2267,7 +2279,7 @@ function renderW4(f){
     <div class="fee-box">
       <strong>Cómo funciona el servicio</strong><br>
       Vos fijás el precio de la entrada. El comprador paga un 5% adicional de cargo por servicio
-      que cobra DataManIAcs directamente. Vos recibís el <strong>94% del precio que fijaste, a los 10 días hábiles</strong>
+      que cobra DataManIAcs directamente. Vos recibís el <strong>94% del precio que fijaste</strong>
       directo en tu cuenta de Mercado Pago.<br>
       Los 10 días de espera son la política de Mercado Pago — nosotros no retenemos nada.
       <div class="fee-example">
@@ -2406,129 +2418,97 @@ function w4Next(){
   wData.mp_titular=mpTitular;
   wData.mp_cuit=mpCuit;
   wData.mp_telefono='+549'+mpTelRaw;
-  wizardStep=5;renderStep(); // → Step 5: Conectar MP
+  wizardStep=5;renderStep();
 }
 
-// Step 5 — Conectar Mercado Pago (OAuth)
-function renderW5mp(f){
-  setModalTitle('Paso 5 · Conectar MP','Autorización de Mercado Pago');
-  const connected = wData._mpConnected || false;
-  const mpEmail   = wData._mpEmail    || '';
+// Step 4 — Transfer variant
+function renderW4Transfer(f){
+  setModalTitle('Paso 4 · Pago por transferencia','Configurá tus entradas');
   f.innerHTML=`
-    <div class="fee-box" style="margin-bottom:16px">
-      <strong>¿Para qué necesitamos esto?</strong><br>
-      Para que el dinero de cada venta llegue <strong>automáticamente</strong> a tu cuenta de
-      Mercado Pago, necesitamos que nos autorices a procesar pagos en tu nombre.<br><br>
-      <span style="color:var(--muted);font-size:12px">
-        Esto <strong style="color:var(--ink2)">no nos da acceso</strong> a tu cuenta ni podemos
-        retirar dinero. Solo le dice a Mercado Pago adónde enviar tu parte de cada venta (94% del
-        precio que fijaste, a los 10 días hábiles).
-      </span>
+    <div class="fee-box">
+      <strong>Cómo funciona este modelo</strong><br>
+      Los compradores transfieren al alias de DataManIAcs. DM verifica cada comprobante y trackea los asistentes.
+      Al día siguiente del evento te transferimos tu parte a tu alias de MP.<br><br>
+      <strong style="color:var(--ink)">También proveemos un QR para ventas en la puerta</strong> — el comprador escanea, transfiere y muestra el comprobante. Sin efectivo, sin caja.
+      <div class="fee-example">
+        <strong style="color:var(--gold)">Ejemplo entrada $10.000:</strong><br>
+        🧾 Comprador paga <strong>$10.300</strong> <span style="color:var(--muted)">(+3% cargo por servicio al comprador)</span><br>
+        💰 Vos recibís <strong style="color:#4ca87a">$9.600</strong> al día siguiente del evento <span style="color:var(--muted)">(−4% cargo DM)</span><br>
+        🏦 DM recibe la transferencia de $10.300 y te acredita $9.600
+      </div>
     </div>
-
-    <div id="mp-connect-status" style="
-      background:var(--s2);border:1px solid ${connected?'rgba(42,122,80,0.4)':'var(--b2)'};
-      border-radius:12px;padding:20px;text-align:center;margin-bottom:16px">
-      ${connected ? `
-        <div style="font-size:32px;margin-bottom:8px">✅</div>
-        <div style="font-weight:600;color:#4ca87a;margin-bottom:4px">Cuenta conectada</div>
-        <div style="font-size:12px;color:var(--muted)">${mpEmail}</div>
-      ` : `
-        <div style="font-size:32px;margin-bottom:8px">🔗</div>
-        <div style="font-weight:600;color:var(--ink2);margin-bottom:12px">
-          Todavía no conectaste tu cuenta de Mercado Pago
-        </div>
-        <button onclick="connectMP()" style="
-          padding:12px 24px;border-radius:10px;border:none;
-          background:linear-gradient(135deg,#009ee3,#00b1f7);
-          color:#fff;font-family:Inter,sans-serif;font-size:14px;font-weight:600;
-          cursor:pointer;display:inline-flex;align-items:center;gap:8px">
-          <img src="https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/5.22.1/mercadopago/logo__small@2x.png"
-               style="width:20px;height:20px;object-fit:contain" onerror="this.style.display='none'">
-          Conectar mi cuenta de Mercado Pago →
-        </button>
-        <div style="font-size:11px;color:var(--muted);margin-top:10px">
-          Se abrirá una ventana de Mercado Pago — iniciá sesión y aceptá los permisos.
-        </div>
-      `}
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Precio de la entrada (ARS) <span>*</span></label>
+        <input class="form-input" id="w-precio" type="number" min="0" placeholder="10000" value="${wData.precio_entrada||''}" oninput="calcFeeTrf()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Stock de entradas <span>*</span></label>
+        <input class="form-input" id="w-stock" type="number" min="1" placeholder="100" value="${wData.stock_entradas||''}">
+      </div>
     </div>
-
+    <div id="fee-preview-trf" style="font-size:12px;color:var(--muted);margin-top:-8px;margin-bottom:8px;min-height:18px"></div>
+    <div class="form-section">Tus datos para el pago</div>
+    <div class="form-group">
+      <label class="form-label">Tu alias de Mercado Pago <span>*</span></label>
+      <input class="form-input" id="w-trf-alias" placeholder="juan.eventos.mp" value="${wData.mp_alias||''}">
+      <div class="form-hint">Usamos este alias para transferirte tu parte al día siguiente del evento · Preferí el alias al CVU</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">WhatsApp para notificaciones <span>*</span></label>
+      <div style="display:flex;align-items:center;background:var(--s2);border:1px solid var(--b2);border-radius:8px;overflow:hidden" id="trf-tel-wrap">
+        <span style="padding:10px;font-size:13px;color:var(--muted);border-right:1px solid var(--b2);white-space:nowrap;flex-shrink:0">📱 +549</span>
+        <input id="w-trf-tel" type="tel" inputmode="numeric" maxlength="10" placeholder="11 1234 5678"
+          style="background:none;border:none;outline:none;padding:10px 12px;color:var(--ink);font-size:13px;width:100%;font-family:Inter,sans-serif"
+          oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+          value="${(wData.mp_telefono||'').replace('+549','')}">
+      </div>
+      <div class="form-hint">Te avisamos por WhatsApp cuando se confirma cada comprobante y te enviamos el listado de asistentes</div>
+    </div>
+    <div style="background:rgba(90,159,212,0.07);border:1px solid rgba(90,159,212,0.2);border-radius:10px;padding:12px 14px;margin-top:4px;font-size:12px;color:var(--ink2);line-height:1.7">
+      <strong style="color:var(--ink)">¿Cómo funciona en la práctica?</strong><br>
+      1. DM publica tu evento con un link de compra y un QR para la puerta<br>
+      2. Cada comprador transfiere a <strong style="color:var(--gold)">datamaniacs.mp</strong> y sube su comprobante<br>
+      3. DM verifica y confirma cada ticket — vos recibís el listado actualizado<br>
+      4. Al día siguiente del evento DM te transfiere <strong>$${(9600/10000*100).toFixed(0)}% del precio fijado</strong> por cada entrada vendida a tu alias
+    </div>
     ${errDiv()}
     <div class="step-nav">
-      <button class="btn-back" onclick="wizardStep=4;renderStep()">← Atrás</button>
-      <button class="btn-next" id="w5mp-next" onclick="w5mpNext()"
-        ${connected?'':'disabled style="opacity:0.3;cursor:not-allowed"'}>
-        Siguiente →
-      </button>
+      <button class="btn-back" onclick="wizardStep=3;renderStep()">← Atrás</button>
+      <button class="btn-next" onclick="w4TransferNext()">Siguiente →</button>
     </div>`;
+  calcFeeTrf();
 }
-
-// Generate a session state and open MP OAuth popup
-async function connectMP(){
-  try {
-    // state = venueSlug:sessionId so callback knows which venue to update
-    const sessionId = Date.now().toString(36);
-    wData._oauthState = 'chamico:' + sessionId; // TODO: dynamic venue slug
-
-    const clientId   = '5778829558994003';
-    const redirectUri = encodeURIComponent('https://entradas.datamaniacs.com.ar/mp-connect');
-    const state      = encodeURIComponent(wData._oauthState);
-    const data = { url: `https://auth.mercadopago.com.ar/authorization?client_id=${clientId}&response_type=code&platform_id=mp&redirect_uri=${redirectUri}&state=${state}` };
-
-    // Save wizard state before redirect
-    sessionStorage.setItem('wData_backup', JSON.stringify(wData));
-    sessionStorage.setItem('wizardStep_backup', '5');
-    // Full page redirect to MP
-    window.location.href = data.url;
-
-    // Listen for the result from the callback page
-    const handler = (event) => {
-      if (!event.data || event.data.type !== 'mp_oauth_result') return;
-      window.removeEventListener('message', handler);
-      if (popup && !popup.closed) { try { popup.close(); } catch(e){} }
-      if (event.data.ok) {
-        wData._mpConnected = true;
-        wData._mpEmail     = event.data.mpEmail || '';
-        // Re-render step to show connected state
-        const f = document.getElementById('subForm');
-        if (f) renderW5mp(f);
-      } else {
-        wErr('Error al conectar: ' + (event.data.message || 'Intentá de nuevo'));
-      }
-    };
-    window.addEventListener('message', handler);
-
-    // Fallback: poll every 2s in case postMessage doesn't fire
-    const poll = setInterval(() => {
-      if (popup && popup.closed) {
-        clearInterval(poll);
-        window.removeEventListener('message', handler);
-        // If connected flag was set by message handler, great.
-        // If not, check manually (user might have completed it)
-        if (!wData._mpConnected) {
-          wErr('Si ya conectaste tu cuenta, tocá "Siguiente →" para continuar.');
-          const btn = document.getElementById('w5mp-next');
-          if (btn) { btn.disabled=false; btn.style.opacity='1'; btn.style.cursor='pointer'; }
-        }
-      }
-    }, 2000);
-
-  } catch(err) {
-    wErr('Error al conectar con Mercado Pago: ' + err.message);
+function calcFeeTrf(){
+  const precio=parseFloat(document.getElementById('w-precio')?.value)||0;
+  const prev=document.getElementById('fee-preview-trf');
+  if(!prev)return;
+  if(precio>0){
+    const comprador=(precio*1.03).toLocaleString('es-AR',{maximumFractionDigits:0});
+    const recibis=(precio*0.96).toLocaleString('es-AR',{maximumFractionDigits:0});
+    prev.innerHTML=`🧾 Comprador paga <strong style="color:var(--ink)">$${comprador}</strong> · Vos recibís <strong style="color:#4ca87a">$${recibis}</strong>`;
+  } else {
+    prev.textContent='';
   }
 }
-
-function w5mpNext(){
-  if (!wData._mpConnected) {
-    wErr('Conectá tu cuenta de Mercado Pago para continuar');
-    return;
-  }
-  wizardStep=6;renderStep();
+function w4TransferNext(){
+  const precio=document.getElementById('w-precio')?.value;
+  const stock=document.getElementById('w-stock')?.value;
+  const alias=document.getElementById('w-trf-alias')?.value.trim();
+  const telRaw=document.getElementById('w-trf-tel')?.value.trim();
+  if(!precio||!stock||!alias||!telRaw){wErr('Por favor completá todos los campos');return;}
+  if(telRaw.length<10){wErr('El WhatsApp debe tener 10 dígitos');return;}
+  wData.precio_entrada=precio;
+  wData.stock_entradas=stock;
+  wData.mp_alias=alias;
+  wData.mp_telefono='+549'+telRaw;
+  wData.mp_email='';wData.mp_titular='';wData.mp_cuit='';
+  wizardStep=5;renderStep();
 }
 
-// Step 6 — Imagen
-function renderW6(f){
-  setModalTitle('Paso 6 · Imagen','Flyer del evento');
+// Step 5 — Imagen
+function renderW5(f){
+  setModalTitle('Paso 5 · Imagen','Flyer del evento');
   f.innerHTML=`
     <div class="form-group">
       <label class="form-label">Link del post de Instagram</label>
@@ -2557,13 +2537,13 @@ function renderW6(f){
       </div>
     </div>
     <div class="step-nav">
-      <button class="btn-back" onclick="wizardStep=5;renderStep()">← Atrás</button>
-      <button class="btn-next" onclick="w6Next()">Siguiente →</button>
+      <button class="btn-back" onclick="wizardStep=4;renderStep()">← Atrás</button>
+      <button class="btn-next" onclick="w5Next()">Siguiente →</button>
     </div>`;
   // Trigger filename update now that wizard data is available
   setTimeout(()=>updateFlyerName(), 50);
 }
-async function w6Next(){
+async function w5Next(){
   wData.ig_link=document.getElementById('f-ig-link')?.value?.trim()||'';
   // Require flyer
   const flyerInput=document.getElementById('f-flyer');
@@ -2589,18 +2569,26 @@ async function w6Next(){
   } else {
     wData._flyerName='';wData._flyerBase64='';wData._flyerMime='image/jpeg';
   }
-  wizardStep=7;renderStep();
+  wizardStep=6;renderStep();
 }
 
-// Step 7 — Publicar / Resumen
-function renderW7(f){
-  setModalTitle('Paso 7 · Publicar','Revisá y enviá tu evento');
+// Step 6 — Publicar / Resumen
+function renderW6(f){
+  setModalTitle('Paso 6 · Publicar','Revisá y enviá tu evento');
   const precio=parseFloat(wData.precio_entrada)||0;
-  const comprador=(precio*1.05).toLocaleString('es-AR',{maximumFractionDigits:0});
-  const recibis=(precio*0.94).toLocaleString('es-AR',{maximumFractionDigits:0});
+  const isTrf=wizardMode==='transferencia';
+  const buyerFee=isTrf?1.03:1.05;
+  const venuePct=isTrf?0.96:0.94;
+  const comprador=(precio*buyerFee).toLocaleString('es-AR',{maximumFractionDigits:0});
+  const recibis=(precio*venuePct).toLocaleString('es-AR',{maximumFractionDigits:0});
 
-  // Save flyer data from step 5
-  wData.ig_link=document.getElementById('f-ig-link')?.value?.trim()||wData.ig_link||'';
+  const terminosText=isTrf
+    ? `Entiendo que los compradores transfieren a DataManIAcs (+3% cargo al comprador). DM verifica cada comprobante y me acredita el ${(venuePct*100).toFixed(0)}% del precio por entrada vendida al día siguiente del evento.`
+    : `Acepto que DataManIAcs cobre el 5% al comprador. Recibiré el 94% del precio de cada entrada en mi cuenta de Mercado Pago según los tiempos de acreditación de MP.`;
+
+  const feeBoxText=isTrf
+    ? `<strong>Publicación gratuita.</strong> El comprador paga el +3% de cargo por servicio. DataManIAcs descuenta el 4% de comisión del precio fijado y te transfiere el resto al día siguiente del evento. Sin sorpresas.`
+    : `<strong>Publicación gratuita.</strong> DataManIAcs cobra el 5% al comprador y el 6% de comisión del precio fijado. El dinero llega a tu cuenta de MP en 10 días hábiles — política de MP, no retenemos nada.`;
 
   f.innerHTML=`
     <div style="background:var(--s2);border-radius:12px;padding:16px;margin-bottom:16px;font-size:13px;line-height:1.8">
@@ -2608,27 +2596,45 @@ function renderW7(f){
       <div>🎟 <strong>${wData.nombre||'-'}</strong></div>
       <div>📍 ${wData.lugar||'-'} · ${wData.categoria||'-'}</div>
       <div>📅 ${wData.funcion_inicio||'-'}</div>
-      <div>💰 Entrada $${(precio).toLocaleString('es-AR')} · Stock ${wData.stock_entradas||'-'}</div>
+      <div>💰 Entrada $${precio.toLocaleString('es-AR')} · Stock ${wData.stock_entradas||'-'}</div>
       <div style="margin-top:6px;font-size:11px;color:var(--muted)">
         Comprador paga $${comprador} · Vos recibís $${recibis}
+        ${isTrf?'<span style="color:#5a9fd4"> · Pago al día siguiente del evento</span>':'<span style="color:var(--muted)"> · Vía MP en 10 días hábiles</span>'}
       </div>
     </div>
-    <div class="fee-box">
-      <strong>Publicación gratuita.</strong> DataManIAcs cobra el 5% únicamente sobre cada entrada vendida,
-      directamente al comprador. No hay costo de publicación ni comisión adicional para vos.
-    </div>
+    <div class="fee-box">${feeBoxText}</div>
     <div class="form-group" style="margin-top:12px">
       <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:12px;color:var(--ink2)">
         <input type="checkbox" id="w-terminos" style="accent-color:var(--gold);margin-top:2px;flex-shrink:0">
-        Acepto que DataManIAcs cobre el cargo por servicio del 5% al comprador, y que recibiré
-        el 94% del precio de cada entrada en mi cuenta de Mercado Pago según los tiempos de
-        acreditación de MP.
+        ${terminosText}
       </label>
     </div>
+    ${colaboracionBlock()}
     ${errDiv()}
     <div class="step-nav">
-      <button class="btn-back" onclick="wizardStep=6;renderStep()">← Atrás</button>
+      <button class="btn-back" onclick="wizardStep=5;renderStep()">← Atrás</button>
       <button class="btn-next" id="subSubmit" onclick="submitWizard()">Publicar mi evento →</button>
+    </div>`;
+}
+
+// ── Colaboración block (shown on final step of all flows) ─────
+function colaboracionBlock(){
+  return`
+    <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:14px 16px;margin-top:14px">
+      <div style="font-size:12px;font-weight:700;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">☕ Colaboración opcional</div>
+      <div style="font-size:12px;color:var(--ink2);line-height:1.6;margin-bottom:10px">
+        Agregar tu evento en Areco Eventos es gratis y lo seguirá siendo.
+        Si querés colaborar con el desarrollo del proyecto, podés hacerlo con cualquier monto —
+        el sugerido es <strong style="color:var(--ink)">$10.000</strong>.
+      </div>
+      <div style="background:var(--s2);border-radius:8px;padding:10px 14px;font-size:12px;line-height:1.8;border:1px solid var(--b2)">
+        🏦 Alias: <strong style="color:var(--gold);letter-spacing:.04em">datamaniacs.mp</strong><br>
+        💬 Referencia: <span style="color:var(--muted)">Areco Eventos — colaboración</span>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;margin-top:10px;cursor:pointer;font-size:12px;color:var(--ink2)">
+        <input type="checkbox" id="w-colab" style="accent-color:var(--gold)">
+        Ya transferí mi colaboración — ¡gracias! 🙌
+      </label>
     </div>`;
 }
 
@@ -2649,12 +2655,14 @@ async function submitWizard(){
   const fechaFmt=`${m}/${d}/${y}`;
   const horaFmt=wData.hora?wData.hora.slice(0,5):'Todo el día';
 
-  // Build funcion_inicio / funcion_fin as full datetime strings
   const fmtDT=(fecha,hora)=>{
     if(!fecha||!hora)return'';
     const [fy,fm,fd]=fecha.split('-');
     return`${fm}/${fd}/${fy} ${hora.slice(0,5)}`;
   };
+
+  const isTrf=wizardMode==='transferencia';
+  const colaboro=document.getElementById('w-colab')?.checked?'yes':'no';
 
   const payload={
     source:'event_submission',
@@ -2673,14 +2681,16 @@ async function submitWizard(){
     contacto_tel:wData.contacto_tel,
     interes_tickets:'Sí',
     ticket_service:'TRUE',
+    mp_conectado:isTrf?'FALSE':'TRUE',
+    modelo_venta:wizardMode,
+    colaboracion:colaboro,
     precio_entrada:String(Math.round(parseFloat(wData.precio_entrada))),
     stock_entradas:wData.stock_entradas,
-    mp_email:wData.mp_email,
-    mp_alias:wData.mp_alias,
-    mp_titular:wData.mp_titular,
-    mp_cuit:wData.mp_cuit,
-    mp_telefono:wData.mp_telefono,
-    mp_conectado:wData._mpConnected?'TRUE':'FALSE',
+    mp_email:wData.mp_email||'',
+    mp_alias:wData.mp_alias||'',
+    mp_titular:wData.mp_titular||'',
+    mp_cuit:wData.mp_cuit||'',
+    mp_telefono:wData.mp_telefono||'',
     funcion_inicio:wData.funcion_inicio||'',
     funcion_fin:wData.funcion_fin||'',
     funciones_extra:wData.funciones_extra||'',
@@ -2732,31 +2742,7 @@ async function init(){
   document.getElementById('loading').style.display='none';
 }
 
-init().then(() => {
-  // ── Check if returning from MP OAuth ──────────────────
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('mp_connected') === 'true') {
-    // Restore wizard state
-    try {
-      const backup = sessionStorage.getItem('wData_backup');
-      const step   = sessionStorage.getItem('wizardStep_backup');
-      if (backup) {
-        wData = JSON.parse(backup);
-        wData._mpConnected = true;
-        wData._mpEmail     = decodeURIComponent(params.get('mp_email') || '');
-        sessionStorage.removeItem('wData_backup');
-        sessionStorage.removeItem('wizardStep_backup');
-        // Clean URL without reloading
-        window.history.replaceState({}, '', window.location.pathname);
-        // Re-open wizard at step 5 showing connected state
-        wizardStep = 5;
-        openModal();
-      }
-    } catch(e) {
-      console.error('MP restore error:', e);
-    }
-  }
-});
+init();
 </script>
 </body>
 </html>
