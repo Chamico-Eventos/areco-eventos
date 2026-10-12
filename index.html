@@ -2340,6 +2340,7 @@ function renderW4(f){
         <label class="form-label">CUIT / CUIL <span>*</span></label>
         <input class="form-input" id="w-mp-cuit" placeholder="20-12345678-9" maxlength="13"
           oninput="fmtCuit(this)" value="${wData.mp_cuit||''}">
+        <div id="cuit-hint" style="font-size:10px;color:var(--muted);margin-top:3px;min-height:14px;font-style:italic"></div>
       </div>
     </div>
     <div class="form-group">
@@ -2411,6 +2412,12 @@ function fmtCuit(input){
   if(v.length>9) v=v.slice(0,2)+'-'+v.slice(2,10)+'-'+v.slice(10);
   else if(v.length>2) v=v.slice(0,2)+'-'+v.slice(2);
   input.value=v;
+  // Live hint
+  const hint=document.getElementById('cuit-hint');
+  if(!hint)return;
+  if(v.replace(/[^0-9]/g,'').length===11) hint.innerHTML='<span style="color:#4ca87a">✓ CUIT completo</span>';
+  else if(v.length>0) hint.textContent=v.replace(/[^0-9]/g,'').length+'/11 dígitos';
+  else hint.textContent='';
 }
 function validateMpTel(){
   const input=document.getElementById('w-mp-tel');
@@ -2433,6 +2440,7 @@ function w4Next(){
   if(!precio||!stock||!mpEmail||!mpAlias||!mpTitular||!mpCuit||!mpTelRaw){
     wErr('Por favor completá todos los campos');return;
   }
+  if(mpCuit.replace(/[^0-9]/g,'').length!==11){wErr('El CUIT/CUIL debe tener 11 dígitos (ej: 20-12345678-9)');return;}
   if(mpTelRaw.length<10){wErr('El teléfono de MP debe tener 10 dígitos');return;}
   if(!mpConfirm){wErr('Confirmá que tu cuenta de Mercado Pago está habilitada para continuar');return;}
   wData.precio_entrada=precio;
