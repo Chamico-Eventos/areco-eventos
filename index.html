@@ -346,6 +346,13 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:rgba(201,168,76,0.4)}
 .form-select option{background:var(--s2)}
 .form-textarea{resize:vertical;min-height:70px}
+/* Force date picker icon to be visible */
+input[type="date"].date-input-gold::-webkit-calendar-picker-indicator{
+  filter:invert(1) sepia(1) saturate(3) hue-rotate(5deg) brightness(1.2);
+  cursor:pointer;
+  width:20px;height:20px;
+  opacity:0.9;
+}
 .form-hint{font-size:10px;color:var(--muted);line-height:1.5;margin-top:2px}
 .form-section{font-size:10px;font-weight:600;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;padding-top:6px;border-top:1px solid var(--b2)}
 .form-submit{width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0e0d0b;border:none;border-radius:10px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px;transition:filter .2s}
@@ -2214,9 +2221,11 @@ function renderW3(f){
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Fecha de inicio <span>*</span></label>
-        <input class="form-input" id="w-fecha-ini" type="date" value="${wData.fecha||''}"
-          style="font-size:15px;padding:12px;color:var(--ink);background:var(--s2);border:2px solid rgba(201,168,76,0.35);cursor:pointer"
-          onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(201,168,76,0.35)'">
+        <div style="position:relative">
+          <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none;z-index:1">📅</span>
+          <input class="form-input date-input-gold" id="w-fecha-ini" type="date" value="${wData.fecha||''}"
+            style="font-size:15px;padding:12px 12px 12px 42px;color:var(--ink);background:var(--s2);border:2px solid rgba(201,168,76,0.5);cursor:pointer">
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label">Hora de inicio <span>*</span></label>
@@ -2228,9 +2237,11 @@ function renderW3(f){
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Fecha de fin</label>
-        <input class="form-input" id="w-fecha-fin" type="date" value="${wData.fecha_fin||''}"
-          style="font-size:15px;padding:12px;color:var(--ink);background:var(--s2);border:2px solid rgba(255,255,255,0.1);cursor:pointer"
-          onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+        <div style="position:relative">
+          <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none;z-index:1">📅</span>
+          <input class="form-input date-input-gold" id="w-fecha-fin" type="date" value="${wData.fecha_fin||''}"
+            style="font-size:15px;padding:12px 12px 12px 42px;color:var(--ink);background:var(--s2);border:2px solid rgba(255,255,255,0.15);cursor:pointer">
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label">Hora de fin</label>
