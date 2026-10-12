@@ -1961,14 +1961,17 @@ function simpleNext(){
   const cat=document.getElementById('f-cat')?.value;
   const contacto=document.getElementById('f-contacto')?.value.trim();
   const email=document.getElementById('f-email')?.value.trim();
-  if(!nombre||!fecha||!lugar||!cat||!contacto||!email){
-    if(errEl){errEl.textContent='Por favor completá los campos obligatorios (*)';errEl.style.display='block';}
-    return;
-  }
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-    if(errEl){errEl.textContent='El email no parece válido';errEl.style.display='block';}
-    return;
-  }
+  const telRaw=document.getElementById('f-tel')?.value.trim();
+  const highlight=(id)=>{const el=document.getElementById(id);if(el)el.style.borderColor='rgba(192,90,74,0.7)';};
+  const showErr=(msg)=>{if(errEl){errEl.textContent=msg;errEl.style.display='block';}};
+  if(!nombre){highlight('f-nombre');showErr('Ingresá el nombre del evento');return;}
+  if(!fecha){highlight('f-fecha');showErr('Seleccioná la fecha del evento');return;}
+  if(!lugar){highlight('f-lugar-sel');showErr('Seleccioná el venue');return;}
+  if(!cat){highlight('f-cat');showErr('Seleccioná una categoría');return;}
+  if(!contacto){highlight('f-contacto');showErr('Ingresá tu nombre');return;}
+  if(!email){highlight('f-email');showErr('Ingresá tu email');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){highlight('f-email');showErr('El email no parece válido (ej: nombre@gmail.com)');return;}
+  if(telRaw&&telRaw.length<10){highlight('f-tel');showErr('El teléfono debe tener 10 dígitos si lo ingresás');return;}
   // Save data
   wData.nombre=nombre;
   wData.fecha=fecha;
@@ -1981,8 +1984,7 @@ function simpleNext(){
   wData.link_fuente=document.getElementById('f-link')?.value.trim()||'';
   wData.contacto_nombre=contacto;
   wData.contacto_email=email;
-  const tel=document.getElementById('f-tel')?.value.trim();
-  wData.contacto_tel=tel?'+549'+tel:'';
+  wData.contacto_tel=telRaw?'+549'+telRaw:'';
   wizardStep=2;
   renderStep();
 }
@@ -2102,11 +2104,11 @@ function renderW1(f){
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Tu nombre <span>*</span></label>
-        <input class="form-input" id="w-contacto" placeholder="Nombre completo" value="${wData.contacto_nombre||''}">
+        <input class="form-input" id="w-contacto" placeholder="Nombre completo" value="${wData.contacto_nombre||''}" oninput="this.style.borderColor=''">
       </div>
       <div class="form-group">
         <label class="form-label">Email <span>*</span></label>
-        <input class="form-input" id="w-email" type="email" autocomplete="email" placeholder="tu@email.com" value="${wData.contacto_email||''}">
+        <input class="form-input" id="w-email" type="email" autocomplete="email" placeholder="tu@email.com" value="${wData.contacto_email||''}" oninput="this.style.borderColor=''">
       </div>
     </div>
     <div class="form-group">
@@ -2129,8 +2131,11 @@ function w1Next(){
   const contacto=document.getElementById('w-contacto')?.value.trim();
   const email=document.getElementById('w-email')?.value.trim();
   const tel=document.getElementById('f-tel')?.value.trim();
-  if(!contacto||!email||!tel||tel.length<10){wErr('Por favor completá todos los campos');return;}
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){wErr('El email no parece válido');return;}
+  const highlight=(id)=>{const el=document.getElementById(id);if(el)el.style.borderColor='rgba(192,90,74,0.7)';};
+  if(!contacto){highlight('w-contacto');wErr('Ingresá tu nombre');return;}
+  if(!email){highlight('w-email');wErr('Ingresá tu email');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){highlight('w-email');wErr('El email no parece válido (ej: nombre@gmail.com)');return;}
+  if(!tel||tel.length<10){highlight('f-tel');wErr('El teléfono debe tener 10 dígitos');return;}
   wData.contacto_nombre=contacto;wData.contacto_email=email;wData.contacto_tel='+549'+tel;
   wizardStep=2;renderStep();
 }
@@ -2201,7 +2206,11 @@ function w2Next(){
   const desc=document.getElementById('w-desc')?.value.trim();
   const lugar=getLugar();
   const cat=document.getElementById('w-cat')?.value;
-  if(!nombre||!desc||!lugar||!cat){wErr('Por favor completá los campos obligatorios');return;}
+  const highlight=(id)=>{const el=document.getElementById(id);if(el)el.style.borderColor='rgba(192,90,74,0.7)';};
+  if(!nombre){highlight('w-nombre');wErr('Ingresá el nombre del evento');return;}
+  if(!desc){highlight('w-desc');wErr('Ingresá una descripción');return;}
+  if(!lugar){highlight('f-lugar-sel');wErr('Seleccioná el venue');return;}
+  if(!cat){highlight('w-cat');wErr('Seleccioná una categoría');return;}
   wData.nombre=nombre;
   wData.subtitulo=document.getElementById('w-subtitulo')?.value.trim()||'';
   wData.descripcion=desc;
@@ -2282,7 +2291,9 @@ function addFuncion(){
 function w3Next(){
   const fechaIni=document.getElementById('w-fecha-ini')?.value;
   const horaIni=document.getElementById('w-hora-ini')?.value;
-  if(!fechaIni||!horaIni){wErr('La fecha y hora de inicio son obligatorias');return;}
+  const highlight=(id)=>{const el=document.getElementById(id);if(el)el.style.borderColor='rgba(192,90,74,0.7)';};
+  if(!fechaIni){highlight('w-fecha-ini');wErr('Seleccioná la fecha de inicio');return;}
+  if(!horaIni){highlight('w-hora-ini');wErr('Ingresá la hora de inicio');return;}
   wData.fecha=fechaIni;
   wData.hora=horaIni;
   wData.fecha_fin=document.getElementById('w-fecha-fin')?.value||'';
@@ -2327,7 +2338,8 @@ function renderW4(f){
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Email de Mercado Pago <span>*</span></label>
-        <input class="form-input" id="w-mp-email" type="email" autocomplete="email" placeholder="tu@email.com" value="${wData.mp_email||''}">
+        <input class="form-input" id="w-mp-email" type="email" autocomplete="email" placeholder="tu@email.com" value="${wData.mp_email||''}"
+          oninput="this.style.borderColor=''">
       </div>
     </div>
     <div class="form-row">
@@ -2447,6 +2459,10 @@ function w4Next(){
   if(!precio||!stock||!mpEmail||!mpAlias||!mpTitular||!mpCuit||!mpTelRaw){
     wErr('Por favor completá todos los campos');return;
   }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mpEmail)){
+    document.getElementById('w-mp-email')?.style.setProperty('border-color','rgba(192,90,74,0.7)');
+    wErr('Ingresá un email válido (ej: nombre@gmail.com)');return;
+  }
   if(mpCuit.replace(/[^0-9]/g,'').length!==11){
     const cuitEl=document.getElementById('w-mp-cuit');
     if(cuitEl) cuitEl.style.borderColor='rgba(192,90,74,0.7)';
@@ -2541,8 +2557,11 @@ function w4TransferNext(){
   const stock=document.getElementById('w-stock')?.value;
   const alias=document.getElementById('w-trf-alias')?.value.trim();
   const telRaw=document.getElementById('w-trf-tel')?.value.trim();
-  if(!precio||!stock||!alias||!telRaw){wErr('Por favor completá todos los campos');return;}
-  if(telRaw.length<10){wErr('El WhatsApp debe tener 10 dígitos');return;}
+  const highlight=(id)=>{const el=document.getElementById(id);if(el)el.style.borderColor='rgba(192,90,74,0.7)';};
+  if(!precio){highlight('w-precio');wErr('Ingresá el precio de la entrada');return;}
+  if(!stock){highlight('w-stock');wErr('Ingresá el stock de entradas');return;}
+  if(!alias){highlight('w-trf-alias');wErr('Ingresá tu alias de Mercado Pago');return;}
+  if(!telRaw||telRaw.length<10){highlight('w-trf-tel');wErr('El WhatsApp debe tener 10 dígitos');return;}
   wData.precio_entrada=precio;
   wData.stock_entradas=stock;
   wData.mp_alias=alias;
