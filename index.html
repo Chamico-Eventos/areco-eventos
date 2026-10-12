@@ -1748,9 +1748,10 @@ function renderChoice(f){
           </div>
         </div>
         <div class="choice-card-desc">
+          <span style="display:inline-block;background:rgba(76,168,122,0.15);border:1px solid rgba(76,168,122,0.4);border-radius:999px;padding:2px 10px;font-size:10px;font-weight:700;color:#4ca87a;letter-spacing:.06em;margin-bottom:8px">⚡ SIN ESFUERZO</span><br>
           ✅ Los compradores pagan online — vos no tocás nada<br>
           ✅ Recibís la lista de asistentes antes del evento<br>
-          ✅ QR en la puerta para ventas sin efectivo<br>
+          ✅ DM provee un QR del evento para ventas en la puerta — el comprador paga desde su celular, sin efectivo, sin caja<br>
           ✅ El dinero llega directo a tu cuenta MP en 10 días hábiles
           <div style="margin-top:9px;padding:8px 10px;background:rgba(201,168,76,0.07);border-radius:7px;border:1px solid rgba(201,168,76,0.15);font-size:11px;line-height:1.7">
             <strong style="color:var(--ink)">Ejemplo entrada $10.000:</strong><br>
@@ -1771,17 +1772,18 @@ function renderChoice(f){
           </div>
         </div>
         <div class="choice-card-desc">
+          <span style="display:inline-block;background:rgba(90,159,212,0.15);border:1px solid rgba(90,159,212,0.4);border-radius:999px;padding:2px 10px;font-size:10px;font-weight:700;color:#5a9fd4;letter-spacing:.06em;margin-bottom:8px">🔧 ESFUERZO MÍNIMO</span><br>
           ✅ Los compradores transfieren al alias de DataManIAcs<br>
           ✅ DM verifica cada comprobante y te mantiene informado<br>
-          ✅ QR en la puerta — el ingresador solo mira el comprobante<br>
+          ✅ DM provee un QR del evento para la puerta — el ingresador verifica el comprobante en pantalla<br>
           ✅ Al día siguiente del evento recibís tu parte en tu alias
           <div style="margin-top:9px;padding:8px 10px;background:rgba(90,159,212,0.07);border-radius:7px;border:1px solid rgba(90,159,212,0.15);font-size:11px;line-height:1.7">
             <strong style="color:var(--ink)">Ejemplo entrada $10.000:</strong><br>
             🧾 Comprador paga <strong style="color:var(--ink)">$10.300</strong> <span style="color:var(--muted)">(+3% cargo por servicio al comprador)</span><br>
-            💰 Vos recibís <strong style="color:#4ca87a">$9.600</strong> <span style="color:var(--muted)">(−4% cargo DM del precio fijado)</span>
+            💰 Vos recibís <strong style="color:#4ca87a">$9.600</strong> al día siguiente del evento <span style="color:var(--muted)">(−4% cargo DM del precio fijado)</span>
           </div>
           <div style="margin-top:7px;font-size:11px;color:var(--muted)">Sin MP necesario · DM trackea manualmente · Pago al día siguiente del evento</div>
-          <div style="margin-top:5px;font-size:11px;color:rgba(232,156,45,0.7)">⚠ En la puerta cada ingresador verifica el comprobante de transferencia manualmente — puede generar demoras en eventos con mucha gente</div>
+          <div style="margin-top:5px;font-size:11px;color:rgba(232,156,45,0.7)">⚠ La verificación del comprobante en la puerta es manual — puede generar demoras en eventos con mucha gente</div>
         </div>
       </div>
 
@@ -1795,10 +1797,11 @@ function renderChoice(f){
           </div>
         </div>
         <div class="choice-card-desc">
+          <span style="display:inline-block;background:rgba(192,90,74,0.15);border:1px solid rgba(192,90,74,0.4);border-radius:999px;padding:2px 10px;font-size:10px;font-weight:700;color:#c05a4a;letter-spacing:.06em;margin-bottom:8px">💪 MÁXIMO ESFUERZO</span><br>
           📌 Tu evento aparece en el mapa con tu link o alias propio<br>
           📌 Ideal para eventos gratuitos o con cobro ya gestionado<br>
           📌 DM no interviene en la venta ni en el seguimiento
-          <div style="margin-top:7px;font-size:11px;color:var(--muted)">⚠ Implica mayor esfuerzo: vos manejás la venta, los comprobantes y la lista de asistentes · No recomendado si tenés cobro de entrada</div>
+          <div style="margin-top:7px;font-size:11px;color:var(--muted)">⚠ Vos manejás la venta, los comprobantes y la lista de asistentes — no recomendado si tenés cobro de entrada</div>
         </div>
       </div>
 
@@ -2211,21 +2214,29 @@ function renderW3(f){
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Fecha de inicio <span>*</span></label>
-        <input class="form-input" id="w-fecha-ini" type="date" value="${wData.fecha||''}">
+        <input class="form-input" id="w-fecha-ini" type="date" value="${wData.fecha||''}"
+          style="font-size:15px;padding:12px;color:var(--ink);background:var(--s2);border:2px solid rgba(201,168,76,0.35);cursor:pointer"
+          onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(201,168,76,0.35)'">
       </div>
       <div class="form-group">
         <label class="form-label">Hora de inicio <span>*</span></label>
-        <input class="form-input" id="w-hora-ini" type="text" placeholder="21:00" maxlength="5" oninput="autoFormatTime(this)" value="${wData.hora||''}">
+        <input class="form-input" id="w-hora-ini" type="text" placeholder="21:00" maxlength="5"
+          style="font-size:15px;padding:12px"
+          oninput="autoFormatTime(this)" value="${wData.hora||''}">
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Fecha de fin</label>
-        <input class="form-input" id="w-fecha-fin" type="date" value="${wData.fecha_fin||''}">
+        <input class="form-input" id="w-fecha-fin" type="date" value="${wData.fecha_fin||''}"
+          style="font-size:15px;padding:12px;color:var(--ink);background:var(--s2);border:2px solid rgba(255,255,255,0.1);cursor:pointer"
+          onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
       </div>
       <div class="form-group">
         <label class="form-label">Hora de fin</label>
-        <input class="form-input" id="w-hora-fin" type="text" placeholder="02:00" maxlength="5" oninput="autoFormatTime(this)" value="${wData.hora_fin||''}">
+        <input class="form-input" id="w-hora-fin" type="text" placeholder="02:00" maxlength="5"
+          style="font-size:15px;padding:12px"
+          oninput="autoFormatTime(this)" value="${wData.hora_fin||''}">
       </div>
     </div>
     ${showMulti?`
@@ -2265,9 +2276,11 @@ function w3Next(){
   wData.hora=horaIni;
   wData.fecha_fin=document.getElementById('w-fecha-fin')?.value||'';
   wData.hora_fin=document.getElementById('w-hora-fin')?.value||'';
-  const fmtDT=(f,h)=>f&&h?`${f.split('-').reverse().join('/')} ${h}`:'';
-  wData.funcion_inicio=fmtDT(fechaIni,horaIni);
-  wData.funcion_fin=fmtDT(wData.fecha_fin,wData.hora_fin);
+  // Store raw ISO dates — submitWizard converts to mm/dd/yyyy for the sheet
+  wData.funcion_inicio_raw=fechaIni;
+  wData.funcion_inicio_hora=horaIni;
+  wData.funcion_fin_raw=wData.fecha_fin;
+  wData.funcion_fin_hora=wData.hora_fin;
   wData.funciones_extra=funcionesExtra.length?JSON.stringify(funcionesExtra):'';
   wizardStep=4;renderStep();
 }
@@ -2323,7 +2336,7 @@ function renderW4(f){
       <div style="display:flex;align-items:center;background:var(--s2);border:1px solid var(--b2);border-radius:8px;overflow:hidden">
         <input id="w-mp-alias" class="form-input" placeholder="juan.eventos.mp" style="border:none;background:none" value="${wData.mp_alias||''}">
       </div>
-      <div class="form-hint">Preferí el alias (ej: juan.eventos.mp) — si no tenés, usá el CVU de 22 dígitos</div>
+      <div class="form-hint">Acá es donde te llegan los pagos — 10 días hábiles después de cada compra, según política de Mercado Pago · Preferí el alias al CVU</div>
     </div>
     <div class="form-group">
       <label class="form-label">Teléfono de contacto MP <span>*</span></label>
@@ -2595,7 +2608,7 @@ function renderW6(f){
       <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Resumen del evento</div>
       <div>🎟 <strong>${wData.nombre||'-'}</strong></div>
       <div>📍 ${wData.lugar||'-'} · ${wData.categoria||'-'}</div>
-      <div>📅 ${wData.funcion_inicio||'-'}</div>
+      <div>📅 ${wData.funcion_inicio_raw&&wData.funcion_inicio_hora?wData.funcion_inicio_raw.split('-').reverse().join('/')+' '+wData.funcion_inicio_hora:'-'}</div>
       <div>💰 Entrada $${precio.toLocaleString('es-AR')} · Stock ${wData.stock_entradas||'-'}</div>
       <div style="margin-top:6px;font-size:11px;color:var(--muted)">
         Comprador paga $${comprador} · Vos recibís $${recibis}
@@ -2655,9 +2668,10 @@ async function submitWizard(){
   const fechaFmt=`${m}/${d}/${y}`;
   const horaFmt=wData.hora?wData.hora.slice(0,5):'Todo el día';
 
-  const fmtDT=(fecha,hora)=>{
-    if(!fecha||!hora)return'';
-    const [fy,fm,fd]=fecha.split('-');
+  // Convert ISO date yyyy-mm-dd + time hh:mm → mm/dd/yyyy hh:mm for Sheets
+  const fmtDT=(isoDate,hora)=>{
+    if(!isoDate||!hora)return'';
+    const [fy,fm,fd]=isoDate.split('-');
     return`${fm}/${fd}/${fy} ${hora.slice(0,5)}`;
   };
 
@@ -2691,8 +2705,8 @@ async function submitWizard(){
     mp_titular:wData.mp_titular||'',
     mp_cuit:wData.mp_cuit||'',
     mp_telefono:wData.mp_telefono||'',
-    funcion_inicio:wData.funcion_inicio||'',
-    funcion_fin:wData.funcion_fin||'',
+    funcion_inicio:fmtDT(wData.funcion_inicio_raw,wData.funcion_inicio_hora),
+    funcion_fin:fmtDT(wData.funcion_fin_raw,wData.funcion_fin_hora),
     funciones_extra:wData.funciones_extra||'',
     tipo_evento:'Presencial',
     flyer_nombre_sugerido:flyerName,
