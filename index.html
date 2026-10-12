@@ -2049,7 +2049,7 @@ async function submitSimple(){
   };
 
   try{
-    await fetch(AS_SUBMIT,{method:'POST',body:JSON.stringify(payload),headers:{'Content-Type':'text/plain'},mode:'no-cors'});
+    await fetch(AS_SUBMIT,{method:'POST',body:JSON.stringify(payload),headers:{'Content-Type':'application/json'},mode:'no-cors'});
     const flyerOk=!!flyerBase64;
     document.getElementById('subForm').innerHTML=`
       <div class="form-success">
@@ -2727,7 +2727,7 @@ async function submitWizard(){
   };
 
   try{
-    await fetch(AS_SUBMIT,{method:'POST',body:JSON.stringify(payload),headers:{'Content-Type':'text/plain'},mode:'no-cors'});
+    await fetch(AS_SUBMIT,{method:'POST',body:JSON.stringify(payload),headers:{'Content-Type':'application/json'},mode:'no-cors'});
     document.getElementById('subForm').innerHTML=`
       <div class="form-success">
         <div class="form-success-icon">🎉</div>
