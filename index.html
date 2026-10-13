@@ -1741,7 +1741,8 @@ function renderChoice(f){
   setModalTitle('Agregá tu evento','San Antonio de Areco · DataManIAcs');
   f.innerHTML=`
     <div style="font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:4px">
-      Agregar tu evento es <strong style="color:var(--gold)">gratis</strong>. Elegí cómo querés gestionar las entradas:
+      Agregar tu evento es <strong style="color:var(--gold)">gratis</strong>, con la posibilidad de hacer una colaboración opcional al final si el proyecto te suma valor.<br><br>
+      <span style="font-size:15px;font-weight:700;color:var(--ink)">¿Cómo querés gestionar las entradas?</span>
     </div>
     <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
 
@@ -1808,7 +1809,7 @@ function renderChoice(f){
           📌 Tu evento aparece en el mapa con tu link o alias propio<br>
           📌 Ideal para eventos gratuitos o con cobro ya gestionado<br>
           📌 DM no interviene en la venta ni en el seguimiento
-          <div style="margin-top:7px;font-size:11px;color:var(--muted)">⚠ Vos manejás la venta, los comprobantes y la lista de asistentes — no recomendado si tenés cobro de entrada</div>
+          <div style="margin-top:7px;font-size:11px;color:var(--muted)">⚠ Vos manejás la venta, los comprobantes y la lista de asistentes — no recomendado si tenés cobro de entrada ni si esperás mucha gente</div>
         </div>
       </div>
 
@@ -2698,7 +2699,7 @@ function colaboracionBlock(){
       onclick="document.getElementById('w-colab').checked=true"
       style="display:inline-flex;align-items:center;justify-content:center;
              padding:6px 8px;border-radius:7px;border:1px solid rgba(201,168,76,0.3);
-             background:rgba(201,168,76,0.08);color:var(--gold);font-size:11px;
+             background:rgba(201,168,76,0.08);color:var(--gold);font-size:10px;
              font-weight:600;text-decoration:none;transition:all 0.15s;white-space:nowrap"
       onmouseover="this.style.background='rgba(201,168,76,0.2)';this.style.borderColor='rgba(201,168,76,0.7)'"
       onmouseout="this.style.background='rgba(201,168,76,0.08)';this.style.borderColor='rgba(201,168,76,0.3)'"
