@@ -837,7 +837,7 @@
     "activo": "true",
     "fecha_scrape": "09/16/2026",
     "tipo_fuente": "Scrape",
-    "ultima_actualizacion": "10/12/2026",
+    "ultima_actualizacion": "10/13/2026",
     "validacion": "",
     "ticket_service": "",
     "precio_entrada": "",
@@ -854,7 +854,7 @@
     "subtitulo": "",
     "tipo_evento": "",
     "mp_conectado": "",
-    "modelo_venta": "free",
+    "modelo_venta": "",
     "colaboracion": ""
   },
   {
@@ -1227,7 +1227,7 @@
     "activo": "true",
     "fecha_scrape": "10/12/2026",
     "tipo_fuente": "Scrape",
-    "ultima_actualizacion": "10/12/2026",
+    "ultima_actualizacion": "10/13/2026",
     "validacion": "",
     "ticket_service": "",
     "precio_entrada": "",
@@ -1244,7 +1244,7 @@
     "subtitulo": "",
     "tipo_evento": "",
     "mp_conectado": "",
-    "modelo_venta": "free",
+    "modelo_venta": "",
     "colaboracion": ""
   }
 ]
