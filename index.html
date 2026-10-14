@@ -1840,11 +1840,15 @@ function renderSimpleStep(f, step){
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Fecha <span>*</span></label>
-          <input class="form-input" id="f-fecha" type="date" value="${wData.fecha||''}">
+          <div style="position:relative">
+            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none;z-index:1">📅</span>
+            <input class="form-input date-input-gold" id="f-fecha" type="date" value="${wData.fecha||''}"
+              style="font-size:15px;padding:12px 12px 12px 42px;color:var(--ink);background:var(--s2);border:2px solid rgba(201,168,76,0.35);cursor:pointer">
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label">Hora</label>
-          <input class="form-input" id="f-hora" type="text" placeholder="21:30" maxlength="5" oninput="autoFormatTime(this)" value="${wData.hora||''}">
+          <input class="form-input" id="f-hora" type="text" placeholder="21:30" maxlength="5" style="font-size:15px;padding:12px" oninput="autoFormatTime(this)" value="${wData.hora||''}">
         </div>
       </div>
       <div class="form-row">
@@ -1858,7 +1862,7 @@ function renderSimpleStep(f, step){
         </div>
         <div class="form-group">
           <label class="form-label">Categoría <span>*</span></label>
-          <select class="form-select" id="f-cat">
+          <select class="form-select" id="f-cat" onchange="wData.categoria=this.value;showPrecioSugerido('precio-sugerido-simple')">
             <option value="">Seleccioná...</option>
             <option>Música</option><option>Arte</option><option>Tradición</option>
             <option>Cultural</option><option>Gastronomía</option><option>Deportes</option>
@@ -1875,6 +1879,7 @@ function renderSimpleStep(f, step){
         <div class="form-group">
           <label class="form-label">Precio</label>
           <input class="form-input" id="f-precio" placeholder="Gratis · $5.000 · Consultar" value="${wData.precio||''}">
+          <div id="precio-sugerido-simple" style="font-size:11px;margin-top:4px;min-height:16px"></div>
         </div>
         <div class="form-group">
           <label class="form-label">Link de más info</label>
@@ -2301,6 +2306,18 @@ function w3Next(){
   const highlight=(id)=>{const el=document.getElementById(id);if(el)el.style.borderColor='rgba(192,90,74,0.7)';};
   if(!fechaIni){highlight('w-fecha-ini');wErr('Seleccioná la fecha de inicio');return;}
   if(!horaIni){highlight('w-hora-ini');wErr('Ingresá la hora de inicio');return;}
+  const fechaFin=document.getElementById('w-fecha-fin')?.value;
+  const horaFin=document.getElementById('w-hora-fin')?.value;
+  if(fechaFin&&horaFin&&horaIni){
+    const dtIni=new Date(`${fechaIni}T${horaIni}`);
+    const dtFin=new Date(`${fechaFin}T${horaFin}`);
+    if(dtFin<=dtIni){
+      highlight('w-fecha-fin');highlight('w-hora-fin');
+      wErr('La fecha y hora de fin debe ser posterior a la de inicio');return;
+    }
+  } else if(fechaFin&&fechaIni&&fechaFin<fechaIni){
+    highlight('w-fecha-fin');wErr('La fecha de fin no puede ser anterior a la de inicio');return;
+  }
   wData.fecha=fechaIni;
   wData.hora=horaIni;
   wData.fecha_fin=document.getElementById('w-fecha-fin')?.value||'';
@@ -2450,9 +2467,9 @@ function showPrecioSugerido(elId){
       <span id="${tipId}-btn"
         onclick="(function(e){e.stopPropagation();var t=document.getElementById('${tipId}');t.style.display=t.style.display==='none'?'block':'none';})(event)"
         style="display:inline-flex;align-items:center;justify-content:center;
-               width:18px;height:18px;border-radius:50%;
+               width:22px;height:22px;border-radius:50%;
                background:linear-gradient(135deg,#c9a84c,#e8c97a);
-               color:#0e0d0b;font-size:11px;font-weight:800;
+               color:#0e0d0b;font-size:13px;font-weight:800;
                cursor:pointer;flex-shrink:0;box-shadow:0 0 6px rgba(201,168,76,0.5);
                animation:pulse-tip 2s ease-in-out infinite"
         title="Ver consejo de precio">ⓘ</span>
