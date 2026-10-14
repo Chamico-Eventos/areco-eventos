@@ -346,6 +346,12 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:rgba(201,168,76,0.4)}
 .form-select option{background:var(--s2)}
 .form-textarea{resize:vertical;min-height:70px}
+/* Precio sugerido tip animations */
+@keyframes pulse-tip{
+  0%,100%{box-shadow:0 0 6px rgba(201,168,76,0.5);}
+  50%{box-shadow:0 0 12px rgba(201,168,76,0.9),0 0 20px rgba(201,168,76,0.3);}
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 /* Force date picker icon to be visible */
 input[type="date"].date-input-gold::-webkit-calendar-picker-indicator{
   filter:invert(1) sepia(1) saturate(3) hue-rotate(5deg) brightness(1.2);
@@ -2334,7 +2340,8 @@ function renderW4(f){
         <input class="form-input" id="w-stock" type="number" min="1" placeholder="200" value="${wData.stock_entradas||''}">
       </div>
     </div>
-    <div id="fee-preview" style="font-size:12px;color:var(--muted);margin-top:-8px;margin-bottom:8px;min-height:18px"></div>
+    <div id="fee-preview" style="font-size:12px;color:var(--muted);margin-top:-8px;margin-bottom:4px;min-height:18px"></div>
+    <div id="precio-sugerido-mp" style="font-size:11px;color:rgba(201,168,76,0.8);margin-bottom:10px;min-height:16px"></div>
     <div class="form-section">Datos de Mercado Pago para el pago</div>
     <div class="form-row">
       <div class="form-group">
@@ -2400,6 +2407,7 @@ function renderW4(f){
       <button class="btn-next" onclick="w4Next()">Siguiente →</button>
     </div>`;
   calcFee();
+  showPrecioSugerido('precio-sugerido-mp');
 }
 function calcFee(){
   const precio=parseFloat(document.getElementById('w-precio')?.value)||0;
@@ -2413,6 +2421,50 @@ function calcFee(){
     prev.textContent='';
   }
 }
+// ── Precios sugeridos por categoría (DataManIAcs research) ───
+const PRECIO_SUGERIDO = {
+  'Música':      { min:15000, max:25000, tip:'Las bandas en vivo tienen más convocatoria con preventa. Precio bajo llena el lugar pero achica lo que le queda al artista. No subestimes el precio — el público lo valora y asocia precio con calidad del evento.' },
+  'Teatro':      { min:15000, max:30000, tip:'El teatro y stand up en provincia funciona bien con precio fijo sin consumición. Estos eventos llevan producciones costosas y suelen ser más caros que en el interior.' },
+  'Tradición':   { min:8000,  max:20000, tip:'Los eventos de tradición suelen tener público fidelizado — no subestimes el precio, el público lo valora.' },
+  'Arte':        { min:10000, max:15000, tip:'Los eventos de arte tienen menor volumen de público. Un precio justo sostiene al artista y al espacio.' },
+  'Cultural':    { min:10000, max:15000, tip:'Si el evento tiene auspiciantes o subsidios, podés bajar el precio al público sin afectar al organizador.' },
+  'Gastronomía': { min:10000, max:60000, tip:'Los eventos gastronómicos incluyen producto — el precio debe cubrir el costo de lo que se sirve más el evento.' },
+  'Deportes':    { min:5000,  max:15000, tip:'El precio depende mucho de si hay infraestructura o transporte incluido. Consideralo al fijar el valor.' },
+  'Infantil':    { min:5000,  max:10000, tip:'El público infantil viene con adultos — precio accesible para chicos con entrada completa para adultos es una buena combinación.' },
+  'Feria':       { min:5000,  max:10000, tip:'Las ferias funcionan mejor con entrada libre o precio muy accesible — el ingreso real está en los puestos.' },
+  'Solidario':   { min:5000,  max:10000, tip:'Siendo solidario, la transparencia es clave — indicá a dónde va la recaudación en la descripción del evento.' },
+  'Evento':      { min:10000, max:15000, tip:'Un precio bien pensado genera más confianza que uno muy bajo. El público asocia precio con calidad del evento.' },
+};
+
+function showPrecioSugerido(elId){
+  const el=document.getElementById(elId);
+  if(!el)return;
+  const cat=wData.categoria||'';
+  const s=PRECIO_SUGERIDO[cat];
+  if(!s){el.innerHTML='';return;}
+  const fmt=n=>'$'+n.toLocaleString('es-AR');
+  const tipId='ps-tip-'+elId;
+  el.innerHTML=`
+    <span style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap">
+      <span style="color:rgba(201,168,76,0.9)">💡 <strong style="color:var(--gold)">Precio sugerido para ${cat}:</strong> ${fmt(s.min)} – ${fmt(s.max)}</span>
+      <span id="${tipId}-btn"
+        onclick="(function(e){e.stopPropagation();var t=document.getElementById('${tipId}');t.style.display=t.style.display==='none'?'block':'none';})(event)"
+        style="display:inline-flex;align-items:center;justify-content:center;
+               width:18px;height:18px;border-radius:50%;
+               background:linear-gradient(135deg,#c9a84c,#e8c97a);
+               color:#0e0d0b;font-size:11px;font-weight:800;
+               cursor:pointer;flex-shrink:0;box-shadow:0 0 6px rgba(201,168,76,0.5);
+               animation:pulse-tip 2s ease-in-out infinite"
+        title="Ver consejo de precio">ⓘ</span>
+    </span>
+    <div id="${tipId}" style="display:none;margin-top:7px;padding:10px 12px;
+      background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);
+      border-radius:8px;font-size:12px;color:var(--ink2);line-height:1.6;
+      animation:fadeIn 0.2s ease">
+      ${s.tip}
+    </div>`;
+}
+
 function toggleMpHelp(e){
   e.stopPropagation();
   const el=document.getElementById('mp-help');
@@ -2509,7 +2561,8 @@ function renderW4Transfer(f){
         <input class="form-input" id="w-stock" type="number" min="1" placeholder="100" value="${wData.stock_entradas||''}">
       </div>
     </div>
-    <div id="fee-preview-trf" style="font-size:12px;color:var(--muted);margin-top:-8px;margin-bottom:8px;min-height:18px"></div>
+    <div id="fee-preview-trf" style="font-size:12px;color:var(--muted);margin-top:-8px;margin-bottom:4px;min-height:18px"></div>
+    <div id="precio-sugerido-trf" style="font-size:11px;color:rgba(201,168,76,0.8);margin-bottom:10px;min-height:16px"></div>
     <div class="form-section">Tus datos para el pago</div>
     <div class="form-group">
       <label class="form-label">Tu alias de Mercado Pago <span>*</span></label>
@@ -2540,6 +2593,7 @@ function renderW4Transfer(f){
       <button class="btn-next" onclick="w4TransferNext()">Siguiente →</button>
     </div>`;
   calcFeeTrf();
+  showPrecioSugerido('precio-sugerido-trf');
 }
 function calcFeeTrf(){
   const precio=parseFloat(document.getElementById('w-precio')?.value)||0;
