@@ -1132,7 +1132,7 @@
   },
   {
     "id": "sub_mv4ok2u7",
-    "fecha": "10/13/2026",
+    "fecha": "10/28/2026",
     "hora": "21:00",
     "nombre": "MP Checkout Test 3",
     "categoria": "Música",
@@ -1171,7 +1171,7 @@
   },
   {
     "id": "sub_mv4pt359",
-    "fecha": "10/13/2026",
+    "fecha": "10/28/2026",
     "hora": "22:00",
     "nombre": "Event Trasf Test",
     "categoria": "Música",
@@ -1189,7 +1189,7 @@
     "fecha_scrape": "",
     "tipo_fuente": "Manual",
     "ultima_actualizacion": "10/12/2026",
-    "validacion": "Publicado",
+    "validacion": "Pendiente",
     "ticket_service": "true",
     "precio_entrada": "50",
     "stock_entradas": "100",
