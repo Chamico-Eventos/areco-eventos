@@ -810,54 +810,137 @@ const API_EVENTOS = '/events.json';
 const CENTER     = [-34.2455, -59.4743];
 
 const FALLBACK = {
-  'museo gauchesco ricardo güiraldes': [-34.2375156, -59.4814842],
-  'parque criollo r. güiraldes':       [-34.2375156, -59.4814842],
-  'parque criollo':                    [-34.2375156, -59.4814842],
-  'museo pulpería la blanqueada':      [-34.2378815, -59.4800224],
-  'pulpería la blanqueada':            [-34.2378815, -59.4800224],
-  'anfiteatro':                        [-34.2400011, -59.4741994],
-  'museo y taller de platería draghi': [-34.2429403, -59.4736440],
-  'museo de bellas artes osvaldo gasparini': [-34.2472360, -59.4688090],
-  'museo de arte la recova':           [-34.2436143, -59.4716535],
-  'museo municipal de artes plásticas':[-34.2423338, -59.4749494],
-  'el tokio':                          [-34.2440576, -59.4730776],
-  'el tokyo':                          [-34.2440576, -59.4730776],
-  'bar el tokio':                      [-34.2440576, -59.4730776],
-  'la cava del tokio':                 [-34.2440576, -59.4730776],
-  'zarza':                             [-34.2461088, -59.4732856],
-  'la esquina de merti':               [-34.2438571, -59.4728732],
-  'la vieja sodería':                  [-34.2444167, -59.4702866],
-  'el mitre':                          [-34.2442654, -59.4740480],
-  'la cervecería':                     [-34.2420898, -59.4722827],
-  'la martina de areco':               [-34.2462404, -59.4731138],
-  'valeria m':                         [-34.2455890, -59.4748322],
-  'ginkgo':                            [-34.2464285, -59.4749318],
-  'café del museo':                    [-34.2472576, -59.4756236],
-  'la arcadía':                        [-34.2413747, -59.4751053],
-  'viejo boliche bessonart':           [-34.2437733, -59.4715842],
-  'café de las artes':                 [-34.2418546, -59.4710754],
-  'la olla de cobre':                  [-34.2417476, -59.4727905],
-  'la posta de arequito':              [-34.2413719, -59.4757077],
-  'rossita':                           [-34.2464339, -59.4740702],
-  'el ancla':                          [-34.2538356, -59.4753577],
-  'lo de poly':                        [-34.2466611, -59.4644639],
-  'la calandria':                      [-34.2495356, -59.4618702],
-  'el rincón del asador':              [-34.2407100, -59.4714805],
-  'la costa de reyes':                 [-34.2415249, -59.4764466],
-  'la porfiada':                       [-34.2417804, -59.4710950],
-  'el rancho':                         [-34.2414750, -59.4761529],
-  'almacén de ramos generales':        [-34.2434839, -59.4716897],
-  'almacén de comidas areco':          [-34.2466667, -59.4719888],
-  'lo de tito':                        [-34.2417866, -59.4730475],
-  'restaurante histórico lacarra':     [-34.2592308, -59.4522913],
-  'lacarra':                           [-34.2592308, -59.4522913],
-  'la toldería "mercado & café"':      [-34.2586085, -59.4736853],
-  'galpón chamico':                    [-34.257616294453555, -59.481367011156955],
-  'plaza ruiz de arellano':            [-34.2455000, -59.4742000],
-  'costanera':                         [-34.2440000, -59.4800000],
-  'la matera':                         [-34.2460000, -59.4756000],
-  'salón guerrico':                    [-34.2453000, -59.4748000],
+  // ── Museos y cultura ──────────────────────────────────────
+  'museo gauchesco ricardo güiraldes':                    [-34.2375156, -59.4814842],
+  'parque criollo r. güiraldes':                          [-34.2375156, -59.4814842],
+  'parque criollo':                                       [-34.2375156, -59.4814842],
+  'museo pulpería la blanqueada':                         [-34.2378815, -59.4800224],
+  'pulpería la blanqueada':                               [-34.2378815, -59.4800224],
+  'museo y taller de platería draghi':                    [-34.2429403, -59.4736440],
+  'museo de bellas artes osvaldo gasparini':              [-34.2472360, -59.4688090],
+  'museo de arte la recova':                              [-34.2436143, -59.4716535],
+  'museo municipal de artes plásticas "juan bautista tapia"': [-34.2423338, -59.4749494],
+  'museo municipal de artes plásticas':                   [-34.2423338, -59.4749494],
+  'museo las lilas de areco':                             [-34.2430000, -59.4720000],
+  'cine teatro vieytes':                                  [-34.2450000, -59.4745000],
+  'anfiteatro':                                           [-34.2400011, -59.4741994],
+  // ── Bares y restaurantes ──────────────────────────────────
+  'el tokyo':                                             [-34.2440576, -59.4730776],
+  'el tokio':                                             [-34.2440576, -59.4730776],
+  'bar el tokio':                                         [-34.2440576, -59.4730776],
+  'la cava del tokio':                                    [-34.2440576, -59.4730776],
+  'bar san martín. bar histórico':                        [-34.2444000, -59.4738000],
+  'zarza':                                                [-34.2461088, -59.4732856],
+  'la esquina de merti':                                  [-34.2438571, -59.4728732],
+  'la vieja sodería':                                     [-34.2444167, -59.4702866],
+  'el mitre, bar histórico':                              [-34.2442654, -59.4740480],
+  'el mitre':                                             [-34.2442654, -59.4740480],
+  'la cervecería':                                        [-34.2420898, -59.4722827],
+  'la martina de areco':                                  [-34.2462404, -59.4731138],
+  'valeria m':                                            [-34.2455890, -59.4748322],
+  'ginkgo':                                               [-34.2464285, -59.4749318],
+  'café del museo':                                       [-34.2472576, -59.4756236],
+  'café y western union':                                 [-34.2455000, -59.4743000],
+  'la arcadía':                                           [-34.2413747, -59.4751053],
+  'viejo boliche bessonart':                              [-34.2437733, -59.4715842],
+  'café de las artes':                                    [-34.2418546, -59.4710754],
+  'la olla de cobre':                                     [-34.2417476, -59.4727905],
+  'la posta de arequito':                                 [-34.2413719, -59.4757077],
+  'rossita':                                              [-34.2464339, -59.4740702],
+  'el ancla':                                             [-34.2538356, -59.4753577],
+  'lo de poly':                                           [-34.2466611, -59.4644639],
+  'la calandria':                                         [-34.2495356, -59.4618702],
+  'el rincón del asador':                                 [-34.2407100, -59.4714805],
+  'la costa de reyes':                                    [-34.2415249, -59.4764466],
+  'la porfiada':                                          [-34.2417804, -59.4710950],
+  'el rancho':                                            [-34.2414750, -59.4761529],
+  'almacén de ramos generales':                           [-34.2434839, -59.4716897],
+  'almacén de comidas areco':                             [-34.2466667, -59.4719888],
+  'lo de tito':                                           [-34.2417866, -59.4730475],
+  'lacarra':                                              [-34.2592308, -59.4522913],
+  'restaurante histórico lacarra':                        [-34.2592308, -59.4522913],
+  'la toldería "mercado & café"':                         [-34.2586085, -59.4736853],
+  'prado español':                                        [-34.2458000, -59.4750000],
+  'leyenda urbana':                                       [-34.2447000, -59.4735000],
+  'maktub':                                               [-34.2453000, -59.4740000],
+  '1730 bar':                                             [-34.2441000, -59.4732000],
+  'cerdo rojo':                                           [-34.2449000, -59.4736000],
+  'zapiola bodegón areco':                                [-34.2462000, -59.4728000],
+  '"lo de co" boliche':                                   [-34.2456000, -59.4742000],
+  'la herradura | parrilla de campo':                     [-34.2500000, -59.4760000],
+  'aquiles pazzaglia':                                    [-34.2444000, -59.4730000],
+  'almacén de campo "el batará"':                         [-34.2510000, -59.4780000],
+  'raíces de cacao':                                      [-34.2448000, -59.4737000],
+  // ── Espacios y clubes ─────────────────────────────────────
+  'galpón chamico':                                       [-34.257616294453555, -59.481367011156955],
+  'club social el progreso':                              [-34.2445000, -59.4740000],
+  'centro de jubilados san antonio de areco':             [-34.2452000, -59.4745000],
+  'skala':                                                [-34.2442000, -59.4736000],
+  // ── Espacios públicos ─────────────────────────────────────
+  'plaza ruiz de arellano':                               [-34.2455000, -59.4742000],
+  'costanera':                                            [-34.2440000, -59.4800000],
+  'salón guerrico':                                       [-34.2453000, -59.4748000],
+  'la matera':                                            [-34.2460000, -59.4756000],
 };
+
+// ── Venue list for dropdown (exact Google names from Venues_Areco sheet) ──
+// Source: Venues_Areco tab · Nombre column · updated periodically
+const VENUE_LIST = [
+  'Zarza',
+  'Museo Gauchesco Ricardo Güiraldes',
+  'Museo y Taller de Platería Draghi',
+  'Museo de Bellas Artes Osvaldo Gasparini',
+  'Museo de Arte La Recova',
+  'Museo Pulpería La Blanqueada',
+  'El Tokyo',
+  'La Esquina de Merti',
+  'La Vieja Sodería',
+  'El Mitre, Bar Histórico',
+  'La Cervecería',
+  'La Martina de Areco',
+  'Valeria M',
+  'Ginkgo',
+  'Café del Museo',
+  'La Arcadía',
+  'Viejo Boliche Bessonart',
+  'Café de Las Artes',
+  'Anfiteatro',
+  'Café y Western Union',
+  'La Olla de Cobre',
+  'La Posta de Arequito',
+  'Rossita',
+  'El Ancla',
+  'Lo de Poly',
+  'La Calandria',
+  'El Rincón del Asador',
+  'La Costa de Reyes',
+  'La Porfiada',
+  'El Rancho',
+  'Almacén de Ramos Generales',
+  'Almacén de Comidas Areco',
+  'Museo Municipal de Artes Plásticas "Juan Bautista Tapia"',
+  'Lo de Tito',
+  'Lacarra',
+  'La Toldería "Mercado & Café"',
+  'Cine Teatro Vieytes',
+  'Galpón Chamico',
+  'Bar San Martín. Bar Histórico',
+  'Prado Español',
+  'LEYENDA URBANA',
+  'Maktub',
+  'Club Social El Progreso',
+  'Centro de jubilados San Antonio de Areco',
+  'Museo Las Lilas de Areco',
+  'Skala',
+  '1730 Bar',
+  'Cerdo Rojo',
+  'Zapiola Bodegón Areco',
+  '"Lo de Co" Boliche',
+  'La Herradura | Parrilla de Campo',
+  'Aquiles Pazzaglia',
+  'Almacén de Campo "El Batará"',
+  'Raíces de Cacao',
+];
 
 const I = '/images/';
 const CAT = {
@@ -1574,12 +1657,7 @@ function toTitleCase(str){
 function populateVenueDropdown(){
   const sel = document.getElementById('f-lugar-sel');
   if(!sel) return;
-  const seen = new Set();
-  const venues = Object.keys(FALLBACK)
-    .map(k => toTitleCase(k))
-    .filter(v => { if(seen.has(v)) return false; seen.add(v); return true; })
-    .sort();
-  venues.forEach(v => {
+  [...VENUE_LIST].sort((a,b)=>a.localeCompare(b,'es')).forEach(v => {
     const opt = document.createElement('option');
     opt.value = v; opt.textContent = v;
     sel.appendChild(opt);
@@ -2462,6 +2540,7 @@ function showPrecioSugerido(elId){
   const fmt=n=>'$'+n.toLocaleString('es-AR');
   const tipId='ps-tip-'+elId;
   el.innerHTML=`
+    <div style="width:100%">
     <span style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap">
       <span style="color:rgba(201,168,76,0.9)">💡 <strong style="color:var(--gold)">Precio sugerido para ${cat}:</strong> ${fmt(s.min)} – ${fmt(s.max)}</span>
       <span id="${tipId}-btn"
@@ -2477,9 +2556,9 @@ function showPrecioSugerido(elId){
     <div id="${tipId}" style="display:none;margin-top:7px;padding:10px 12px;
       background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);
       border-radius:8px;font-size:12px;color:var(--ink2);line-height:1.6;
-      animation:fadeIn 0.2s ease">
+      animation:fadeIn 0.2s ease;width:100%;box-sizing:border-box">
       ${s.tip}
-    </div>`;
+    </div></div>`;
 }
 
 function toggleMpHelp(e){
