@@ -1162,6 +1162,7 @@ function renderList(list){
       </div>
       ${!isPast?`<div class="ecard-ft">
         <span class="ptag ${pc}">${pl}</span>
+        ${ev.precio_puerta&&ev.precio_puerta!=='0'&&ev.precio_puerta!==''?`<span style="font-size:10px;color:var(--muted)">· En puerta $${parseFloat(ev.precio_puerta).toLocaleString('es-AR')}</span>`:''}
         ${dm&&String(ev.preventa_disponible).toLowerCase()==='true'?`<span class="pvtag">🎟 Preventa</span>`:''}
         ${!dm&&ev.link_accion?`<a class="slink" href="${ev.link_accion}" target="_blank" onclick="event.stopPropagation()">Ver más →</a>`:''}
       </div>`:''}
@@ -1294,7 +1295,7 @@ function renderMap(list, future=[], past=[]){
           ${ev.lugar?`📍 ${ev.lugar}<br>`:''}
           ${d?`📅 ${prettyD(d)}<br>`:''}
           ${ev.hora&&ev.hora!=='Todo el día'?`🕐 ${ev.hora} hs<br>`:''}
-          ${ev.precio&&ev.precio!=='Consultar'?`<br><span class="pgold">${ev.precio}</span>`:''}
+          ${ev.precio&&ev.precio!=='Consultar'?`<br><span class="pgold">${ev.precio}</span>${ev.precio_puerta&&ev.precio_puerta!=='0'&&ev.precio_puerta!==''?`<span style="font-size:11px;color:var(--muted)"> · En puerta $${parseFloat(ev.precio_puerta).toLocaleString('es-AR')}</span>`:''}`:''}
           ${ev.descripcion&&!hasFlyer?`<br><span style="font-size:11px;color:#6b6150;line-height:1.5">${ev.descripcion.slice(0,120)}…</span>`:''}
         </div>`;
 
