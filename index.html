@@ -2428,25 +2428,28 @@ function renderW4(f){
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Precio de la entrada (ARS) <span>*</span></label>
-        <input class="form-input" id="w-precio" type="number" min="0" placeholder="15000" value="${wData.precio_entrada||''}" oninput="calcFee()">
+        <label class="form-label">Preventa (ARS) <span>*</span></label>
+        <input class="form-input" id="w-precio" type="number" min="0" placeholder="15000"
+          value="${wData.precio_entrada||''}"
+          oninput="calcFee()"
+          onblur="autoFillPuerta('mp')">
       </div>
       <div class="form-group">
-        <label class="form-label">Stock de entradas <span>*</span></label>
-        <input class="form-input" id="w-stock" type="number" min="1" placeholder="200" value="${wData.stock_entradas||''}">
+        <label class="form-label">En puerta (ARS) <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">opcional</span></label>
+        <input class="form-input" id="w-precio-puerta" type="number" min="0" placeholder="Ej: 17000"
+          value="${wData.precio_puerta||''}"
+          oninput="this.style.borderColor=''">
       </div>
     </div>
     <div id="fee-preview" style="font-size:12px;color:var(--muted);margin-top:-8px;margin-bottom:4px;min-height:18px"></div>
-    <div id="precio-sugerido-mp" style="font-size:11px;color:rgba(201,168,76,0.8);margin-bottom:10px;min-height:16px"></div>
+    <div id="precio-sugerido-mp" style="font-size:11px;color:rgba(201,168,76,0.8);margin-bottom:4px;min-height:16px"></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.6">
+      💡 <strong style="color:var(--ink2)">Recomendación:</strong> el precio en puerta debería ser mayor que el de preventa para incentivar la compra anticipada.
+      <span id="mp-puerta-hint" style="color:rgba(201,168,76,0.8)"></span>
+    </div>
     <div class="form-group" style="margin-bottom:14px">
-      <label class="form-label">Precio en puerta <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
-      <input class="form-input" id="w-precio-puerta" type="number" min="0" placeholder="Dejá vacío si no habrá venta en puerta"
-        value="${wData.precio_puerta||''}"
-        oninput="this.style.borderColor=''">
-      <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.6">
-        💡 <strong style="color:var(--ink2)">Recomendación:</strong> el precio en puerta debería ser mayor que el de preventa para incentivar la compra anticipada.
-        <span id="mp-puerta-hint" style="color:rgba(201,168,76,0.8)"></span>
-      </div>
+      <label class="form-label">Stock de entradas <span>*</span></label>
+      <input class="form-input" id="w-stock" type="number" min="1" placeholder="200" value="${wData.stock_entradas||''}">
     </div>
     <div class="form-section">Datos de Mercado Pago para el pago</div>
     <div class="form-row">
@@ -2514,16 +2517,7 @@ function renderW4(f){
     </div>`;
   calcFee();
   showPrecioSugerido('precio-sugerido-mp');
-  // Autocomplete puerta on render if preventa already set from wData
-  if(wData.precio_entrada&&!wData.precio_puerta){
-    const puertaEl=document.getElementById('w-precio-puerta');
-    const hint=document.getElementById('mp-puerta-hint');
-    if(puertaEl&&!puertaEl.value){
-      const sugerido=parseFloat(wData.precio_entrada)+2000;
-      puertaEl.value=sugerido;
-      if(hint) hint.textContent=` · Autocompletado con $${sugerido.toLocaleString('es-AR')} (preventa + $2.000) — podés editarlo.`;
-    }
-  }
+  if(wData.precio_entrada&&!wData.precio_puerta) autoFillPuerta('mp');
 }
 function calcFee(){
   const precio=parseFloat(document.getElementById('w-precio')?.value)||0;
@@ -2533,14 +2527,6 @@ function calcFee(){
     const comprador=(precio*1.05).toLocaleString('es-AR',{maximumFractionDigits:0});
     const recibis=(precio*0.94).toLocaleString('es-AR',{maximumFractionDigits:0});
     prev.innerHTML=`🧾 Comprador paga <strong style="color:var(--ink)">$${comprador}</strong> · Vos recibís <strong style="color:#4ca87a">$${recibis}</strong>`;
-    // Autocomplete puerta price if not yet set
-    const puertaEl=document.getElementById('w-precio-puerta');
-    const hint=document.getElementById('mp-puerta-hint');
-    if(puertaEl&&!puertaEl.value){
-      const sugerido=precio+2000;
-      puertaEl.value=sugerido;
-      if(hint) hint.textContent=` · Autocompletado con $${sugerido.toLocaleString('es-AR')} (preventa + $2.000) — podés editarlo.`;
-    }
   } else {
     prev.textContent='';
   }
@@ -2590,6 +2576,18 @@ function showPrecioSugerido(elId){
     </div></div>`;
 }
 
+// Auto-fill puerta price on blur — fires when user leaves preventa field
+function autoFillPuerta(mode){
+  const preventa=parseFloat(document.getElementById('w-precio')?.value)||0;
+  if(!preventa) return;
+  const puertaEl=document.getElementById('w-precio-puerta');
+  if(!puertaEl||puertaEl.value) return; // don't overwrite if already set
+  const sugerido=preventa+2000;
+  puertaEl.value=sugerido;
+  const hintId=mode==='mp'?'mp-puerta-hint':'trf-puerta-hint';
+  const hint=document.getElementById(hintId);
+  if(hint) hint.textContent=` · Sugerido: $${sugerido.toLocaleString('es-AR')} (preventa + $2.000) — podés editarlo.`;
+}
 function toggleMpHelp(e){
   e.stopPropagation();
   const el=document.getElementById('mp-help');
@@ -2685,25 +2683,28 @@ function renderW4Transfer(f){
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Precio de la entrada (ARS) <span>*</span></label>
-        <input class="form-input" id="w-precio" type="number" min="0" placeholder="10000" value="${wData.precio_entrada||''}" oninput="calcFeeTrf()">
+        <label class="form-label">Preventa (ARS) <span>*</span></label>
+        <input class="form-input" id="w-precio" type="number" min="0" placeholder="10000"
+          value="${wData.precio_entrada||''}"
+          oninput="calcFeeTrf()"
+          onblur="autoFillPuerta('trf')">
       </div>
       <div class="form-group">
-        <label class="form-label">Stock de entradas <span>*</span></label>
-        <input class="form-input" id="w-stock" type="number" min="1" placeholder="100" value="${wData.stock_entradas||''}">
+        <label class="form-label">En puerta (ARS) <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">opcional</span></label>
+        <input class="form-input" id="w-precio-puerta" type="number" min="0" placeholder="Ej: 12000"
+          value="${wData.precio_puerta||''}"
+          oninput="this.style.borderColor=''">
       </div>
     </div>
     <div id="fee-preview-trf" style="font-size:12px;color:var(--muted);margin-top:-8px;margin-bottom:4px;min-height:18px"></div>
-    <div id="precio-sugerido-trf" style="font-size:11px;color:rgba(201,168,76,0.8);margin-bottom:10px;min-height:16px"></div>
+    <div id="precio-sugerido-trf" style="font-size:11px;color:rgba(201,168,76,0.8);margin-bottom:4px;min-height:16px"></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.6">
+      💡 <strong style="color:var(--ink2)">Recomendación:</strong> el precio en puerta debería ser mayor que el de preventa para incentivar la compra anticipada.
+      <span id="trf-puerta-hint" style="color:rgba(201,168,76,0.8)"></span>
+    </div>
     <div class="form-group" style="margin-bottom:14px">
-      <label class="form-label">Precio en puerta <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
-      <input class="form-input" id="w-precio-puerta" type="number" min="0" placeholder="Dejá vacío si no habrá venta en puerta"
-        value="${wData.precio_puerta||''}"
-        oninput="this.style.borderColor=''">
-      <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.6">
-        💡 <strong style="color:var(--ink2)">Recomendación:</strong> el precio en puerta debería ser mayor que el de preventa para incentivar la compra anticipada.
-        <span id="trf-puerta-hint" style="color:rgba(201,168,76,0.8)"></span>
-      </div>
+      <label class="form-label">Stock de entradas <span>*</span></label>
+      <input class="form-input" id="w-stock" type="number" min="1" placeholder="100" value="${wData.stock_entradas||''}">
     </div>
     <div class="form-section">Tus datos para el pago</div>
     <div class="form-group">
@@ -2736,16 +2737,7 @@ function renderW4Transfer(f){
     </div>`;
   calcFeeTrf();
   showPrecioSugerido('precio-sugerido-trf');
-  // Autocomplete puerta on render if preventa already set from wData
-  if(wData.precio_entrada&&!wData.precio_puerta){
-    const puertaEl=document.getElementById('w-precio-puerta');
-    const hint=document.getElementById('trf-puerta-hint');
-    if(puertaEl&&!puertaEl.value){
-      const sugerido=parseFloat(wData.precio_entrada)+2000;
-      puertaEl.value=sugerido;
-      if(hint) hint.textContent=` · Autocompletado con $${sugerido.toLocaleString('es-AR')} (preventa + $2.000) — podés editarlo.`;
-    }
-  }
+  if(wData.precio_entrada&&!wData.precio_puerta) autoFillPuerta('trf');
 }
 function calcFeeTrf(){
   const precio=parseFloat(document.getElementById('w-precio')?.value)||0;
@@ -2755,14 +2747,6 @@ function calcFeeTrf(){
     const comprador=(precio*1.03).toLocaleString('es-AR',{maximumFractionDigits:0});
     const recibis=(precio*0.96).toLocaleString('es-AR',{maximumFractionDigits:0});
     prev.innerHTML=`🧾 Comprador paga <strong style="color:var(--ink)">$${comprador}</strong> · Vos recibís <strong style="color:#4ca87a">$${recibis}</strong>`;
-    // Autocomplete puerta price if not yet set
-    const puertaEl=document.getElementById('w-precio-puerta');
-    const hint=document.getElementById('trf-puerta-hint');
-    if(puertaEl&&!puertaEl.value){
-      const sugerido=precio+2000;
-      puertaEl.value=sugerido;
-      if(hint) hint.textContent=` · Autocompletado con $${sugerido.toLocaleString('es-AR')} (preventa + $2.000) — podés editarlo.`;
-    }
   } else {
     prev.textContent='';
   }
