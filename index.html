@@ -2514,6 +2514,16 @@ function renderW4(f){
     </div>`;
   calcFee();
   showPrecioSugerido('precio-sugerido-mp');
+  // Autocomplete puerta on render if preventa already set from wData
+  if(wData.precio_entrada&&!wData.precio_puerta){
+    const puertaEl=document.getElementById('w-precio-puerta');
+    const hint=document.getElementById('mp-puerta-hint');
+    if(puertaEl&&!puertaEl.value){
+      const sugerido=parseFloat(wData.precio_entrada)+2000;
+      puertaEl.value=sugerido;
+      if(hint) hint.textContent=` · Autocompletado con $${sugerido.toLocaleString('es-AR')} (preventa + $2.000) — podés editarlo.`;
+    }
+  }
 }
 function calcFee(){
   const precio=parseFloat(document.getElementById('w-precio')?.value)||0;
@@ -2655,16 +2665,22 @@ function w4Next(){
 function renderW4Transfer(f){
   setModalTitle('Paso 4 · Pago por transferencia','Configurá tus entradas');
   f.innerHTML=`
-    <div class="fee-box">
-      <strong>Cómo funciona este modelo</strong><br>
-      Los compradores transfieren al alias de DataManIAcs. DM verifica cada comprobante y trackea los asistentes.
-      Al día siguiente del evento te transferimos tu parte a tu alias de MP.<br><br>
-      <strong style="color:var(--ink)">También proveemos un QR para ventas en la puerta</strong> — el comprador escanea, transfiere y muestra el comprobante. Sin efectivo, sin caja.
-      <div class="fee-example">
-        <strong style="color:var(--gold)">Ejemplo entrada $10.000:</strong><br>
-        🧾 Comprador paga <strong>$10.300</strong> <span style="color:var(--muted)">(+3% cargo por servicio al comprador)</span><br>
-        💰 Vos recibís <strong style="color:#4ca87a">$9.600</strong> al día siguiente del evento <span style="color:var(--muted)">(−4% cargo DM)</span><br>
-        🏦 DM recibe la transferencia de $10.300 y te acredita $9.600
+    <div class="fee-box" style="padding:10px 14px">
+      <div onclick="(function(e){var d=document.getElementById('trf-fee-detail');d.style.display=d.style.display==='none'?'block':'none';e.currentTarget.querySelector('.trf-toggle').textContent=d.style.display==='none'?'▸ Ver detalle':'▾ Ocultar'})(event)"
+        style="cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+        <strong>Cómo funciona este modelo</strong>
+        <span class="trf-toggle" style="font-size:11px;color:var(--muted)">▸ Ver detalle</span>
+      </div>
+      <div id="trf-fee-detail" style="display:none;margin-top:8px;font-size:12px;line-height:1.7">
+        Los compradores transfieren al alias de DataManIAcs. DM verifica cada comprobante y trackea los asistentes.
+        Al día siguiente del evento te transferimos tu parte a tu alias de MP.<br><br>
+        <strong style="color:var(--ink)">También proveemos un QR para ventas en la puerta</strong> — el comprador escanea, transfiere y muestra el comprobante. Sin efectivo, sin caja.
+        <div class="fee-example" style="margin-top:8px">
+          <strong style="color:var(--gold)">Ejemplo entrada $10.000:</strong><br>
+          🧾 Comprador paga <strong>$10.300</strong> <span style="color:var(--muted)">(+3% cargo por servicio al comprador)</span><br>
+          💰 Vos recibís <strong style="color:#4ca87a">$9.600</strong> al día siguiente del evento <span style="color:var(--muted)">(−4% cargo DM)</span><br>
+          🏦 DM recibe la transferencia de $10.300 y te acredita $9.600
+        </div>
       </div>
     </div>
     <div class="form-row">
@@ -2720,6 +2736,16 @@ function renderW4Transfer(f){
     </div>`;
   calcFeeTrf();
   showPrecioSugerido('precio-sugerido-trf');
+  // Autocomplete puerta on render if preventa already set from wData
+  if(wData.precio_entrada&&!wData.precio_puerta){
+    const puertaEl=document.getElementById('w-precio-puerta');
+    const hint=document.getElementById('trf-puerta-hint');
+    if(puertaEl&&!puertaEl.value){
+      const sugerido=parseFloat(wData.precio_entrada)+2000;
+      puertaEl.value=sugerido;
+      if(hint) hint.textContent=` · Autocompletado con $${sugerido.toLocaleString('es-AR')} (preventa + $2.000) — podés editarlo.`;
+    }
+  }
 }
 function calcFeeTrf(){
   const precio=parseFloat(document.getElementById('w-precio')?.value)||0;
