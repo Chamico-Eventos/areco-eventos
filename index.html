@@ -2437,6 +2437,16 @@ function renderW4(f){
     </div>
     <div id="fee-preview" style="font-size:12px;color:var(--muted);margin-top:-8px;margin-bottom:4px;min-height:18px"></div>
     <div id="precio-sugerido-mp" style="font-size:11px;color:rgba(201,168,76,0.8);margin-bottom:10px;min-height:16px"></div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label class="form-label">Precio en puerta <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+      <input class="form-input" id="w-precio-puerta" type="number" min="0" placeholder="Dejá vacío si no habrá venta en puerta"
+        value="${wData.precio_puerta||''}"
+        oninput="this.style.borderColor=''">
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.6">
+        💡 <strong style="color:var(--ink2)">Recomendación:</strong> el precio en puerta debería ser mayor que el de preventa para incentivar la compra anticipada.
+        <span id="mp-puerta-hint" style="color:rgba(201,168,76,0.8)"></span>
+      </div>
+    </div>
     <div class="form-section">Datos de Mercado Pago para el pago</div>
     <div class="form-row">
       <div class="form-group">
@@ -2512,6 +2522,14 @@ function calcFee(){
     const comprador=(precio*1.05).toLocaleString('es-AR',{maximumFractionDigits:0});
     const recibis=(precio*0.94).toLocaleString('es-AR',{maximumFractionDigits:0});
     prev.innerHTML=`🧾 Comprador paga <strong style="color:var(--ink)">$${comprador}</strong> · Vos recibís <strong style="color:#4ca87a">$${recibis}</strong>`;
+    // Autocomplete puerta price if not yet set
+    const puertaEl=document.getElementById('w-precio-puerta');
+    const hint=document.getElementById('mp-puerta-hint');
+    if(puertaEl&&!puertaEl.value){
+      const sugerido=precio+2000;
+      puertaEl.value=sugerido;
+      if(hint) hint.textContent=` · Autocompletado con $${sugerido.toLocaleString('es-AR')} (preventa + $2.000) — podés editarlo.`;
+    }
   } else {
     prev.textContent='';
   }
@@ -2622,6 +2640,7 @@ function w4Next(){
   if(mpTelRaw.length<10){wErr('El teléfono de MP debe tener 10 dígitos');return;}
   if(!mpConfirm){wErr('Confirmá que tu cuenta de Mercado Pago está habilitada para continuar');return;}
   wData.precio_entrada=precio;
+  wData.precio_puerta=document.getElementById('w-precio-puerta')?.value||'';
   wData.stock_entradas=stock;
   wData.mp_email=mpEmail;
   wData.mp_alias=mpAlias;
@@ -2659,6 +2678,16 @@ function renderW4Transfer(f){
     </div>
     <div id="fee-preview-trf" style="font-size:12px;color:var(--muted);margin-top:-8px;margin-bottom:4px;min-height:18px"></div>
     <div id="precio-sugerido-trf" style="font-size:11px;color:rgba(201,168,76,0.8);margin-bottom:10px;min-height:16px"></div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label class="form-label">Precio en puerta <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+      <input class="form-input" id="w-precio-puerta" type="number" min="0" placeholder="Dejá vacío si no habrá venta en puerta"
+        value="${wData.precio_puerta||''}"
+        oninput="this.style.borderColor=''">
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.6">
+        💡 <strong style="color:var(--ink2)">Recomendación:</strong> el precio en puerta debería ser mayor que el de preventa para incentivar la compra anticipada.
+        <span id="trf-puerta-hint" style="color:rgba(201,168,76,0.8)"></span>
+      </div>
+    </div>
     <div class="form-section">Tus datos para el pago</div>
     <div class="form-group">
       <label class="form-label">Tu alias de Mercado Pago <span>*</span></label>
@@ -2699,6 +2728,14 @@ function calcFeeTrf(){
     const comprador=(precio*1.03).toLocaleString('es-AR',{maximumFractionDigits:0});
     const recibis=(precio*0.96).toLocaleString('es-AR',{maximumFractionDigits:0});
     prev.innerHTML=`🧾 Comprador paga <strong style="color:var(--ink)">$${comprador}</strong> · Vos recibís <strong style="color:#4ca87a">$${recibis}</strong>`;
+    // Autocomplete puerta price if not yet set
+    const puertaEl=document.getElementById('w-precio-puerta');
+    const hint=document.getElementById('trf-puerta-hint');
+    if(puertaEl&&!puertaEl.value){
+      const sugerido=precio+2000;
+      puertaEl.value=sugerido;
+      if(hint) hint.textContent=` · Autocompletado con $${sugerido.toLocaleString('es-AR')} (preventa + $2.000) — podés editarlo.`;
+    }
   } else {
     prev.textContent='';
   }
@@ -2714,6 +2751,7 @@ function w4TransferNext(){
   if(!alias){highlight('w-trf-alias');wErr('Ingresá tu alias de Mercado Pago');return;}
   if(!telRaw||telRaw.length<10){highlight('w-trf-tel');wErr('El WhatsApp debe tener 10 dígitos');return;}
   wData.precio_entrada=precio;
+  wData.precio_puerta=document.getElementById('w-precio-puerta')?.value||'';
   wData.stock_entradas=stock;
   wData.mp_alias=alias;
   wData.mp_telefono='+549'+telRaw;
@@ -2942,6 +2980,7 @@ async function submitWizard(){
     modelo_venta:wizardMode,
     colaboracion:colaboro,
     precio_entrada:String(Math.round(parseFloat(wData.precio_entrada))),
+    precio_puerta:wData.precio_puerta?String(Math.round(parseFloat(wData.precio_puerta))):'',
     stock_entradas:wData.stock_entradas,
     mp_email:wData.mp_email||'',
     mp_alias:wData.mp_alias||'',
