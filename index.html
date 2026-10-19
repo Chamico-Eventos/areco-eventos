@@ -1086,15 +1086,26 @@ function openSheet(ev){
   const btn=document.getElementById('sheetBuyBtn');
   const eventParam=encodeURIComponent(ev.id||ev.nombre||'');
   const isValidUrl=u=>!!u&&(u.startsWith('http://')||u.startsWith('https://'));
-  const targetUrl=isValidUrl(ev.link_accion)?ev.link_accion:`${TICKETS_URL}/?event=${eventParam}`;
-  btn.href=targetUrl;
-  const hasPreventa = String(ev.preventa_disponible).toLowerCase()==='true';
-  btn.textContent = hasPreventa ? 'Comprá tus anticipadas →' : 'Ver más →';
+  const isTicketEv=String(ev.ticket_service).toLowerCase()==='true';
+  const hasPreventa=String(ev.preventa_disponible).toLowerCase()==='true';
+  if(isTicketEv&&hasPreventa){
+    btn.href=`${TICKETS_URL}/?event=${eventParam}`;
+    btn.textContent='🎟 Comprá tus anticipadas →';
+    btn.style.display='inline-flex';
+  } else if(!isTicketEv&&isValidUrl(ev.link_accion)){
+    btn.href=ev.link_accion;
+    btn.textContent='Ver más →';
+    btn.style.display='inline-flex';
+  } else {
+    btn.style.display='none';
+  }
 
   const srcLink=document.getElementById('sheetSourceLink');
-  if(ev.fuente_url&&ev.fuente_url!==ev.link_accion){
+  // Always show Instagram link separately when fuente_url is Instagram
+  const igSrc=ev.fuente_url&&ev.fuente_url.includes('instagram.com');
+  if(ev.fuente_url&&(igSrc||(!isTicketEv&&ev.fuente_url!==ev.link_accion))){
     srcLink.href=ev.fuente_url;
-    srcLink.textContent=`Ver en ${ev.fuente_nombre||'fuente'} →`;
+    srcLink.textContent=igSrc?`📷 Ver en Instagram →`:`Ver en ${ev.fuente_nombre||'fuente'} →`;
     srcLink.style.display='inline-flex';
   } else {
     srcLink.style.display='none';
@@ -1285,9 +1296,13 @@ function renderMap(list, future=[], past=[]){
         const ticketUrl=isValidUrl(ev.link_accion)?ev.link_accion:`${TICKETS_URL}/?event=${eventParam}`;
         const hasPreventa=String(ev.preventa_disponible).toLowerCase()==='true';
 
+        const isTicketEvent=String(ev.ticket_service).toLowerCase()==='true';
+        const entradaUrl=`${TICKETS_URL}/?event=${eventParam}`;
+        const igUrl=ev.fuente_url&&ev.fuente_url.includes('instagram.com')?ev.fuente_url:'';
         const linksHtml=`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;align-items:center">
-          ${dm&&hasPreventa?`<a class="plink" href="${ticketUrl}" target="_blank" style="background:rgba(226,185,79,0.15);border:1px solid rgba(226,185,79,0.35);border-radius:6px;padding:5px 12px;font-weight:600">🎟 Comprar entrada</a>`:''}
-          ${(dm&&!hasPreventa||!dm)&&isValidUrl(ev.link_accion)?`<a class="plink" href="${ev.link_accion}" target="_blank">Ver más →</a>`:''}
+          ${isTicketEvent&&hasPreventa?`<a class="plink" href="${entradaUrl}" target="_blank" style="background:rgba(226,185,79,0.15);border:1px solid rgba(226,185,79,0.35);border-radius:6px;padding:5px 12px;font-weight:600">🎟 Comprar entrada</a>`:''}
+          ${!isTicketEvent&&isValidUrl(ev.link_accion)?`<a class="plink" href="${ev.link_accion}" target="_blank">Ver más →</a>`:''}
+          ${igUrl?`<a class="plink" href="${igUrl}" target="_blank" style="color:var(--muted);font-size:12px">📷 Instagram</a>`:''}
           ${gmDir?`<a class="plink" href="${gmDir}" target="_blank" style="color:var(--ink2)">🗺 Cómo llegar</a>`:''}
         </div>`;
 
