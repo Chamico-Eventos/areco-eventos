@@ -1864,7 +1864,7 @@ function renderChoice(f){
           <div style="margin-top:9px;padding:8px 10px;background:rgba(201,168,76,0.07);border-radius:7px;border:1px solid rgba(201,168,76,0.15);font-size:11px;line-height:1.7">
             <strong style="color:var(--ink)">Ejemplo entrada $10.000:</strong><br>
             🧾 Comprador paga <strong style="color:var(--ink)">$10.500</strong> <span style="color:var(--muted)">(+5% cargo por servicio al comprador)</span><br>
-            💰 Vos recibís <strong style="color:#4ca87a">$9.400</strong> <span style="color:var(--muted)">(−6% cargo DM del precio fijado)</span>
+            💰 Vos recibís <strong style="color:#4ca87a">$9.300</strong> <span style="color:var(--muted)">(−7% cargo DM: 6% arancel MP + 1% comisión DataManIAcs)</span>
           </div>
           <div style="margin-top:7px;font-size:11px;color:var(--muted)">Requiere cuenta de Mercado Pago activa · Los 10 días son política de MP, no retenemos nada</div>
         </div>
@@ -2432,13 +2432,14 @@ function renderW4(f){
     <div class="fee-box">
       <strong>Cómo funciona el servicio</strong><br>
       Vos fijás el precio de la entrada. El comprador paga un 5% adicional de cargo por servicio
-      que cobra DataManIAcs directamente. Vos recibís el <strong>94% del precio que fijaste</strong>
+      que cobra DataManIAcs directamente. Vos recibís el <strong>93% del precio que fijaste</strong>
       directo en tu cuenta de Mercado Pago.<br>
       Los 10 días de espera son la política de Mercado Pago — nosotros no retenemos nada.
       <div class="fee-example">
-        <strong style="color:var(--gold)">Ejemplo:</strong> Precio entrada $15.000<br>
-        🧾 El comprador paga <strong>$15.750</strong> (incluye 5% cargo por servicio)<br>
-        💰 Vos recibís <strong>$14.100</strong> (94% de $15.000) en tu cuenta MP
+        <strong style="color:var(--gold)">Ejemplo:</strong> Precio entrada $10.000<br>
+        🧾 El comprador paga <strong>$10.500</strong> (incluye 5% cargo por servicio)<br>
+        💰 Vos recibís <strong>$9.300</strong> (93% de $10.000) en tu cuenta MP<br>
+        <span style="color:var(--muted);font-size:11px">· $600 arancel MP (6%) + $100 comisión DataManIAcs (1%) = $700 cargo total al venue</span>
       </div>
     </div>
     <div class="form-row">
@@ -2540,7 +2541,7 @@ function calcFee(){
   if(!prev)return;
   if(precio>0){
     const comprador=(precio*1.05).toLocaleString('es-AR',{maximumFractionDigits:0});
-    const recibis=(precio*0.94).toLocaleString('es-AR',{maximumFractionDigits:0});
+    const recibis=(precio*0.93).toLocaleString('es-AR',{maximumFractionDigits:0});
     prev.innerHTML=`🧾 Comprador paga <strong style="color:var(--ink)">$${comprador}</strong> · Vos recibís <strong style="color:#4ca87a">$${recibis}</strong>`;
   } else {
     prev.textContent='';
@@ -2857,17 +2858,17 @@ function renderW6(f){
   const precio=parseFloat(wData.precio_entrada)||0;
   const isTrf=wizardMode==='transferencia';
   const buyerFee=isTrf?1.03:1.05;
-  const venuePct=isTrf?0.96:0.94;
+  const venuePct=isTrf?0.96:0.93;
   const comprador=(precio*buyerFee).toLocaleString('es-AR',{maximumFractionDigits:0});
   const recibis=(precio*venuePct).toLocaleString('es-AR',{maximumFractionDigits:0});
 
   const terminosText=isTrf
     ? `Entiendo que los compradores transfieren a DataManIAcs (+3% cargo al comprador). DM verifica cada comprobante y me acredita el ${(venuePct*100).toFixed(0)}% del precio por entrada vendida al día siguiente del evento.`
-    : `Acepto que DataManIAcs cobre el 5% al comprador. Recibiré el 94% del precio de cada entrada en mi cuenta de Mercado Pago según los tiempos de acreditación de MP.`;
+    : `Acepto que DataManIAcs cobre el 5% al comprador. Recibiré el 93% del precio de cada entrada en mi cuenta de Mercado Pago según los tiempos de acreditación de MP.`;
 
   const feeBoxText=isTrf
     ? `<strong>Publicación gratuita.</strong> El comprador paga el +3% de cargo por servicio. DataManIAcs descuenta el 4% de comisión del precio fijado y te transfiere el resto al día siguiente del evento. Sin sorpresas.`
-    : `<strong>Publicación gratuita.</strong> DataManIAcs cobra el 5% al comprador y el 6% de comisión del precio fijado. El dinero llega a tu cuenta de MP en 10 días hábiles — política de MP, no retenemos nada.`;
+    : `<strong>Publicación gratuita.</strong> DataManIAcs cobra el 5% al comprador y el 7% del precio fijado al venue (6% arancel MP + 1% comisión DataManIAcs). El dinero llega a tu cuenta de MP en 10 días hábiles — política de MP, no retenemos nada.`;
 
   f.innerHTML=`
     <div style="background:var(--s2);border-radius:12px;padding:16px;margin-bottom:16px;font-size:13px;line-height:1.8">
