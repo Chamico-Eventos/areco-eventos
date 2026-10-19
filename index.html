@@ -352,6 +352,50 @@ img.leaflet-tile{border:none !important;outline:none !important}
   50%{box-shadow:0 0 12px rgba(201,168,76,0.9),0 0 20px rgba(201,168,76,0.3);}
 }
 @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+/* ── OVNI map animation ────────────────────────────────── */
+.areco-map-characters{position:absolute;inset:0;z-index:400;overflow:hidden;pointer-events:none}
+.areco-map-characters,.areco-map-characters *{box-sizing:border-box;pointer-events:none;user-select:none;-webkit-user-select:none}
+.areco-ovni-animation{--areco-ovni-cycle:14s;--areco-ovni-cyan:#72ffe7;--areco-ovni-width:clamp(170px,19vw,290px);--areco-ovni-height:clamp(255px,28.5vw,435px);position:absolute;width:var(--areco-ovni-width);height:var(--areco-ovni-height);transform:translate(-50%,-81.8%);transform-origin:50% 81.8%;isolation:isolate;contain:layout style;overflow:visible}
+.areco-ovni-animation[hidden]{display:none!important}
+.areco-ovni-animation.areco-ovni-paused *,.areco-ovni-animation.areco-ovni-paused *::before,.areco-ovni-animation.areco-ovni-paused *::after{animation-play-state:paused!important}
+.areco-ovni-animation.areco-ovni-reset *,.areco-ovni-animation.areco-ovni-reset *::before,.areco-ovni-animation.areco-ovni-reset *::after{animation:none!important}
+.areco-ovni-animation .areco-ovni-ambient{position:absolute;left:50%;top:20%;width:130%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(55,255,223,.09),rgba(10,28,33,.035) 34%,transparent 68%);filter:blur(20px);opacity:0;will-change:transform,opacity;animation:arecoOvniAmbientPulse var(--areco-ovni-cycle) linear infinite}
+.areco-ovni-animation .areco-ovni-arrival-flash{position:absolute;left:50%;top:18%;width:62%;aspect-ratio:1;transform:translate(-50%,-50%) scale(.06);border-radius:50%;background:radial-gradient(circle,rgba(235,255,252,.98) 0 3%,rgba(149,255,239,.76) 7%,rgba(59,240,219,.34) 23%,rgba(38,183,173,.12) 45%,transparent 72%);mix-blend-mode:screen;filter:blur(3px);opacity:0;will-change:transform,opacity;animation:arecoOvniArrivalFlash var(--areco-ovni-cycle) ease-in-out infinite}
+.areco-ovni-animation .areco-ovni-ship-stage{position:absolute;left:50%;top:18%;width:77%;transform:translate(-50%,-50%) scale(.08);transform-origin:50% 52%;opacity:0;filter:blur(18px) brightness(3.1);will-change:transform,opacity,filter;animation:arecoOvniMaterialize var(--areco-ovni-cycle) cubic-bezier(.22,.84,.25,1) infinite}
+.areco-ovni-animation .areco-ovni-ship-float{position:relative;width:100%;will-change:transform;animation:arecoOvniHover 2.7s ease-in-out infinite}
+.areco-ovni-animation .areco-ovni-ship{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 7px 10px rgba(0,0,0,.72)) drop-shadow(0 0 10px rgba(75,255,228,.38)) drop-shadow(0 0 30px rgba(34,198,186,.21))}
+.areco-ovni-animation .areco-ovni-rim-light{animation:arecoOvniRimBlink 1.45s ease-in-out infinite}
+.areco-ovni-animation .areco-ovni-rim-light:nth-of-type(2){animation-delay:-.35s}
+.areco-ovni-animation .areco-ovni-rim-light:nth-of-type(3){animation-delay:-.7s}
+.areco-ovni-animation .areco-ovni-rim-light:nth-of-type(4){animation-delay:-1.05s}
+.areco-ovni-animation .areco-ovni-rim-light:nth-of-type(5){animation-delay:-1.4s}
+.areco-ovni-animation .areco-ovni-beam{position:absolute;left:50%;top:24%;width:76%;height:58%;transform:translateX(-50%) scaleY(.02);transform-origin:50% 0;clip-path:polygon(38% 0,62% 0,89% 94%,84% 100%,16% 100%,11% 94%);background:linear-gradient(90deg,transparent 0%,rgba(81,255,225,.025) 10%,rgba(107,255,229,.28) 37%,rgba(207,255,248,.48) 50%,rgba(107,255,229,.28) 63%,rgba(81,255,225,.025) 90%,transparent 100%);filter:blur(5px) drop-shadow(0 0 12px rgba(85,255,226,.38));opacity:0;mix-blend-mode:screen;will-change:transform,opacity;animation:arecoOvniBeamCycle var(--areco-ovni-cycle) ease-in-out infinite}
+.areco-ovni-animation .areco-ovni-beam-core{position:absolute;left:50%;top:25%;width:18%;height:52%;transform:translateX(-50%) scaleY(.02);transform-origin:50% 0;clip-path:polygon(38% 0,62% 0,78% 100%,22% 100%);background:linear-gradient(180deg,rgba(227,255,251,.7),rgba(71,255,225,.14) 72%,transparent);filter:blur(7px);opacity:0;mix-blend-mode:screen;will-change:transform,opacity;animation:arecoOvniBeamCore var(--areco-ovni-cycle) ease-in-out infinite}
+.areco-ovni-animation .areco-ovni-ground-glow{position:absolute;left:50%;top:81.8%;width:67%;height:10.5%;transform:translate(-50%,-50%) scale(.18);border-radius:50%;background:radial-gradient(ellipse at center,rgba(230,255,251,.74) 0 10%,rgba(135,255,235,.48) 24%,rgba(53,245,216,.20) 47%,rgba(23,155,151,.08) 62%,transparent 76%);box-shadow:0 0 10px rgba(175,255,242,.42),0 0 24px rgba(61,244,216,.24),0 0 42px rgba(23,177,169,.14);filter:blur(3.2px);mix-blend-mode:screen;opacity:0;will-change:transform,opacity;animation:arecoOvniGroundGlow var(--areco-ovni-cycle) ease-in-out infinite}
+.areco-ovni-animation .areco-ovni-ground-glow::before{content:"";position:absolute;inset:13% 6%;border:1.5px solid rgba(202,255,247,.58);border-radius:50%;box-shadow:inset 0 0 8px rgba(144,255,237,.28),0 0 10px rgba(93,255,229,.32)}
+.areco-ovni-animation .areco-ovni-ground-glow::after{content:"";position:absolute;left:50%;top:50%;width:72%;height:44%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(236,255,252,.42),rgba(92,255,229,.16) 45%,transparent 76%);filter:blur(3px)}
+.areco-ovni-animation .areco-ovni-cow-wrap{position:absolute;left:50%;top:75.5%;width:21%;transform:translate(-50%,-50%);transform-origin:50% 50%;opacity:0;filter:drop-shadow(0 5px 6px rgba(0,0,0,.75)) drop-shadow(0 0 7px rgba(117,255,232,.22));will-change:transform,opacity;animation:arecoOvniAbductCow var(--areco-ovni-cycle) cubic-bezier(.33,.02,.2,1) infinite}
+.areco-ovni-animation .areco-ovni-cow{display:block;width:100%;height:auto;overflow:visible}
+.areco-ovni-animation .areco-ovni-particle{--areco-particle-x:0px;--areco-particle-scale:1;--areco-particle-x-mid:0px;--areco-particle-scale-mid:.6;position:absolute;left:50%;top:75%;width:4px;height:4px;margin:-2px;border-radius:50%;background:rgba(193,255,246,.9);box-shadow:0 0 8px rgba(81,255,226,.8);opacity:0;will-change:transform,opacity;animation:arecoOvniParticleRise var(--areco-ovni-cycle) linear infinite}
+.areco-ovni-animation .areco-ovni-particle.p1{--areco-particle-x:-36px;--areco-particle-x-mid:-11px;--areco-particle-scale:.7;--areco-particle-scale-mid:.42;animation-delay:-.15s}
+.areco-ovni-animation .areco-ovni-particle.p2{--areco-particle-x:28px;--areco-particle-x-mid:8px;--areco-particle-scale:.5;--areco-particle-scale-mid:.3;animation-delay:-.52s}
+.areco-ovni-animation .areco-ovni-particle.p3{--areco-particle-x:-12px;--areco-particle-x-mid:-4px;--areco-particle-scale:1.1;--areco-particle-scale-mid:.66;animation-delay:-.9s}
+.areco-ovni-animation .areco-ovni-particle.p4{--areco-particle-x:42px;--areco-particle-x-mid:13px;--areco-particle-scale:.8;--areco-particle-scale-mid:.48;animation-delay:-1.25s}
+.areco-ovni-animation .areco-ovni-particle.p5{--areco-particle-x:-49px;--areco-particle-x-mid:-15px;--areco-particle-scale:.45;--areco-particle-scale-mid:.27;animation-delay:-1.6s}
+.areco-ovni-animation .areco-ovni-particle.p6{--areco-particle-x:8px;--areco-particle-x-mid:2px;--areco-particle-scale:.65;--areco-particle-scale-mid:.39;animation-delay:-1.95s}
+@keyframes arecoOvniMaterialize{0%,5%{opacity:0;transform:translate(-50%,-50%) scale(.05) rotate(-4deg);filter:blur(18px) brightness(3.2)}8%{opacity:.25;transform:translate(-50%,-50%) scale(.18) rotate(2deg);filter:blur(13px) brightness(4.2)}12%{opacity:.9;transform:translate(-50%,-50%) scale(.78) rotate(-1deg);filter:blur(3px) brightness(2.2)}16%{opacity:1;transform:translate(-50%,-50%) scale(1.05) rotate(.5deg);filter:blur(0) brightness(1.22)}20%,76%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0);filter:blur(0) brightness(1)}81%{opacity:1;transform:translate(-50%,-50%) scale(.92) rotate(1deg);filter:blur(1px) brightness(2.2)}85%{opacity:.55;transform:translate(-50%,-50%) scale(.38) rotate(-2deg);filter:blur(9px) brightness(3.8)}89%,100%{opacity:0;transform:translate(-50%,-50%) scale(.04) rotate(4deg);filter:blur(18px) brightness(4.5)}}
+@keyframes arecoOvniHover{0%,100%{transform:translateY(0) rotate(-.35deg)}50%{transform:translateY(-5px) rotate(.45deg)}}
+@keyframes arecoOvniArrivalFlash{0%,4%{opacity:0;transform:translate(-50%,-50%) scale(.03)}8%{opacity:.95;transform:translate(-50%,-50%) scale(.35)}13%{opacity:.65;transform:translate(-50%,-50%) scale(1.45)}19%,78%{opacity:0;transform:translate(-50%,-50%) scale(2.1)}81%{opacity:.35;transform:translate(-50%,-50%) scale(.5)}85%{opacity:.9;transform:translate(-50%,-50%) scale(1.2)}90%,100%{opacity:0;transform:translate(-50%,-50%) scale(2.15)}}
+@keyframes arecoOvniAmbientPulse{0%,4%,91%,100%{opacity:0;transform:translate(-50%,-50%) scale(.35)}14%{opacity:.75;transform:translate(-50%,-50%) scale(1)}26%,72%{opacity:.42;transform:translate(-50%,-50%) scale(.92)}86%{opacity:.72;transform:translate(-50%,-50%) scale(1.18)}}
+@keyframes arecoOvniBeamCycle{0%,24%{opacity:0;transform:translateX(-50%) scaleY(.015)}28%{opacity:.35;transform:translateX(-50%) scaleY(.28)}33%{opacity:.9;transform:translateX(-50%) scaleY(1)}36%,65%{opacity:.78;transform:translateX(-50%) scaleY(1)}69%{opacity:.38;transform:translateX(-50%) scaleY(.48)}73%,100%{opacity:0;transform:translateX(-50%) scaleY(.015)}}
+@keyframes arecoOvniBeamCore{0%,27%{opacity:0;transform:translateX(-50%) scaleY(.01)}32%{opacity:.82;transform:translateX(-50%) scaleY(1)}37%,63%{opacity:.5;transform:translateX(-50%) scaleY(1)}70%,100%{opacity:0;transform:translateX(-50%) scaleY(.02)}}
+@keyframes arecoOvniGroundGlow{0%,28%{opacity:0;transform:translate(-50%,-50%) scale(.15)}34%{opacity:.95;transform:translate(-50%,-50%) scale(1)}39%,62%{opacity:.65;transform:translate(-50%,-50%) scale(.88)}70%,100%{opacity:0;transform:translate(-50%,-50%) scale(.22)}}
+@keyframes arecoOvniAbductCow{0%,4%{opacity:0;transform:translate(-50%,-50%) translateY(0) rotate(0deg) scale(.96)}7%,35%{opacity:.88;transform:translate(-50%,-50%) translateY(0) rotate(0deg) scale(1)}39%{opacity:1;transform:translate(-50%,-50%) translateY(-3px) rotate(-2deg) scale(1.02)}59%{opacity:.92;transform:translate(-50%,-50%) translateY(-145%) rotate(7deg) scale(.72)}66%{opacity:.24;transform:translate(-50%,-50%) translateY(-230%) rotate(-9deg) scale(.38)}69%,100%{opacity:0;transform:translate(-50%,-50%) translateY(-255%) rotate(10deg) scale(.2)}}
+@keyframes arecoOvniParticleRise{0%,30%{opacity:0;transform:translate(calc(-50% + var(--areco-particle-x)),0) scale(var(--areco-particle-scale))}38%{opacity:.8}62%{opacity:.55;transform:translate(calc(-50% + var(--areco-particle-x-mid)),-150px) scale(var(--areco-particle-scale-mid))}68%,100%{opacity:0;transform:translate(-50%,-190px) scale(.1)}}
+@keyframes arecoOvniRimBlink{0%,100%{opacity:.4;filter:drop-shadow(0 0 2px var(--areco-ovni-cyan))}50%{opacity:1;filter:drop-shadow(0 0 7px var(--areco-ovni-cyan))}}
+@media(max-width:700px){.areco-ovni-animation{--areco-ovni-width:clamp(165px,46vw,245px);--areco-ovni-height:clamp(248px,69vw,368px)}}
+@media(prefers-reduced-motion:reduce){.areco-ovni-animation{display:none!important}}
+
 /* Force date picker icon to be visible */
 input[type="date"].date-input-gold::-webkit-calendar-picker-indicator{
   filter:invert(1) sepia(1) saturate(3) hue-rotate(5deg) brightness(1.2);
@@ -982,6 +1026,83 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
   keepBuffer:4,
   detectRetina:true,
 }).addTo(map);
+
+// ── OVNI ANIMATION ────────────────────────────────────
+(function attachArecoOvniAnimation(global){'use strict';let instanceCounter=0;const DEFAULTS=Object.freeze({id:'char-ovni',containerId:'map-characters',lat:-34.2420,lng:-59.4780,minHour:20,minZoom:14,maxZoom:16,zIndex:400,cycle:'14s',width:null,height:null,forceVisible:false,visibilityCheckMs:600000});function assertLeafletMap(map){if(!map||typeof map.getContainer!=='function'||typeof map.latLngToContainerPoint!=='function'){throw new TypeError('ArecoOvniAnimation.mount(map, options) requires an initialized Leaflet map.');}}function getOrCreateCharacterContainer(map,config){const mapElement=map.getContainer();let container=mapElement.querySelector('#'+config.containerId);if(!container){container=document.createElement('div');container.id=config.containerId;container.dataset.arecoAnimationContainer='created';mapElement.appendChild(container);}container.classList.add('areco-map-characters');container.style.zIndex=String(config.zIndex);container.style.pointerEvents='none';return container;}function buildEffectMarkup(prefix){const id=(name)=>`${prefix}-${name}`;return`<div class="areco-ovni-ambient"></div><div class="areco-ovni-arrival-flash"></div><div class="areco-ovni-beam"></div><div class="areco-ovni-beam-core"></div><div class="areco-ovni-ground-glow"></div><div class="areco-ovni-particle p1"></div><div class="areco-ovni-particle p2"></div><div class="areco-ovni-particle p3"></div><div class="areco-ovni-particle p4"></div><div class="areco-ovni-particle p5"></div><div class="areco-ovni-particle p6"></div><div class="areco-ovni-cow-wrap"><svg class="areco-ovni-cow" viewBox="0 0 120 76" role="presentation" aria-hidden="true"><defs><linearGradient id="${id('cow-body')}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b8c7c8"/><stop offset=".58" stop-color="#68787b"/><stop offset="1" stop-color="#202a2d"/></linearGradient><linearGradient id="${id('cow-head')}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a8b8b8"/><stop offset="1" stop-color="#344144"/></linearGradient></defs><g fill="url(#${id('cow-body')})" stroke="#0d1517" stroke-width="3" stroke-linejoin="round"><path d="M20 29c7-11 22-15 49-13 12 1 20 5 25 13l-4 23H30l-11-10z"/><path d="M29 48l7 2-1 22H25zM54 49h8l4 22H56zM78 48h8l10 20-10 2z"/><path d="M20 34L9 27l3-5 12 6z"/></g><g fill="url(#${id('cow-head')})" stroke="#0d1517" stroke-width="3" stroke-linejoin="round"><path d="M90 24l15 3 9 10-8 17-18-1-6-14z"/><path d="M104 29l10-8M91 27l-5-9" fill="none" stroke-linecap="round"/><path d="M103 39l11 2-4 7-9-1z"/></g><circle cx="103" cy="34" r="2.3" fill="#9affea"/><path d="M46 23c4 7 11 9 16 1M69 20c3 6 8 8 14 3" fill="none" stroke="#273235" stroke-width="4" stroke-linecap="round"/></svg></div><div class="areco-ovni-ship-stage"><div class="areco-ovni-ship-float"><svg class="areco-ovni-ship" viewBox="0 0 320 180" role="presentation" aria-hidden="true"><defs><radialGradient id="${id('dome-glass')}" cx="40%" cy="18%" r="88%"><stop offset="0" stop-color="#f4ffff" stop-opacity="1"/><stop offset=".18" stop-color="#aafff4" stop-opacity=".98"/><stop offset=".55" stop-color="#35d8d5" stop-opacity=".91"/><stop offset="1" stop-color="#062b3a" stop-opacity=".98"/></radialGradient><linearGradient id="${id('metal-top')}" x1=".08" y1=".08" x2=".9" y2=".88"><stop offset="0" stop-color="#f1fbfb"/><stop offset=".16" stop-color="#9aadb1"/><stop offset=".38" stop-color="#34464c"/><stop offset=".58" stop-color="#d0dddd"/><stop offset=".77" stop-color="#60757a"/><stop offset="1" stop-color="#17262c"/></linearGradient><linearGradient id="${id('rim')}" x1="0" y1="0" x2="1" y2=".55"><stop offset="0" stop-color="#dff8f6"/><stop offset=".2" stop-color="#53686e"/><stop offset=".48" stop-color="#f1ffff"/><stop offset=".72" stop-color="#60767b"/><stop offset="1" stop-color="#15242a"/></linearGradient><linearGradient id="${id('metal-lower')}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#657d81"/><stop offset=".26" stop-color="#263a40"/><stop offset=".7" stop-color="#101d22"/><stop offset="1" stop-color="#050b0e"/></linearGradient><radialGradient id="${id('under-glow')}" cx="50%" cy="20%" r="72%"><stop offset="0" stop-color="#e7fffb" stop-opacity=".96"/><stop offset=".2" stop-color="#79ffe9" stop-opacity=".78"/><stop offset=".62" stop-color="#26cfc1" stop-opacity=".2"/><stop offset="1" stop-color="#1cb9ae" stop-opacity="0"/></radialGradient><radialGradient id="${id('aperture')}" cx="50%" cy="50%" r="62%"><stop offset="0" stop-color="#cffff7" stop-opacity=".78"/><stop offset=".4" stop-color="#54f7df" stop-opacity=".35"/><stop offset="1" stop-color="#061419" stop-opacity=".1"/></radialGradient></defs><g transform="rotate(-8 160 90)"><ellipse cx="163" cy="130" rx="96" ry="23" fill="url(#${id('under-glow')})" opacity=".64"/><path d="M108 78C113 50 135 33 163 32c29-1 51 16 58 43z" fill="url(#${id('dome-glass')})" stroke="#c9fff7" stroke-opacity=".78" stroke-width="2.1"/><path d="M127 53c9-10 22-15 37-14" fill="none" stroke="#f4ffff" stroke-opacity=".62" stroke-width="2.8" stroke-linecap="round"/><ellipse cx="163" cy="94" rx="97" ry="26" fill="url(#${id('metal-top')})"/><ellipse cx="163" cy="96" rx="97" ry="11" fill="url(#${id('rim')})"/><ellipse cx="163" cy="101" rx="82" ry="18" fill="url(#${id('metal-lower')})"/><ellipse cx="161" cy="118" rx="38" ry="7" fill="url(#${id('aperture')})" opacity=".86"/><ellipse cx="161" cy="123" rx="23" ry="5" fill="#b9fff5" opacity=".14"/><g fill="#a4fff1" stroke="#e8fffb" stroke-width="1.1"><circle class="areco-ovni-rim-light" cx="74" cy="106" r="5.1"/><circle class="areco-ovni-rim-light" cx="117" cy="116" r="5.1"/><circle class="areco-ovni-rim-light" cx="164" cy="120" r="5.1"/><circle class="areco-ovni-rim-light" cx="211" cy="115" r="5.1"/><circle class="areco-ovni-rim-light" cx="254" cy="104" r="5.1"/></g></g></svg></div></div>`;}
+function mount(map,options){assertLeafletMap(map);const config=Object.assign({},DEFAULTS,options||{});const container=getOrCreateCharacterContainer(map,config);const previousElement=document.getElementById(config.id);if(previousElement&&previousElement.classList.contains('areco-ovni-animation')){previousElement.remove();}instanceCounter+=1;const prefix=`areco-ovni-${instanceCounter}`;const element=document.createElement('div');element.id=config.id;element.className='areco-ovni-animation';element.setAttribute('aria-hidden','true');element.hidden=true;element.dataset.lat=String(config.lat);element.dataset.lng=String(config.lng);element.style.setProperty('--areco-ovni-cycle',String(config.cycle));if(config.width)element.style.setProperty('--areco-ovni-width',String(config.width));if(config.height)element.style.setProperty('--areco-ovni-height',String(config.height));element.innerHTML=buildEffectMarkup(prefix);container.appendChild(element);let lat=Number(config.lat);let lng=Number(config.lng);let forceVisible=Boolean(config.forceVisible);let destroyed=false;let frameRequest=0;function reposition(){frameRequest=0;if(destroyed)return;const point=map.latLngToContainerPoint([lat,lng]);element.style.left=`${Math.round(point.x*100)/100}px`;element.style.top=`${Math.round(point.y*100)/100}px`;}function scheduleReposition(){if(destroyed||frameRequest)return;frameRequest=global.requestAnimationFrame(reposition);}function passesProductionRules(){const zoom=Number(map.getZoom());const hour=new Date().getHours();const zoomOk=zoom>=Number(config.minZoom)&&zoom<=Number(config.maxZoom);const hourOk=config.minHour===null||config.minHour===undefined||hour>=Number(config.minHour);return zoomOk&&hourOk;}function updateVisibility(){if(destroyed)return false;const shouldShow=forceVisible||passesProductionRules();const wasHidden=element.hidden;element.hidden=!shouldShow;if(shouldShow&&wasHidden){scheduleReposition();replay();}return shouldShow;}function replay(){if(destroyed||element.hidden)return;element.classList.add('areco-ovni-reset');void element.offsetWidth;element.classList.remove('areco-ovni-reset');}function setForceVisible(value){forceVisible=Boolean(value);updateVisibility();return forceVisible;}function setPosition(nextLat,nextLng){const parsedLat=Number(nextLat);const parsedLng=Number(nextLng);if(!Number.isFinite(parsedLat)||!Number.isFinite(parsedLng))throw new TypeError('setPosition(lat, lng) requires two valid numbers.');lat=parsedLat;lng=parsedLng;element.dataset.lat=String(lat);element.dataset.lng=String(lng);scheduleReposition();}function pause(){element.classList.add('areco-ovni-paused');}function resume(){element.classList.remove('areco-ovni-paused');}function handleDocumentVisibility(){if(document.hidden){pause();}else{resume();updateVisibility();}}const mapEvents='move zoom moveend zoomend resize viewreset';map.on(mapEvents,scheduleReposition);map.on('zoomend',updateVisibility);document.addEventListener('visibilitychange',handleDocumentVisibility);const visibilityTimer=global.setInterval(updateVisibility,Number(config.visibilityCheckMs));map.whenReady(function initializeOvni(){reposition();updateVisibility();});function destroy(){if(destroyed)return;destroyed=true;if(frameRequest)global.cancelAnimationFrame(frameRequest);global.clearInterval(visibilityTimer);map.off(mapEvents,scheduleReposition);map.off('zoomend',updateVisibility);document.removeEventListener('visibilitychange',handleDocumentVisibility);element.remove();if(container.dataset.arecoAnimationContainer==='created'&&container.childElementCount===0)container.remove();}return Object.freeze({element,replay,pause,resume,destroy,updateVisibility,setForceVisible,setPosition,getPosition:()=>({lat,lng}),isForceVisible:()=>forceVisible});}global.ArecoOvniAnimation=Object.freeze({mount});})(window);
+
+// ── OVNI random positioning in field zones ────────────
+// Safe field zones: rural areas around Areco away from town center
+const OVNI_FIELD_ZONES = [
+  {lat:-34.230, lng:-59.480}, // North fields near Parque Criollo
+  {lat:-34.232, lng:-59.465}, // NE fields
+  {lat:-34.238, lng:-59.490}, // NW fields near river bend
+  {lat:-34.252, lng:-59.500}, // West fields
+  {lat:-34.268, lng:-59.485}, // SW fields near Chamico
+  {lat:-34.260, lng:-59.460}, // South fields
+  {lat:-34.245, lng:-59.455}, // SE open area
+  {lat:-34.235, lng:-59.472}, // N open area
+];
+const OVNI_SPREAD = 0.004; // ~400m random spread around each zone center
+
+function ovniRandomFieldPos() {
+  const zone = OVNI_FIELD_ZONES[Math.floor(Math.random() * OVNI_FIELD_ZONES.length)];
+  return {
+    lat: zone.lat + (Math.random() - 0.5) * OVNI_SPREAD,
+    lng: zone.lng + (Math.random() - 0.5) * OVNI_SPREAD
+  };
+}
+
+function ovniClearOfMarkers(lat, lng) {
+  // Check pixel distance from all active event markers
+  const pt = map.latLngToContainerPoint([lat, lng]);
+  const markers = document.querySelectorAll('.leaflet-marker-icon');
+  for (const m of markers) {
+    const r = m.getBoundingClientRect();
+    const mapRect = document.getElementById('map').getBoundingClientRect();
+    const mx = r.left - mapRect.left + r.width / 2;
+    const my = r.top - mapRect.top + r.height / 2;
+    if (Math.hypot(pt.x - mx, pt.y - my) < 160) return false;
+  }
+  return true;
+}
+
+function ovniPickPosition(attempts) {
+  for (let i = 0; i < (attempts || 8); i++) {
+    const pos = ovniRandomFieldPos();
+    if (ovniClearOfMarkers(pos.lat, pos.lng)) return pos;
+  }
+  return ovniRandomFieldPos(); // fallback — just pick somewhere
+}
+
+// Mount the OVNI — forceVisible:true for testing, change to false for production
+const ovniAnimation = window.ArecoOvniAnimation.mount(map, {
+  forceVisible: true,  // ← change to false once placement confirmed
+  minHour: 0,          // ← change to 20 for night-only production mode
+  minZoom: 14,
+  maxZoom: 16,
+});
+
+// Reposition every 20–40 seconds to a new random field
+function ovniWander() {
+  if (ovniAnimation.isForceVisible() || true) {
+    const pos = ovniPickPosition();
+    ovniAnimation.setPosition(pos.lat, pos.lng);
+    ovniAnimation.replay();
+  }
+  // Next move: 20–40 seconds random interval
+  setTimeout(ovniWander, 20000 + Math.random() * 20000);
+}
+
+map.whenReady(function() {
+  // Set initial random position
+  const initPos = ovniPickPosition();
+  ovniAnimation.setPosition(initPos.lat, initPos.lng);
+  // Start wandering after first animation cycle completes (14s)
+  setTimeout(ovniWander, 14000 + Math.random() * 6000);
+});
+
+window.ovniAnimation = ovniAnimation; // console access for testing
 
 // ── HELPERS ───────────────────────────────────────────
 function wRange(off=0){
