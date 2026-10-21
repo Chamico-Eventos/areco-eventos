@@ -2670,15 +2670,15 @@ function renderW4(f){
         Para que el <strong style="color:var(--ink)">93% de cada entrada</strong> llegue directo a tu cuenta, necesitás autorizar a DataManIAcs en Mercado Pago. Es el sistema estándar de MP — <strong style="color:var(--ink)">no capturamos tu contraseña ni podemos retirar fondos</strong>. Solo podemos depositarte dinero.
       </div>
       <div style="background:var(--s2);border-radius:8px;padding:10px 13px;font-size:12px;line-height:1.8;border:1px solid var(--b2);margin-bottom:10px">
-        <strong style="color:var(--ink)">Cómo hacerlo ahora (2 minutos):</strong><br>
-        1. Hacé clic en el botón de abajo — se abre en una nueva pestaña<br>
+        <strong style="color:var(--ink)">Cómo hacerlo (2 minutos):</strong><br>
+        1. Hacé clic en el botón — <strong style="color:var(--ink)">se abre en una pestaña nueva, esta página queda abierta</strong><br>
         2. Iniciá sesión con tu cuenta MP (alias: <strong style="color:var(--gold)">${wData.mp_alias||'tu alias'}</strong>)<br>
         3. MP te pregunta "¿Autorizar a DataManIAcs?" → hacés clic en <strong style="color:var(--ink)">Autorizar</strong><br>
-        4. Cerrá esa pestaña y volvé acá para continuar
+        4. <strong style="color:var(--ink)">Volvé a esta pestaña</strong> — verificamos automáticamente que quedó conectado
       </div>
       <a href="https://entradas.datamaniacs.com.ar/mp-connect?venue=${slugify(wData.lugar||'venue').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40)}"
         target="_blank" rel="noopener"
-        onclick="setTimeout(()=>document.getElementById('w-mp-connected').style.display='flex',3000)"
+        onclick="startMpConnectWatch()"
         style="display:block;text-align:center;padding:11px 20px;background:linear-gradient(135deg,var(--gold),#e8c97a);
                color:#0e0d0b;font-weight:700;font-size:13px;border-radius:9px;text-decoration:none;margin-bottom:8px">
         🔗 Conectar mi Mercado Pago →
@@ -2686,11 +2686,9 @@ function renderW4(f){
       <div style="font-size:11px;color:rgba(192,90,74,0.8);text-align:center;margin-bottom:10px">
         ⚠ Abrí en Safari o Chrome — no desde WhatsApp
       </div>
-      <label id="w-mp-connected" style="display:none;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--ink2);
-             background:rgba(42,122,80,0.1);border:1px solid rgba(42,122,80,0.3);border-radius:8px;padding:10px 12px">
-        <input type="checkbox" id="w-mp-connected-chk" style="accent-color:#4ca87a;flex-shrink:0">
-        <span>✅ Ya autoricé a DataManIAcs en mi cuenta de Mercado Pago</span>
-      </label>
+      <div id="w-mp-watch-status" style="display:none;text-align:center;font-size:12px;color:var(--muted);padding:6px 0 4px">
+        ⏳ Cuando vuelvas a esta pestaña verificamos automáticamente…
+      </div>
       <div style="font-size:11px;color:var(--muted);line-height:1.6;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:6px;margin-top:8px">
         ⚠ Si no completás este paso ahora, los pagos quedarán retenidos en la cuenta de DataManIAcs y hay que transferirlos manualmente. <strong style="color:var(--ink2)">Se hace una sola vez por venue.</strong>
       </div>
@@ -2806,6 +2804,23 @@ function autoFillPuerta(mode){
   const hintId=mode==='mp'?'mp-puerta-hint':'trf-puerta-hint';
   const hint=document.getElementById(hintId);
   if(hint) hint.textContent=` · Sugerido: $${sugerido.toLocaleString('es-AR')} (preventa + $2.000) — podés editarlo.`;
+}
+function startMpConnectWatch(){
+  // Show waiting message
+  const ws=document.getElementById('w-mp-watch-status');
+  if(ws) ws.style.display='block';
+  // When user returns to this tab, re-check connection status
+  function onTabFocus(){
+    document.removeEventListener('visibilitychange',onTabFocus);
+    window.removeEventListener('focus',onTabFocus);
+    if(ws) ws.innerHTML='⏳ Verificando conexión…';
+    // Small delay to let Supabase finish writing the token
+    setTimeout(()=>checkVenueConnected(),1500);
+  }
+  document.addEventListener('visibilitychange',function handler(){
+    if(!document.hidden){ document.removeEventListener('visibilitychange',handler); onTabFocus(); }
+  });
+  window.addEventListener('focus',onTabFocus,{once:true});
 }
 function toggleMpHelp(e){
   e.stopPropagation();
