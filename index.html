@@ -2655,8 +2655,10 @@ function renderW4(f){
         <span style="color:var(--muted)">Si nunca usaste MP para cobrar, abrí la app → tocá <strong style="color:var(--ink2)">"Tu dinero"</strong> → vas a ver tu alias y CVU listos para usar.</span>
       </div>
     </div>
+    <!-- MP Connect status (filled by checkVenueConnected) -->
+    <div id="mp-connect-status" style="display:none;margin-top:12px"></div>
     <!-- MP Connect authorization -->
-    <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.3);border-radius:12px;padding:14px 16px;margin-top:12px">
+    <div id="mp-connect-block" style="display:none;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.3);border-radius:12px;padding:14px 16px;margin-top:12px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
         <span style="font-size:18px">🔐</span>
         <div>
@@ -2665,20 +2667,32 @@ function renderW4(f){
         </div>
       </div>
       <div style="font-size:12px;color:var(--ink2);line-height:1.7;margin-bottom:12px">
-        Para que el <strong style="color:var(--ink)">93% del valor de cada entrada</strong> llegue directo a tu cuenta de MP, necesitás autorizarnos una sola vez. Es el sistema estándar de Mercado Pago — el mismo que usan plataformas como Eventbrite o Ticketek.<br><br>
-        <strong style="color:var(--ink)">¿Qué pasa exactamente?</strong><br>
-        Mercado Pago te pregunta si autorizás a DataManIAcs a <em>depositar dinero</em> en tu cuenta. No accedemos a tu contraseña, no podemos retirar fondos, ni ver tu historial. Solo podemos enviarte plata — nada más.
+        Para que el <strong style="color:var(--ink)">93% de cada entrada</strong> llegue directo a tu cuenta, necesitás autorizar a DataManIAcs en Mercado Pago. Es el sistema estándar de MP — <strong style="color:var(--ink)">no capturamos tu contraseña ni podemos retirar fondos</strong>. Solo podemos depositarte dinero.
       </div>
       <div style="background:var(--s2);border-radius:8px;padding:10px 13px;font-size:12px;line-height:1.8;border:1px solid var(--b2);margin-bottom:10px">
-        <strong style="color:var(--ink)">Cómo hacerlo (2 minutos):</strong><br>
-        1. Después de enviar el evento, te mandamos el link por email<br>
-        2. Abrís el link → iniciás sesión con tu cuenta MP (alias: <strong style="color:var(--gold)">${wData.mp_alias||'tu alias'}</strong>)<br>
+        <strong style="color:var(--ink)">Cómo hacerlo ahora (2 minutos):</strong><br>
+        1. Hacé clic en el botón de abajo — se abre en una nueva pestaña<br>
+        2. Iniciá sesión con tu cuenta MP (alias: <strong style="color:var(--gold)">${wData.mp_alias||'tu alias'}</strong>)<br>
         3. MP te pregunta "¿Autorizar a DataManIAcs?" → hacés clic en <strong style="color:var(--ink)">Autorizar</strong><br>
-        4. Listo — todos tus eventos futuros en este venue quedan conectados automáticamente
+        4. Cerrá esa pestaña y volvé acá para continuar
       </div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:6px">
-        ⚠ Si no completás este paso, los pagos quedan retenidos en la cuenta de DataManIAcs y hay que transferirlos manualmente después del evento. <strong style="color:var(--ink2)">Recomendamos hacerlo antes de que empiece la venta.</strong><br>
-        <span style="color:rgba(192,90,74,0.8)">⚠ Abrí el link en Safari o Chrome — no funciona desde WhatsApp.</span>
+      <a href="https://entradas.datamaniacs.com.ar/mp-connect?venue=${slugify(wData.lugar||'venue').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40)}"
+        target="_blank" rel="noopener"
+        onclick="setTimeout(()=>document.getElementById('w-mp-connected').style.display='flex',3000)"
+        style="display:block;text-align:center;padding:11px 20px;background:linear-gradient(135deg,var(--gold),#e8c97a);
+               color:#0e0d0b;font-weight:700;font-size:13px;border-radius:9px;text-decoration:none;margin-bottom:8px">
+        🔗 Conectar mi Mercado Pago →
+      </a>
+      <div style="font-size:11px;color:rgba(192,90,74,0.8);text-align:center;margin-bottom:10px">
+        ⚠ Abrí en Safari o Chrome — no desde WhatsApp
+      </div>
+      <label id="w-mp-connected" style="display:none;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--ink2);
+             background:rgba(42,122,80,0.1);border:1px solid rgba(42,122,80,0.3);border-radius:8px;padding:10px 12px">
+        <input type="checkbox" id="w-mp-connected-chk" style="accent-color:#4ca87a;flex-shrink:0">
+        <span>✅ Ya autoricé a DataManIAcs en mi cuenta de Mercado Pago</span>
+      </label>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:6px;margin-top:8px">
+        ⚠ Si no completás este paso ahora, los pagos quedarán retenidos en la cuenta de DataManIAcs y hay que transferirlos manualmente. <strong style="color:var(--ink2)">Se hace una sola vez por venue.</strong>
       </div>
     </div>
     ${errDiv()}
@@ -2689,6 +2703,40 @@ function renderW4(f){
   calcFee();
   showPrecioSugerido('precio-sugerido-mp');
   if(wData.precio_entrada&&!wData.precio_puerta) autoFillPuerta('mp');
+  // Check if venue already connected to MP
+  checkVenueConnected();
+}
+
+async function checkVenueConnected(){
+  const block=document.getElementById('mp-connect-block');
+  const status=document.getElementById('mp-connect-status');
+  if(!block||!status) return;
+  const slug=slugify(wData.lugar||'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40);
+  if(!slug) return;
+  // Show loading state
+  status.innerHTML='<span style="color:var(--muted);font-size:12px">⏳ Verificando estado de conexión…</span>';
+  status.style.display='block';
+  try{
+    const r=await fetch(`https://entradas.datamaniacs.com.ar/api/venue-status?venue=${slug}`,{mode:'cors'});
+    if(!r.ok) throw new Error('API error');
+    const data=await r.json();
+    if(data.connected){
+      // Already connected — hide the whole connect block, show green confirmation
+      block.style.display='none';
+      status.innerHTML=`<div style="display:flex;align-items:center;gap:8px;background:rgba(42,122,80,0.12);border:1px solid rgba(42,122,80,0.3);border-radius:10px;padding:12px 14px;font-size:13px;color:#4ca87a">
+        ✅ <span><strong>Tu venue ya está conectado a DataManIAcs.</strong><br>
+        <span style="font-size:11px;color:var(--muted)">El dinero de las entradas irá directo a tu cuenta automáticamente.</span></span>
+      </div>`;
+    } else {
+      // Not connected — show connect block normally
+      block.style.display='block';
+      status.style.display='none';
+    }
+  } catch(e){
+    // API unreachable — show block anyway (fail safe)
+    block.style.display='block';
+    status.style.display='none';
+  }
 }
 function calcFee(){
   const precio=parseFloat(document.getElementById('w-precio')?.value)||0;
@@ -3188,8 +3236,12 @@ async function submitWizard(){
       <div class="form-success">
         <div class="form-success-icon">🎉</div>
         <h3>¡Evento recibido!</h3>
-        <p>Revisamos tu evento y te contactamos en menos de 24 horas para confirmar el servicio de entradas.<br>
-        Te escribimos a <strong>${wData.contacto_email}</strong>.</p>
+        <p>Tu evento fue enviado y está siendo revisado por el equipo de DataManIAcs.</p>
+        <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin:12px 0;font-size:12px;color:var(--ink2);line-height:1.8;text-align:left">
+          ⏳ <strong style="color:var(--ink)">Tiempo de validación:</strong> hasta 24 horas hábiles<br>
+          📧 <strong style="color:var(--ink)">Te avisamos por email</strong> a <strong>${wData.contacto_email}</strong> cuando el evento esté publicado en el mapa<br>
+          🗺 Una vez publicado aparecerá en <strong style="color:var(--gold)">areco-eventos.vercel.app</strong>
+        </div>
         ${flyerBase64?'<div style="background:rgba(42,122,80,0.12);border:1px solid rgba(42,122,80,0.3);border-radius:10px;padding:12px 14px;margin:14px 0;font-size:13px;color:#4ca87a">✅ Flyer subido correctamente.</div>':''}
         ${isMp?`
         <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.35);border-radius:12px;padding:16px;margin:16px 0;text-align:left">
@@ -3212,7 +3264,7 @@ async function submitWizard(){
             ⚠ Abrí el link en Safari o Chrome — no funciona desde WhatsApp
           </div>
           <div style="font-size:10px;color:var(--muted);text-align:center">
-            Si preferís hacerlo después, te enviamos el link a <strong>${wData.contacto_email}</strong>
+            Solo necesitás hacer esto una vez — aplica a todos tus eventos futuros en este venue
           </div>
         </div>`:''}
         <button class="form-submit" style="margin-top:8px;max-width:200px;margin-left:auto;margin-right:auto" onclick="closeSubModal()">Cerrar</button>
