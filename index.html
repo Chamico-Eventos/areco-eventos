@@ -2805,22 +2805,44 @@ function autoFillPuerta(mode){
   const hint=document.getElementById(hintId);
   if(hint) hint.textContent=` · Sugerido: $${sugerido.toLocaleString('es-AR')} (preventa + $2.000) — podés editarlo.`;
 }
+let _mpPollTimer=null;
 function startMpConnectWatch(){
-  // Show waiting message
   const ws=document.getElementById('w-mp-watch-status');
   if(ws) ws.style.display='block';
-  // When user returns to this tab, re-check connection status
-  function onTabFocus(){
-    document.removeEventListener('visibilitychange',onTabFocus);
-    window.removeEventListener('focus',onTabFocus);
-    if(ws) ws.innerHTML='⏳ Verificando conexión…';
-    // Small delay to let Supabase finish writing the token
-    setTimeout(()=>checkVenueConnected(),1500);
-  }
-  document.addEventListener('visibilitychange',function handler(){
-    if(!document.hidden){ document.removeEventListener('visibilitychange',handler); onTabFocus(); }
-  });
-  window.addEventListener('focus',onTabFocus,{once:true});
+  // Clear any existing poll
+  if(_mpPollTimer) clearInterval(_mpPollTimer);
+  const slug=slugify(wData.lugar||'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40);
+  if(!slug) return;
+  let dots=0;
+  _mpPollTimer=setInterval(async()=>{
+    // Animate waiting dots
+    dots=(dots+1)%4;
+    if(ws) ws.textContent='⏳ Esperando autorización'+'.'.repeat(dots);
+    try{
+      const r=await fetch(`https://entradas.datamaniacs.com.ar/api/venue-status?venue=${slug}`,{mode:'cors'});
+      if(!r.ok) return;
+      const data=await r.json();
+      if(data.connected){
+        clearInterval(_mpPollTimer);
+        _mpPollTimer=null;
+        // Update the UI — hide connect block, show success
+        const block=document.getElementById('mp-connect-block');
+        const status=document.getElementById('mp-connect-status');
+        if(block) block.style.display='none';
+        if(status){
+          status.style.display='block';
+          status.innerHTML=`<div style="display:flex;align-items:center;gap:8px;background:rgba(42,122,80,0.12);border:1px solid rgba(42,122,80,0.3);border-radius:10px;padding:12px 14px;font-size:13px;color:#4ca87a">
+            ✅ <span><strong>¡Cuenta conectada!</strong> El dinero de las entradas irá directo a tu cuenta automáticamente.<br>
+            <span style="font-size:11px;color:var(--muted)">Podés continuar con el siguiente paso.</span></span>
+          </div>`;
+        }
+      }
+    }catch(e){ /* keep polling silently */ }
+  },4000); // check every 4 seconds
+  // Stop polling after 5 minutes regardless
+  setTimeout(()=>{
+    if(_mpPollTimer){ clearInterval(_mpPollTimer); _mpPollTimer=null; }
+  },300000);
 }
 function toggleMpHelp(e){
   e.stopPropagation();
