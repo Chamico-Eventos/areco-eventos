@@ -2671,14 +2671,14 @@ function renderW4(f){
       </div>
       <div style="background:var(--s2);border-radius:8px;padding:10px 13px;font-size:12px;line-height:1.8;border:1px solid var(--b2);margin-bottom:10px">
         <strong style="color:var(--ink)">Cómo hacerlo (2 minutos):</strong><br>
-        1. Hacé clic en el botón — <strong style="color:var(--ink)">se abre en una pestaña nueva, esta página queda abierta</strong><br>
+        1. Hacé clic en el botón — se abre en una pestaña nueva<br>
         2. Iniciá sesión con tu cuenta MP (alias: <strong style="color:var(--gold)">${wData.mp_alias||'tu alias'}</strong>)<br>
         3. MP te pregunta "¿Autorizar a DataManIAcs?" → hacés clic en <strong style="color:var(--ink)">Autorizar</strong><br>
-        4. <strong style="color:var(--ink)">Volvé a esta pestaña</strong> — verificamos automáticamente que quedó conectado
+        4. Cerrá esa pestaña y volvé acá — después tocá <strong style="color:var(--ink)">"Ya conecté mi cuenta"</strong>
       </div>
       <a href="https://entradas.datamaniacs.com.ar/mp-connect?venue=${slugify(wData.lugar||'venue').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40)}"
         target="_blank" rel="noopener"
-        onclick="startMpConnectWatch()"
+        onclick="document.getElementById('w-mp-ya-conecte').style.display='block'"
         style="display:block;text-align:center;padding:11px 20px;background:linear-gradient(135deg,var(--gold),#e8c97a);
                color:#0e0d0b;font-weight:700;font-size:13px;border-radius:9px;text-decoration:none;margin-bottom:8px">
         🔗 Conectar mi Mercado Pago →
@@ -2686,9 +2686,11 @@ function renderW4(f){
       <div style="font-size:11px;color:rgba(192,90,74,0.8);text-align:center;margin-bottom:10px">
         ⚠ Abrí en Safari o Chrome — no desde WhatsApp
       </div>
-      <div id="w-mp-watch-status" style="display:none;text-align:center;font-size:12px;color:var(--muted);padding:6px 0 4px">
-        ⏳ Cuando vuelvas a esta pestaña verificamos automáticamente…
-      </div>
+      <button id="w-mp-ya-conecte" onclick="mpYaConecte()" style="display:none;width:100%;padding:10px;border-radius:9px;
+        border:1px solid rgba(42,122,80,0.4);background:rgba(42,122,80,0.1);color:#4ca87a;
+        font-size:13px;font-weight:600;cursor:pointer;margin-bottom:8px">
+        ✅ Ya conecté mi cuenta — continuar
+      </button>
       <div style="font-size:11px;color:var(--muted);line-height:1.6;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:6px;margin-top:8px">
         ⚠ Si no completás este paso ahora, los pagos quedarán retenidos en la cuenta de DataManIAcs y hay que transferirlos manualmente. <strong style="color:var(--ink2)">Se hace una sola vez por venue.</strong>
       </div>
@@ -2805,44 +2807,46 @@ function autoFillPuerta(mode){
   const hint=document.getElementById(hintId);
   if(hint) hint.textContent=` · Sugerido: $${sugerido.toLocaleString('es-AR')} (preventa + $2.000) — podés editarlo.`;
 }
-let _mpPollTimer=null;
 function startMpConnectWatch(){
-  const ws=document.getElementById('w-mp-watch-status');
-  if(ws) ws.style.display='block';
-  // Clear any existing poll
-  if(_mpPollTimer) clearInterval(_mpPollTimer);
+  // Placeholder — once entradas adds return_to support this can auto-verify
+}
+async function mpYaConecte(){
+  const btn=document.getElementById('w-mp-ya-conecte');
+  const block=document.getElementById('mp-connect-block');
+  const status=document.getElementById('mp-connect-status');
+  if(btn){btn.disabled=true;btn.textContent='⏳ Verificando…';}
   const slug=slugify(wData.lugar||'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40);
-  if(!slug) return;
-  let dots=0;
-  _mpPollTimer=setInterval(async()=>{
-    // Animate waiting dots
-    dots=(dots+1)%4;
-    if(ws) ws.textContent='⏳ Esperando autorización'+'.'.repeat(dots);
-    try{
-      const r=await fetch(`https://entradas.datamaniacs.com.ar/api/venue-status?venue=${slug}`,{mode:'cors'});
-      if(!r.ok) return;
-      const data=await r.json();
-      if(data.connected){
-        clearInterval(_mpPollTimer);
-        _mpPollTimer=null;
-        // Update the UI — hide connect block, show success
-        const block=document.getElementById('mp-connect-block');
-        const status=document.getElementById('mp-connect-status');
-        if(block) block.style.display='none';
-        if(status){
-          status.style.display='block';
-          status.innerHTML=`<div style="display:flex;align-items:center;gap:8px;background:rgba(42,122,80,0.12);border:1px solid rgba(42,122,80,0.3);border-radius:10px;padding:12px 14px;font-size:13px;color:#4ca87a">
-            ✅ <span><strong>¡Cuenta conectada!</strong> El dinero de las entradas irá directo a tu cuenta automáticamente.<br>
-            <span style="font-size:11px;color:var(--muted)">Podés continuar con el siguiente paso.</span></span>
-          </div>`;
-        }
+  try{
+    const r=await fetch(`https://entradas.datamaniacs.com.ar/api/venue-status?venue=${slug}`,{mode:'cors'});
+    const data=r.ok?await r.json():{connected:false};
+    if(data.connected){
+      if(block) block.style.display='none';
+      if(status){
+        status.style.display='block';
+        status.innerHTML=`<div style="display:flex;align-items:center;gap:8px;background:rgba(42,122,80,0.12);border:1px solid rgba(42,122,80,0.3);border-radius:10px;padding:12px 14px;font-size:13px;color:#4ca87a">
+          ✅ <span><strong>¡Cuenta conectada!</strong> El dinero irá directo a tu cuenta automáticamente.</span>
+        </div>`;
       }
-    }catch(e){ /* keep polling silently */ }
-  },4000); // check every 4 seconds
-  // Stop polling after 5 minutes regardless
-  setTimeout(()=>{
-    if(_mpPollTimer){ clearInterval(_mpPollTimer); _mpPollTimer=null; }
-  },300000);
+    } else {
+      // Not connected yet — reset button so they can retry
+      if(btn){btn.disabled=false;btn.textContent='✅ Ya conecté mi cuenta — continuar';}
+      if(status){
+        status.style.display='block';
+        status.innerHTML=`<div style="font-size:12px;color:#c05a4a;padding:8px 10px;background:rgba(192,90,74,0.08);border:1px solid rgba(192,90,74,0.25);border-radius:8px">
+          ⚠ No detectamos la conexión todavía. Asegurate de haber hecho clic en "Autorizar" en la página de MP e intentá de nuevo.
+        </div>`;
+      }
+    }
+  }catch(e){
+    // API unreachable — trust the user and let them proceed
+    if(block) block.style.display='none';
+    if(status){
+      status.style.display='block';
+      status.innerHTML=`<div style="display:flex;align-items:center;gap:8px;background:rgba(42,122,80,0.12);border:1px solid rgba(42,122,80,0.3);border-radius:10px;padding:12px 14px;font-size:13px;color:#4ca87a">
+        ✅ <span><strong>Gracias.</strong> Verificaremos la conexión cuando el evento sea publicado.</span>
+      </div>`;
+    }
+  }
 }
 function toggleMpHelp(e){
   e.stopPropagation();
