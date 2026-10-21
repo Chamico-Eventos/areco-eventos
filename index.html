@@ -2676,7 +2676,7 @@ function renderW4(f){
         3. MP te pregunta "¿Autorizar a DataManIAcs?" → hacés clic en <strong style="color:var(--ink)">Autorizar</strong><br>
         4. Cerrá esa pestaña y volvé acá — después tocá <strong style="color:var(--ink)">"Ya conecté mi cuenta"</strong>
       </div>
-      <a href="https://entradas.datamaniacs.com.ar/mp-connect?venue=${slugify(wData.lugar||'venue').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40)}"
+      <a href="https://entradas.datamaniacs.com.ar/mp-connect?venue=${slugify(wData.lugar||'venue').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40)}&return_to=${encodeURIComponent('https://areco-eventos.vercel.app')}"
         target="_blank" rel="noopener"
         onclick="document.getElementById('w-mp-ya-conecte').style.display='block'"
         style="display:block;text-align:center;padding:11px 20px;background:linear-gradient(135deg,var(--gold),#e8c97a);
@@ -3271,7 +3271,7 @@ async function submitWizard(){
   try{
     await fetch(AS_SUBMIT,{method:'POST',body:JSON.stringify(payload),headers:{'Content-Type':'application/json'},mode:'no-cors'});
     const venueSlug=slugify(wData.lugar||'venue').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40);
-    const mpConnectUrl=`https://entradas.datamaniacs.com.ar/mp-connect?venue=${venueSlug}`;
+    const mpConnectUrl=`https://entradas.datamaniacs.com.ar/mp-connect?venue=${venueSlug}&return_to=${encodeURIComponent('https://areco-eventos.vercel.app')}`;
     const isMp=wizardMode==='mp';
     document.getElementById('subForm').innerHTML=`
       <div class="form-success">
