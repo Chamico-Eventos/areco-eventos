@@ -3338,6 +3338,41 @@ async function init(){
       `<div class="empty"><strong>Error al cargar</strong>${e.message}</div>`;
   }
   document.getElementById('loading').style.display='none';
+
+  // ── Handle MP OAuth return ─────────────────────────────
+  // Detects ?mp_connected=true&venue=SLUG after OAuth redirect
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('mp_connected')==='true'){
+    const venueSlug = params.get('venue')||'';
+    // Clean the URL without reloading
+    window.history.replaceState({}, '', window.location.pathname);
+    // Restore wizard state to step 4 with MP connected confirmation
+    wizardMode='mp';
+    wizardStep=4;
+    wData.lugar = wData.lugar || venueSlug.replace(/-/g,' ');
+    openSubModal();
+    // Short delay so modal renders first
+    setTimeout(()=>{
+      const f=document.getElementById('subForm');
+      if(!f) return;
+      setModalTitle('Paso 4 · Tickets y Mercado Pago','Configurá tus entradas');
+      f.innerHTML=`
+        <div style="display:flex;align-items:center;gap:12px;background:rgba(42,122,80,0.12);border:1px solid rgba(42,122,80,0.35);border-radius:12px;padding:16px;margin-bottom:16px">
+          <span style="font-size:32px">✅</span>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:#4ca87a;margin-bottom:4px">¡Cuenta de Mercado Pago conectada!</div>
+            <div style="font-size:12px;color:var(--ink2);line-height:1.6">El dinero de las entradas irá directo a tu cuenta automáticamente. Ya podés continuar con el siguiente paso.</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:16px">
+          Esta conexión aplica a todos tus eventos futuros en este venue — no necesitás repetirla.
+        </div>
+        <div class="step-nav">
+          <button class="btn-back" onclick="wizardStep=3;renderStep()">← Atrás</button>
+          <button class="btn-next" onclick="wizardStep=5;renderStep()">Siguiente →</button>
+        </div>`;
+    }, 300);
+  }
 }
 
 init();
