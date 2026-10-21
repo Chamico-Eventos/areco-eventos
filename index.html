@@ -2676,7 +2676,7 @@ function renderW4(f){
         3. MP te pregunta "¿Autorizar a DataManIAcs?" → hacés clic en <strong style="color:var(--ink)">Autorizar</strong><br>
         4. Cerrá esa pestaña y volvé acá — después tocá <strong style="color:var(--ink)">"Ya conecté mi cuenta"</strong>
       </div>
-      <a href="https://entradas.datamaniacs.com.ar/mp-connect?venue=${slugify(wData.lugar||'venue').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40)}&return_to=${encodeURIComponent('https://areco-eventos.vercel.app')}"
+      <a href="https://entradas.datamaniacs.com.ar/mp-connect?venue=${getVenueSlug(wData.lugar||'venue')}&return_to=${encodeURIComponent('https://areco-eventos.vercel.app')}&mp_email=${encodeURIComponent(wData.mp_email||'')}"
         target="_blank" rel="noopener"
         onclick="document.getElementById('w-mp-ya-conecte').style.display='block'"
         style="display:block;text-align:center;padding:11px 20px;background:linear-gradient(135deg,var(--gold),#e8c97a);
@@ -2707,11 +2707,31 @@ function renderW4(f){
   checkVenueConnected();
 }
 
+// Known venue slug overrides to match Supabase venue table
+const VENUE_SLUG_MAP = {
+  'galpon chamico': 'chamico',
+  'galpón chamico': 'chamico',
+  'el tokyo': 'el-tokio',
+  'el tokio': 'el-tokio',
+  'bar el tokio': 'el-tokio',
+  'la cava del tokio': 'el-tokio',
+  'el mitre': 'el-mitre',
+  'el mitre, bar historico': 'el-mitre',
+  'el mitre, bar histórico': 'el-mitre',
+  'skala': 'skala',
+  'el ancla': 'el-ancla',
+  'el rancho': 'el-rancho',
+};
+function getVenueSlug(lugar){
+  const key=(lugar||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  return VENUE_SLUG_MAP[key] || slugify(lugar||'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40);
+}
+
 async function checkVenueConnected(){
   const block=document.getElementById('mp-connect-block');
   const status=document.getElementById('mp-connect-status');
   if(!block||!status) return;
-  const slug=slugify(wData.lugar||'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40);
+  const slug=getVenueSlug(wData.lugar||'');
   if(!slug) return;
   // Show loading state
   status.innerHTML='<span style="color:var(--muted);font-size:12px">⏳ Verificando estado de conexión…</span>';
@@ -2815,7 +2835,7 @@ async function mpYaConecte(){
   const block=document.getElementById('mp-connect-block');
   const status=document.getElementById('mp-connect-status');
   if(btn){btn.disabled=true;btn.textContent='⏳ Verificando…';}
-  const slug=slugify(wData.lugar||'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40);
+  const slug=getVenueSlug(wData.lugar||'');
   try{
     const r=await fetch(`https://entradas.datamaniacs.com.ar/api/venue-status?venue=${slug}`,{mode:'cors'});
     const data=r.ok?await r.json():{connected:false};
@@ -3270,8 +3290,8 @@ async function submitWizard(){
 
   try{
     await fetch(AS_SUBMIT,{method:'POST',body:JSON.stringify(payload),headers:{'Content-Type':'application/json'},mode:'no-cors'});
-    const venueSlug=slugify(wData.lugar||'venue').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40);
-    const mpConnectUrl=`https://entradas.datamaniacs.com.ar/mp-connect?venue=${venueSlug}&return_to=${encodeURIComponent('https://areco-eventos.vercel.app')}`;
+    const venueSlug=getVenueSlug(wData.lugar||'venue');
+    const mpConnectUrl=`https://entradas.datamaniacs.com.ar/mp-connect?venue=${venueSlug}&return_to=${encodeURIComponent('https://areco-eventos.vercel.app')}&mp_email=${encodeURIComponent(wData.mp_email||'')}`;
     const isMp=wizardMode==='mp';
     document.getElementById('subForm').innerHTML=`
       <div class="form-success">
