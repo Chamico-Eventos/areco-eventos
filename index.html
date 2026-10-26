@@ -355,7 +355,7 @@ img.leaflet-tile{border:none !important;outline:none !important}
 /* ── OVNI map animation ────────────────────────────────── */
 .areco-map-characters{position:absolute;inset:0;z-index:400;overflow:hidden;pointer-events:none}
 .areco-map-characters,.areco-map-characters *{box-sizing:border-box;pointer-events:none;user-select:none;-webkit-user-select:none}
-.areco-ovni-animation{--areco-ovni-cycle:14s;--areco-ovni-cyan:#72ffe7;--areco-ovni-width:clamp(80px,8vw,120px);--areco-ovni-height:clamp(120px,12vw,180px);position:absolute;width:0;height:0;overflow:visible;isolation:isolate}
+.areco-ovni-animation{--areco-ovni-cycle:14s;--areco-ovni-cyan:#72ffe7;--areco-ovni-width:clamp(55px,5vw,80px);--areco-ovni-height:clamp(82px,7.5vw,120px);position:absolute;width:0;height:0;overflow:visible;isolation:isolate}
 .areco-ovni-scale-wrap{position:absolute;width:var(--areco-ovni-width);height:var(--areco-ovni-height);transform-origin:50% 81.8%;transform:scale(1);transition:transform 0.3s ease;margin-left:calc(var(--areco-ovni-width) / -2);margin-top:calc(var(--areco-ovni-height) * -0.818)}
 .areco-ovni-animation[hidden]{display:none!important}
 .areco-ovni-animation.areco-ovni-paused *,.areco-ovni-animation.areco-ovni-paused *::before,.areco-ovni-animation.areco-ovni-paused *::after{animation-play-state:paused!important}
@@ -394,7 +394,7 @@ img.leaflet-tile{border:none !important;outline:none !important}
 @keyframes arecoOvniAbductCow{0%,4%{opacity:0;transform:translate(-50%,-50%) translateY(0) rotate(0deg) scale(.96)}7%,35%{opacity:.88;transform:translate(-50%,-50%) translateY(0) rotate(0deg) scale(1)}39%{opacity:1;transform:translate(-50%,-50%) translateY(-3px) rotate(-2deg) scale(1.02)}59%{opacity:.92;transform:translate(-50%,-50%) translateY(-145%) rotate(7deg) scale(.72)}66%{opacity:.24;transform:translate(-50%,-50%) translateY(-230%) rotate(-9deg) scale(.38)}69%,100%{opacity:0;transform:translate(-50%,-50%) translateY(-255%) rotate(10deg) scale(.2)}}
 @keyframes arecoOvniParticleRise{0%,30%{opacity:0;transform:translate(calc(-50% + var(--areco-particle-x)),0) scale(var(--areco-particle-scale))}38%{opacity:.8}62%{opacity:.55;transform:translate(calc(-50% + var(--areco-particle-x-mid)),-150px) scale(var(--areco-particle-scale-mid))}68%,100%{opacity:0;transform:translate(-50%,-190px) scale(.1)}}
 @keyframes arecoOvniRimBlink{0%,100%{opacity:.4;filter:drop-shadow(0 0 2px var(--areco-ovni-cyan))}50%{opacity:1;filter:drop-shadow(0 0 7px var(--areco-ovni-cyan))}}
-@media(max-width:700px){.areco-ovni-animation{--areco-ovni-width:clamp(70px,18vw,100px);--areco-ovni-height:clamp(105px,27vw,150px)}}
+@media(max-width:700px){.areco-ovni-animation{--areco-ovni-width:clamp(45px,12vw,70px);--areco-ovni-height:clamp(68px,18vw,105px)}}
 @media(prefers-reduced-motion:reduce){.areco-ovni-animation{display:none!important}}
 
 /* Force date picker icon to be visible */
@@ -542,6 +542,7 @@ input[type="date"].date-input-gold::-webkit-calendar-picker-indicator{
 .tn-day-num{font-size:11px;font-weight:600;color:var(--ink2)}
 .tn-day-today{background:rgba(226,185,79,0.12)}
 .tn-day-today .tn-day-name,.tn-day-today .tn-day-num{color:var(--gold);font-weight:700}
+.tn-day-selected{background:rgba(226,185,79,0.25);border-radius:6px;outline:1px solid rgba(226,185,79,0.5)}
 /* Timeline mood bar */
 .tn-timeline{
   display:flex;align-items:center;
@@ -814,7 +815,7 @@ input[type="date"].date-input-gold::-webkit-calendar-picker-indicator{
             <span class="tn-count" id="tnCount">–</span>
             <!-- Desktop: return button inline in the status row — no height change -->
             <button class="tn-return-btn" id="tnReturn" aria-label="Volver a la semana actual"
-              onclick="wOff=0;render(0)" style="display:none">↩ Volver a esta semana</button>
+              onclick="wOff=0;selectedDay=null;render(0)" style="display:none">↩ Volver a esta semana</button>
           </div>
           <!-- Mobile-only: return button below date (status-row is hidden on mobile) -->
           <button class="tn-return-btn mob-return-btn" id="tnReturnMob" aria-label="Volver a la semana actual"
@@ -1003,7 +1004,7 @@ const CAT = {
 };
 
 // ── STATE ─────────────────────────────────────────────
-let evs=[],vmap={...FALLBACK},activeFilter='all',wOff=0,mkrs={},ghostMkrs={},activeId=null;
+let evs=[],vmap={...FALLBACK},activeFilter='all',wOff=0,mkrs={},ghostMkrs={},activeId=null,selectedDay=null;
 
 // Navigate to the week containing a given MM/DD/YYYY date
 function goToEventWeek(fecha){
@@ -1038,27 +1039,14 @@ const zoom=map.getZoom();const scale=Math.pow(2,zoom-15);const inner=element.que
 // Safe field zones: rural areas around Areco away from town center
 // Verified open pampa fields around Areco — no streets, no buildings
 const OVNI_FIELD_ZONES = [
-  {lat:-34.2268, lng:-59.4812}, // Open fields N of Parque Criollo
-  {lat:-34.2295, lng:-59.4650}, // NE pampa, open rural
-  {lat:-34.2310, lng:-59.4920}, // NW flood plain near river
-  {lat:-34.2198, lng:-59.4755}, // Far north open fields
-  {lat:-34.2220, lng:-59.4680}, // NNE rural open
-  {lat:-34.2580, lng:-59.5020}, // West pampa open
-  {lat:-34.2640, lng:-59.4880}, // SW open fields near Chamico
-  {lat:-34.2700, lng:-59.4760}, // South rural open
-  {lat:-34.2620, lng:-59.4630}, // SE open fields
-  {lat:-34.2490, lng:-59.4580}, // East rural open
-  {lat:-34.2350, lng:-59.5010}, // Far NW river flood area
-  {lat:-34.2180, lng:-59.4850}, // Far north open
+  {lat:-34.249359, lng:-59.488223},
+  {lat:-34.237013, lng:-59.464019},
+  {lat:-34.244889, lng:-59.452518},
+  {lat:-34.266930, lng:-59.484550},
 ];
-const OVNI_SPREAD = 0.002; // ~200m spread — tighter to stay in field
 
 function ovniRandomFieldPos() {
-  const zone = OVNI_FIELD_ZONES[Math.floor(Math.random() * OVNI_FIELD_ZONES.length)];
-  return {
-    lat: zone.lat + (Math.random() - 0.5) * OVNI_SPREAD,
-    lng: zone.lng + (Math.random() - 0.5) * OVNI_SPREAD
-  };
+  return OVNI_FIELD_ZONES[Math.floor(Math.random() * OVNI_FIELD_ZONES.length)];
 }
 
 function ovniClearOfMarkers(lat, lng) {
@@ -1253,13 +1241,28 @@ function closeSheet(){
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();});
 
+function selectDay(dayKey){
+  selectedDay = selectedDay===dayKey ? null : dayKey; // toggle off if same day
+  render(wOff);
+}
+
 // ── FILTER ────────────────────────────────────────────
 function filtered(){
   const{start,end}=wRange(wOff);
+  const today=new Date();today.setHours(0,0,0,0);
+  const past30=new Date(today);past30.setDate(today.getDate()-30);
   return evs.filter(ev=>{
     if(String(ev.activo).toLowerCase()==='false')return false;
     const d=parseD(ev.fecha);if(!d)return false;
-    if(d<start||d>end)return false;
+    // Current week: show all events in range
+    // Past: show up to 30 days back (current week view only)
+    if(wOff===0){
+      if(d<past30)return false; // older than 30 days ago — hide
+      if(d>end)return false;    // future — handled by other weeks
+    } else {
+      if(d<start||d>end)return false;
+    }
+    if(selectedDay&&d.toDateString()!==selectedDay)return false;
     if(activeFilter==='DM')return String(ev.es_datamanIAcs).toLowerCase()==='true';
     if(activeFilter!=='all'&&ev.categoria!==activeFilter)return false;
     return true;
@@ -1300,12 +1303,23 @@ function renderList(list){
         ${ev.lugar?`<div class="mrow"><span style="opacity:.5">${hc?'📍':'📌'}</span>${ev.lugar}</div>`:''}
         ${ev.hora&&ev.hora!=='Todo el día'?`<div class="mrow"><span style="opacity:.5">🕐</span>${ev.hora} hs</div>`:`<div class="mrow" style="color:var(--muted)">Todo el día</div>`}
       </div>
-      ${!isPast?`<div class="ecard-ft">
-        <span class="ptag ${pc}">${pl}</span>
-        ${ev.precio_puerta&&ev.precio_puerta!=='0'&&ev.precio_puerta!==''?`<span style="font-size:10px;color:var(--muted)">· En puerta $${parseFloat(ev.precio_puerta).toLocaleString('es-AR')}</span>`:''}
-        ${dm&&String(ev.preventa_disponible).toLowerCase()==='true'?`<span class="pvtag">🎟 Preventa</span>`:''}
-        ${!dm&&ev.link_accion?`<a class="slink" href="${ev.link_accion}" target="_blank" onclick="event.stopPropagation()">Ver más →</a>`:''}
-      </div>`:''}
+      ${(()=>{
+        const diffDays=d?Math.round((d-TODAY)/(24*60*60*1000)):null;
+        let daysLabel='';
+        if(diffDays===0) daysLabel='<span style="font-size:10px;color:var(--gold);font-weight:600">Hoy</span>';
+        else if(diffDays===1) daysLabel='<span style="font-size:10px;color:var(--gold)">Mañana</span>';
+        else if(diffDays>1&&diffDays<=7) daysLabel=`<span style="font-size:10px;color:var(--ink2)">en ${diffDays} días</span>`;
+        else if(diffDays>7) daysLabel=`<span style="font-size:10px;color:var(--muted)">en ${diffDays} días</span>`;
+        else if(isPast&&diffDays>=-30) daysLabel=`<span style="font-size:10px;color:var(--muted)">hace ${Math.abs(diffDays)} día${Math.abs(diffDays)!==1?'s':''}</span>`;
+        if(isPast) return daysLabel?`<div class="ecard-ft">${daysLabel}${ev.nota_periodistica_1?`<a class="slink" href="${ev.nota_periodistica_1}" target="_blank" onclick="event.stopPropagation()" style="margin-left:auto">📰 Leer nota</a>`:''}${ev.nota_periodistica_2?`<a class="slink" href="${ev.nota_periodistica_2}" target="_blank" onclick="event.stopPropagation()">📰</a>`:''}${ev.nota_periodistica_3?`<a class="slink" href="${ev.nota_periodistica_3}" target="_blank" onclick="event.stopPropagation()">📰</a>`:''}${ev.nota_periodistica_4?`<a class="slink" href="${ev.nota_periodistica_4}" target="_blank" onclick="event.stopPropagation()">📰</a>`:''}</div>`:'';
+        return `<div class="ecard-ft">
+          <span class="ptag ${pc}">${pl}</span>
+          ${ev.precio_puerta&&ev.precio_puerta!=='0'&&ev.precio_puerta!==''?`<span style="font-size:10px;color:var(--muted)">· En puerta $${parseFloat(ev.precio_puerta).toLocaleString('es-AR')}</span>`:''}
+          ${dm&&String(ev.preventa_disponible).toLowerCase()==='true'?`<span class="pvtag">🎟 Preventa</span>`:''}
+          ${!dm&&isValidUrl(ev.link_accion)?`<a class="slink" href="${ev.link_accion}" target="_blank" onclick="event.stopPropagation()">Ver más →</a>`:''}
+          ${daysLabel?`<span style="margin-left:auto">${daysLabel}</span>`:''}
+        </div>`;
+      })()}
     </div>`;
   });
   el.innerHTML=html;
@@ -1637,7 +1651,9 @@ function updateTimeNav(count, direction, eventsList=[]){
       const isToday=d.getTime()===today.getTime();
       const evtCls=evtDayMap[d.toDateString()]||'';
       const hasEv=!!evtCls;
-      html+='<div class="tn-day'+(isToday?' tn-day-today':'')+(hasEv?' tn-day-ev':'')+'">'+
+      const dayKey=d.toDateString();
+      const isSel=selectedDay===dayKey;
+      html+='<div class="tn-day'+(isToday?' tn-day-today':'')+(hasEv?' tn-day-ev':'')+(isSel?' tn-day-selected':'')+'" style="cursor:pointer" onclick="selectDay(\''+dayKey+'\')">'+
         '<span class="tn-day-name">'+(isToday?'HOY':DAY_NAMES[i])+'</span>'+
         '<span class="tn-day-num">'+d.getDate()+'</span>'+
         (hasEv?'<span class="tn-day-dot '+evtCls+'"></span>':'<span class="tn-day-dot-e"></span>')+
@@ -1776,8 +1792,8 @@ function updateMobWeekLabel(){
   if(lbl) lbl.textContent=s+' – '+e;
 }
 
-document.getElementById('wPrev').onclick=(e)=>{e.stopPropagation();wOff--;render(-1);updateMobWeekLabel();};
-document.getElementById('wNext').onclick=(e)=>{e.stopPropagation();wOff++;render(1);updateMobWeekLabel();};
+document.getElementById('wPrev').onclick=(e)=>{e.stopPropagation();wOff--;selectedDay=null;render(-1);updateMobWeekLabel();};
+document.getElementById('wNext').onclick=(e)=>{e.stopPropagation();wOff++;selectedDay=null;render(1);updateMobWeekLabel();};
 
 // Wire up mobile week buttons
 document.addEventListener('DOMContentLoaded',()=>{
@@ -2676,7 +2692,7 @@ function renderW4(f){
         3. MP te pregunta "¿Autorizar a DataManIAcs?" → hacés clic en <strong style="color:var(--ink)">Autorizar</strong><br>
         4. Cerrá esa pestaña y volvé acá — después tocá <strong style="color:var(--ink)">"Ya conecté mi cuenta"</strong>
       </div>
-      <a href="https://entradas.datamaniacs.com.ar/mp-connect?venue=${getVenueSlug(wData.lugar||'venue')}&return_to=${encodeURIComponent('https://areco-eventos.vercel.app')}&mp_email=${encodeURIComponent(wData.mp_email||'')}"
+      <a href="https://entradas.datamaniacs.com.ar/mp-connect?venue=${getVenueSlug(wData.lugar||'venue')}&return_to=${encodeURIComponent('https://areco-eventos.vercel.app')}"
         target="_blank" rel="noopener"
         onclick="document.getElementById('w-mp-ya-conecte').style.display='block'"
         style="display:block;text-align:center;padding:11px 20px;background:linear-gradient(135deg,var(--gold),#e8c97a);
@@ -2732,28 +2748,34 @@ async function checkVenueConnected(){
   const status=document.getElementById('mp-connect-status');
   if(!block||!status) return;
   const slug=getVenueSlug(wData.lugar||'');
-  if(!slug) return;
+  if(!slug){ block.style.display='block'; status.style.display='none'; return; }
   // Show loading state
   status.innerHTML='<span style="color:var(--muted);font-size:12px">⏳ Verificando estado de conexión…</span>';
   status.style.display='block';
+  block.style.display='none';
   try{
-    const r=await fetch(`https://entradas.datamaniacs.com.ar/api/venue-status?venue=${slug}`,{mode:'cors'});
+    const r=await fetch(`https://entradas.datamaniacs.com.ar/api/check-mp-connection?venue=${slug}`,{mode:'cors'});
     if(!r.ok) throw new Error('API error');
     const data=await r.json();
     if(data.connected){
-      // Already connected — hide the whole connect block, show green confirmation
-      block.style.display='none';
-      status.innerHTML=`<div style="display:flex;align-items:center;gap:8px;background:rgba(42,122,80,0.12);border:1px solid rgba(42,122,80,0.3);border-radius:10px;padding:12px 14px;font-size:13px;color:#4ca87a">
-        ✅ <span><strong>Tu venue ya está conectado a DataManIAcs.</strong><br>
-        <span style="font-size:11px;color:var(--muted)">El dinero de las entradas irá directo a tu cuenta automáticamente.</span></span>
+      // Already connected — keep block hidden, show green confirmation
+      status.innerHTML=`<div style="background:rgba(42,122,80,0.08);border:1px solid rgba(42,122,80,0.2);border-radius:12px;padding:16px 20px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:20px">✅</span>
+          <div>
+            <div style="font-weight:600;color:#4ca87a">¡Cuenta de Mercado Pago conectada!</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px">El dinero de las entradas irá directo a tu cuenta automáticamente. Ya podés continuar con el siguiente paso.</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:10px;text-align:center">Esta conexión aplica a todos tus eventos futuros en este venue — no necesitás repetirla.</div>
       </div>`;
     } else {
-      // Not connected — show connect block normally
+      // Not connected — show connect block
       block.style.display='block';
       status.style.display='none';
     }
   } catch(e){
-    // API unreachable — show block anyway (fail safe)
+    // API unreachable — show block as fallback, never block the user
     block.style.display='block';
     status.style.display='none';
   }
@@ -2837,7 +2859,7 @@ async function mpYaConecte(){
   if(btn){btn.disabled=true;btn.textContent='⏳ Verificando…';}
   const slug=getVenueSlug(wData.lugar||'');
   try{
-    const r=await fetch(`https://entradas.datamaniacs.com.ar/api/venue-status?venue=${slug}`,{mode:'cors'});
+    const r=await fetch(`https://entradas.datamaniacs.com.ar/api/check-mp-connection?venue=${slug}`,{mode:'cors'});
     const data=r.ok?await r.json():{connected:false};
     if(data.connected){
       if(block) block.style.display='none';
@@ -3291,7 +3313,7 @@ async function submitWizard(){
   try{
     await fetch(AS_SUBMIT,{method:'POST',body:JSON.stringify(payload),headers:{'Content-Type':'application/json'},mode:'no-cors'});
     const venueSlug=getVenueSlug(wData.lugar||'venue');
-    const mpConnectUrl=`https://entradas.datamaniacs.com.ar/mp-connect?venue=${venueSlug}&return_to=${encodeURIComponent('https://areco-eventos.vercel.app')}&mp_email=${encodeURIComponent(wData.mp_email||'')}`;
+    const mpConnectUrl=`https://entradas.datamaniacs.com.ar/mp-connect?venue=${venueSlug}&return_to=${encodeURIComponent('https://areco-eventos.vercel.app')}`;
     const isMp=wizardMode==='mp';
     document.getElementById('subForm').innerHTML=`
       <div class="form-success">
