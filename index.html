@@ -1958,9 +1958,9 @@ const WIZARD_STEPS_TRF  = ['Personal','Evento','Función','Pago','Imagen','Publi
 const SIMPLE_STEPS      = ['Tu evento','Imagen'];
 
 function openReviewModal(){
-  const modal=document.getElementById('subModal');
-  if(!modal)return;
-  modal.style.display='flex';
+  document.getElementById('subOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  document.getElementById('stepBar').style.display='none';
   setModalTitle('📰 Contanos cómo fue','Notas y reseñas de eventos pasados');
   const f=document.getElementById('subForm');
   const today=new Date();today.setHours(0,0,0,0);
