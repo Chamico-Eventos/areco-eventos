@@ -285,10 +285,14 @@ img.leaflet-tile{border:none !important;outline:none !important}
 #map{overflow:hidden}
 
 /* ── PAST EVENT CARDS ─────────────────────────────── */
-.past-card{opacity:.32;border-color:transparent!important;background:var(--bg)!important}
-.past-name{text-decoration:line-through;color:var(--muted)!important}
-.past-div{opacity:.4}
+.past-card{opacity:.72;border-color:rgba(255,255,255,0.06)!important;background:var(--s1)!important;border-left:2px solid rgba(107,97,80,0.3)!important}
+.past-card:hover{opacity:.9!important}
+.past-name{color:var(--ink2)!important}
+.past-div{opacity:.6}
 .past-tag{display:inline-block;margin-left:8px;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:rgba(107,97,80,0.2);border-radius:999px;padding:1px 6px;vertical-align:middle}
+.past-flyer{width:100%;border-radius:8px;margin-top:8px;max-height:140px;object-fit:cover;opacity:.8}
+.nota-link{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--ink2);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:3px 8px;text-decoration:none;white-space:nowrap}
+.nota-link:hover{background:rgba(226,185,79,0.1);border-color:rgba(226,185,79,0.3);color:var(--gold)}
 /* ── MAP BRANDING ─────────────────────────────────── */
 .map-brand-wrapper{position:absolute;top:14px;right:14px;z-index:999;display:flex;flex-direction:column;gap:8px;min-width:200px}
 .map-brand{background:rgba(14,13,11,0.82);backdrop-filter:blur(10px);border:1px solid rgba(201,168,76,0.18);border-radius:12px;padding:10px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;width:100%}
@@ -796,6 +800,7 @@ input[type="date"].date-input-gold::-webkit-calendar-picker-indicator{
   <div id="map">
     <!-- Mobile floating add-event button — sits below the time-nav -->
     <button class="mob-add-ev-map" onclick="openSubModal()">✦ Agregá tu evento gratis</button>
+    <button class="mob-add-ev-map" onclick="openReviewModal()" style="background:rgba(14,13,11,0.85);border:1px solid rgba(226,185,79,0.35);color:var(--gold);margin-top:4px">📰 Agregar nota</button>
     <!-- Floating Time Navigator -->
     <nav class="time-nav" id="timeNav" aria-label="Navegación por semanas">
       <div class="tn-main">
@@ -842,6 +847,9 @@ input[type="date"].date-input-gold::-webkit-calendar-picker-indicator{
       </div>
       <button class="add-ev-btn" onclick="openSubModal()">
         ✦ Agregá tu evento gratis
+      </button>
+      <button class="add-ev-btn" onclick="openReviewModal()" style="margin-top:6px;background:transparent;border:1px solid rgba(226,185,79,0.3);color:var(--gold);box-shadow:none">
+        📰 Agregar nota periodística
       </button>
     </div>
   </div>
@@ -1311,7 +1319,7 @@ function renderList(list){
         else if(diffDays>1&&diffDays<=7) daysLabel=`<span style="font-size:10px;color:var(--ink2)">en ${diffDays} días</span>`;
         else if(diffDays>7) daysLabel=`<span style="font-size:10px;color:var(--muted)">en ${diffDays} días</span>`;
         else if(isPast&&diffDays>=-30) daysLabel=`<span style="font-size:10px;color:var(--muted)">hace ${Math.abs(diffDays)} día${Math.abs(diffDays)!==1?'s':''}</span>`;
-        if(isPast) return daysLabel?`<div class="ecard-ft">${daysLabel}${ev.nota_periodistica_1?`<a class="slink" href="${ev.nota_periodistica_1}" target="_blank" onclick="event.stopPropagation()" style="margin-left:auto">📰 Leer nota</a>`:''}${ev.nota_periodistica_2?`<a class="slink" href="${ev.nota_periodistica_2}" target="_blank" onclick="event.stopPropagation()">📰</a>`:''}${ev.nota_periodistica_3?`<a class="slink" href="${ev.nota_periodistica_3}" target="_blank" onclick="event.stopPropagation()">📰</a>`:''}${ev.nota_periodistica_4?`<a class="slink" href="${ev.nota_periodistica_4}" target="_blank" onclick="event.stopPropagation()">📰</a>`:''}</div>`:'';
+        if(isPast){const notas=[ev.nota_periodistica_1,ev.nota_periodistica_2,ev.nota_periodistica_3,ev.nota_periodistica_4].filter(Boolean);const notasHtml=notas.map((url,i)=>`<a class="nota-link" href="${url}" target="_blank" onclick="event.stopPropagation()">📰 Nota${notas.length>1?" "+(i+1):""}</a>`).join("");const flyerSrc=ev.imagen_url?(ev.imagen_url.startsWith("/")?"https://raw.githubusercontent.com/Chamico-Eventos/areco-eventos/main"+ev.imagen_url:ev.imagen_url):"";const flyerHtml=flyerSrc?`<img class="past-flyer" src="${flyerSrc}" alt="${ev.nombre||""}" onerror="this.style.display=\"none\"">`:"";return flyerHtml+(daysLabel||notasHtml?`<div class="ecard-ft" style="flex-wrap:wrap;gap:5px;margin-top:${flyerHtml?"6px":"0"}">${daysLabel?`<span style="margin-right:auto">${daysLabel}</span>`:""}${notasHtml}</div>`:"");}
         return `<div class="ecard-ft">
           <span class="ptag ${pc}">${pl}</span>
           ${ev.precio_puerta&&ev.precio_puerta!=='0'&&ev.precio_puerta!==''?`<span style="font-size:10px;color:var(--muted)">· En puerta $${parseFloat(ev.precio_puerta).toLocaleString('es-AR')}</span>`:''}
@@ -1936,6 +1944,104 @@ const wData = {};      // collected form data
 const WIZARD_STEPS_MP   = ['Personal','Evento','Función','Tickets MP','Imagen','Publicar'];
 const WIZARD_STEPS_TRF  = ['Personal','Evento','Función','Pago','Imagen','Publicar'];
 const SIMPLE_STEPS      = ['Tu evento','Imagen'];
+
+function openReviewModal(){
+  const modal=document.getElementById('subModal');
+  if(!modal)return;
+  modal.style.display='flex';
+  setModalTitle('📰 Agregar nota periodística','Para eventos pasados · últimos 30 días');
+  const f=document.getElementById('subForm');
+  const today=new Date();today.setHours(0,0,0,0);
+  const past30=new Date(today);past30.setDate(today.getDate()-30);
+  const pastEvs=evs.filter(ev=>{
+    if(String(ev.activo).toLowerCase()==='false')return false;
+    const d=parseD(ev.fecha);if(!d)return false;
+    return d>=past30&&d<today;
+  }).sort((a,b)=>(parseD(b.fecha)||0)-(parseD(a.fecha)||0));
+  f.innerHTML=`
+    <div class="info-box" style="margin-bottom:16px;font-size:12px;line-height:1.7">
+      Esta sección es para <strong>periodistas y medios</strong> que quieran agregar una nota o reseña sobre un evento pasado.
+      El link aparecerá en la tarjeta del evento con el botón 📰.
+      El equipo de DataManIAcs revisa y aprueba cada nota antes de publicarla.
+    </div>
+    <div class="form-group">
+      <label class="form-label">Evento <span>*</span></label>
+      <select class="form-input" id="rv-evento" style="color:var(--ink)">
+        <option value="">— Seleccioná un evento —</option>
+        ${pastEvs.map(ev=>{
+          const d=parseD(ev.fecha);
+          const label=`${ev.nombre||'Evento'} · ${d?prettyD(d):ev.fecha} · ${ev.lugar||''}`;
+          return `<option value="${ev.id}">${label}</option>`;
+        }).join('')}
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tu nombre / medio <span>*</span></label>
+      <input class="form-input" id="rv-autor" type="text" placeholder="Ej: Juan Pérez · El Cronista de Areco">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email de contacto <span>*</span></label>
+      <input class="form-input" id="rv-email" type="email" placeholder="tu@email.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Link a la nota <span>*</span></label>
+      <input class="form-input" id="rv-url" type="url" placeholder="https://...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Título de la nota (opcional)</label>
+      <input class="form-input" id="rv-titulo" type="text" placeholder="Ej: Una noche increíble en el Chamico">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Comentario adicional (opcional)</label>
+      <textarea class="form-input" id="rv-comentario" rows="3" placeholder="Contexto, cobertura, etc." style="resize:vertical"></textarea>
+    </div>
+    <div id="rv-err" style="display:none;font-size:12px;color:#c05a4a;padding:8px 10px;background:rgba(192,90,74,0.08);border-radius:8px;margin-bottom:8px"></div>
+    <div class="step-nav" style="margin-top:4px">
+      <button class="btn-back" onclick="closeSubModal()">Cancelar</button>
+      <button class="btn-next" onclick="submitReview()">Enviar nota →</button>
+    </div>`;
+}
+
+async function submitReview(){
+  const evId=document.getElementById('rv-evento')?.value;
+  const autor=document.getElementById('rv-autor')?.value.trim();
+  const email=document.getElementById('rv-email')?.value.trim();
+  const url=document.getElementById('rv-url')?.value.trim();
+  const titulo=document.getElementById('rv-titulo')?.value.trim();
+  const comentario=document.getElementById('rv-comentario')?.value.trim();
+  const errEl=document.getElementById('rv-err');
+  const emailRe=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if(!evId||!autor||!email||!url){errEl.textContent='Completá todos los campos obligatorios.';errEl.style.display='block';return;}
+  if(!emailRe.test(email)){errEl.textContent='Email inválido.';errEl.style.display='block';return;}
+  if(!url.startsWith('http')){errEl.textContent='El link debe empezar con http:// o https://';errEl.style.display='block';return;}
+  errEl.style.display='none';
+  const ev=evs.find(e=>e.id===evId);
+  const btn=document.querySelector('#subForm .btn-next');
+  if(btn){btn.disabled=true;btn.textContent='Enviando…';}
+  try{
+    await fetch('https://script.google.com/macros/s/AKfycbyq687XCjn2YbtAjLHvrWE0RZ5u-Tyijhoa_5nWHkJorE62_G1xYLEvEmx3dTA9Zs9k/exec',{
+      method:'POST',mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        source:'nota_periodistica',
+        event_id:evId,
+        event_nombre:ev?.nombre||'',
+        autor,email,url,titulo,comentario,
+        fecha_envio:new Date().toLocaleDateString('es-AR'),
+      }),
+    });
+    document.getElementById('subForm').innerHTML=`
+      <div class="form-success">
+        <div class="form-success-icon">📰</div>
+        <h3>¡Nota recibida!</h3>
+        <p>Revisamos el link y si todo está bien lo publicamos en la tarjeta del evento en menos de 24 horas.</p>
+        <button class="form-submit" style="margin-top:16px;max-width:200px;margin-left:auto;margin-right:auto" onclick="closeSubModal()">Cerrar</button>
+      </div>`;
+  }catch(err){
+    if(btn){btn.disabled=false;btn.textContent='Enviar nota →';}
+    errEl.textContent='Error al enviar. Intentá de nuevo.';errEl.style.display='block';
+  }
+}
 
 function openSubModal(){
   document.getElementById('subOverlay').classList.add('open');
