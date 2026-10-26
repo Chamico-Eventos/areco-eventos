@@ -1312,6 +1312,7 @@ function renderList(list){
     html+=`<div class="ecard${activeId===ev.id?' active':''}${dm?' dm':''}${isPast?' past-card':''}" data-id="${ev.id}" onclick="selEv('${ev.id}')">
       <div class="ecard-top">
         <div class="ecard-name${isPast?' past-name':''}">${dm&&!isPast?`<img src="/images/logo-datamaniacs.png" style="height:12px;opacity:.65;mix-blend-mode:multiply;vertical-align:middle;margin-right:4px" onerror="this.style.display='none'">`:''}${ev.nombre||'Evento'}</div>
+        ${ev.fuente_url&&ev.fuente_url.includes('instagram.com')?`<a href="${ev.fuente_url}" target="_blank" onclick="event.stopPropagation()" title="Ver en Instagram" style="flex-shrink:0;opacity:.55;transition:opacity .15s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.55"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/></svg></a>`:''}
         <span class="badge ${isPast?'c-evento':cls}" style="${isPast?'opacity:.45':''}">${isPast?'Pasado':dm?'DataManIAcs':ev.categoria||'Evento'}</span>
       </div>
       <div class="ecard-meta" style="${isPast?'opacity:.4':''}">
@@ -1982,8 +1983,8 @@ function openReviewModal(){
         <option value="">— Seleccioná un evento —</option>
         ${pastEvs.map(ev=>{
           const d=parseD(ev.fecha);
-          const fmtD=d?d.toLocaleDateString('es-AR',{day:'numeric',month:'short'}):'';
-          return `<option value="${ev.id}">${ev.nombre||'Evento'}${fmtD?' · '+fmtD:''}${ev.lugar?' · '+ev.lugar:''}</option>`;
+          const fmtD=d?d.toLocaleDateString('es-AR',{weekday:'short',day:'numeric',month:'short'}):'';
+          return `<option value="${ev.id}">${fmtD?fmtD+' — ':''}${ev.nombre||'Evento'}${ev.lugar?' · '+ev.lugar:''}</option>`;
         }).join('')}
       </select>
       <div id="rv-ev-preview" style="margin-top:6px"></div>
