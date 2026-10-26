@@ -800,7 +800,7 @@ input[type="date"].date-input-gold::-webkit-calendar-picker-indicator{
   <div id="map">
     <!-- Mobile floating add-event button — sits below the time-nav -->
     <button class="mob-add-ev-map" onclick="openSubModal()">✦ Agregá tu evento gratis</button>
-    <button class="mob-add-ev-map" onclick="openReviewModal()" style="background:rgba(14,13,11,0.85);border:1px solid rgba(226,185,79,0.35);color:var(--gold);margin-top:4px">📰 Agregar nota</button>
+    <button class="mob-add-ev-map" onclick="openReviewModal()" style="background:rgba(14,13,11,0.85);border:1px solid rgba(226,185,79,0.35);color:var(--gold);margin-top:4px">📰 Contanos cómo fue</button>
     <!-- Floating Time Navigator -->
     <nav class="time-nav" id="timeNav" aria-label="Navegación por semanas">
       <div class="tn-main">
@@ -849,7 +849,7 @@ input[type="date"].date-input-gold::-webkit-calendar-picker-indicator{
         ✦ Agregá tu evento gratis
       </button>
       <button class="add-ev-btn" onclick="openReviewModal()" style="margin-top:6px;background:transparent;border:1px solid rgba(226,185,79,0.3);color:var(--gold);box-shadow:none">
-        📰 Agregar nota periodística
+        📰 Contanos cómo fue
       </button>
     </div>
   </div>
@@ -1275,8 +1275,15 @@ function filtered(){
     if(activeFilter!=='all'&&ev.categoria!==activeFilter)return false;
     return true;
   }).sort((a,b)=>{
+    const today=new Date();today.setHours(0,0,0,0);
     const da=parseD(a.fecha)||new Date(0),db=parseD(b.fecha)||new Date(0);
-    if(da-db)return da-db;
+    const aPast=da<today,bPast=db<today;
+    // Past events: newest first (descending). Future events: oldest first (ascending).
+    // Past always shown after future in the list
+    if(aPast&&!bPast)return 1;
+    if(!aPast&&bPast)return -1;
+    if(aPast&&bPast)return db-da; // both past: newest first
+    if(da-db)return da-db;        // both future: oldest first
     return(a.hora||'').localeCompare(b.hora||'');
   });
 }
@@ -1450,10 +1457,15 @@ function renderMap(list, future=[], past=[]){
         const isTicketEvent=String(ev.ticket_service).toLowerCase()==='true';
         const entradaUrl=`${TICKETS_URL}/?event=${eventParam}`;
         const igUrl=ev.fuente_url&&ev.fuente_url.includes('instagram.com')?ev.fuente_url:'';
-        const linksHtml=`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;align-items:center">
+        const notasLinks=[ev.nota_periodistica_1,ev.nota_periodistica_2,ev.nota_periodistica_3,ev.nota_periodistica_4]
+          .filter(Boolean)
+          .map((url,i)=>`<a class="nota-link" href="${url}" target="_blank">📰 Nota${i>0?' '+(i+1):''}</a>`)
+          .join('');
+        const linksHtml=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center">
           ${isTicketEvent&&hasPreventa?`<a class="plink" href="${entradaUrl}" target="_blank" style="background:rgba(226,185,79,0.15);border:1px solid rgba(226,185,79,0.35);border-radius:6px;padding:5px 12px;font-weight:600">🎟 Comprar entrada</a>`:''}
           ${!isTicketEvent&&isValidUrl(ev.link_accion)?`<a class="plink" href="${ev.link_accion}" target="_blank">Ver más →</a>`:''}
           ${igUrl?`<a class="plink" href="${igUrl}" target="_blank" style="color:var(--muted);font-size:12px">📷 Instagram</a>`:''}
+          ${notasLinks}
           ${gmDir?`<a class="plink" href="${gmDir}" target="_blank" style="color:var(--ink2)">🗺 Cómo llegar</a>`:''}
         </div>`;
 
@@ -1949,7 +1961,7 @@ function openReviewModal(){
   const modal=document.getElementById('subModal');
   if(!modal)return;
   modal.style.display='flex';
-  setModalTitle('📰 Agregar nota periodística','Para eventos pasados · últimos 30 días');
+  setModalTitle('📰 Contanos cómo fue','Notas y reseñas de eventos pasados');
   const f=document.getElementById('subForm');
   const today=new Date();today.setHours(0,0,0,0);
   const past30=new Date(today);past30.setDate(today.getDate()-30);
@@ -1957,26 +1969,33 @@ function openReviewModal(){
     if(String(ev.activo).toLowerCase()==='false')return false;
     const d=parseD(ev.fecha);if(!d)return false;
     return d>=past30&&d<today;
-  }).sort((a,b)=>(parseD(b.fecha)||0)-(parseD(a.fecha)||0));
+  }).sort((a,b)=>(parseD(b.fecha)||new Date(0))-(parseD(a.fecha)||new Date(0)));
   f.innerHTML=`
     <div class="info-box" style="margin-bottom:16px;font-size:12px;line-height:1.7">
-      Esta sección es para <strong>periodistas y medios</strong> que quieran agregar una nota o reseña sobre un evento pasado.
-      El link aparecerá en la tarjeta del evento con el botón 📰.
-      El equipo de DataManIAcs revisa y aprueba cada nota antes de publicarla.
+      ¿Fuiste al evento? ¿Escribiste sobre él? Compartí el link de tu nota, reseña o post de Instagram.
+      Aparecerá en la tarjeta del evento con el botón 📰 para que todos puedan leerla.
+      El equipo de DataManIAcs revisa y aprueba cada envío.
     </div>
     <div class="form-group">
-      <label class="form-label">Evento <span>*</span></label>
-      <select class="form-input" id="rv-evento" style="color:var(--ink)">
+      <label class="form-label">¿De qué evento querés hablar? <span>*</span></label>
+      <select class="form-input" id="rv-evento" style="color:var(--ink)" onchange="rvPreviewEvent(this.value)">
         <option value="">— Seleccioná un evento —</option>
         ${pastEvs.map(ev=>{
           const d=parseD(ev.fecha);
-          const label=`${ev.nombre||'Evento'} · ${d?prettyD(d):ev.fecha} · ${ev.lugar||''}`;
-          return `<option value="${ev.id}">${label}</option>`;
+          const fmtD=d?d.toLocaleDateString('es-AR',{day:'numeric',month:'short'}):'';
+          return `<option value="${ev.id}">${ev.nombre||'Evento'}${fmtD?' · '+fmtD:''}${ev.lugar?' · '+ev.lugar:''}</option>`;
         }).join('')}
       </select>
+      <div id="rv-ev-preview" style="margin-top:6px"></div>
     </div>
     <div class="form-group">
-      <label class="form-label">Tu nombre / medio <span>*</span></label>
+      <label class="form-label">Link a tu nota, reseña o post <span>*</span></label>
+      <input class="form-input" id="rv-url" type="url" placeholder="https://... (web, Instagram, Facebook, etc.)"
+        oninput="rvPreviewUrl(this.value)">
+      <div id="rv-url-preview" style="margin-top:8px"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tu nombre o medio <span>*</span></label>
       <input class="form-input" id="rv-autor" type="text" placeholder="Ej: Juan Pérez · El Cronista de Areco">
     </div>
     <div class="form-group">
@@ -1984,61 +2003,98 @@ function openReviewModal(){
       <input class="form-input" id="rv-email" type="email" placeholder="tu@email.com">
     </div>
     <div class="form-group">
-      <label class="form-label">Link a la nota <span>*</span></label>
-      <input class="form-input" id="rv-url" type="url" placeholder="https://...">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Título de la nota (opcional)</label>
-      <input class="form-input" id="rv-titulo" type="text" placeholder="Ej: Una noche increíble en el Chamico">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Comentario adicional (opcional)</label>
-      <textarea class="form-input" id="rv-comentario" rows="3" placeholder="Contexto, cobertura, etc." style="resize:vertical"></textarea>
+      <label class="form-label">Comentario (opcional)</label>
+      <textarea class="form-input" id="rv-comentario" rows="2" placeholder="Algo más que quieras contarnos…" style="resize:vertical"></textarea>
     </div>
     <div id="rv-err" style="display:none;font-size:12px;color:#c05a4a;padding:8px 10px;background:rgba(192,90,74,0.08);border-radius:8px;margin-bottom:8px"></div>
     <div class="step-nav" style="margin-top:4px">
       <button class="btn-back" onclick="closeSubModal()">Cancelar</button>
-      <button class="btn-next" onclick="submitReview()">Enviar nota →</button>
+      <button class="btn-next" id="rv-submit-btn" onclick="submitReview()">Enviar →</button>
     </div>`;
+}
+
+function rvPreviewEvent(evId){
+  const ev=evs.find(e=>e.id===evId);
+  const el=document.getElementById('rv-ev-preview');
+  if(!el)return;
+  if(!ev){el.innerHTML='';return;}
+  const flyerSrc=ev.imagen_url?(ev.imagen_url.startsWith('/')?'https://raw.githubusercontent.com/Chamico-Eventos/areco-eventos/main'+ev.imagen_url:ev.imagen_url):'';
+  el.innerHTML=`<div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:8px;padding:8px 10px;border:1px solid var(--border)">
+    ${flyerSrc?`<img src="${flyerSrc}" style="width:44px;height:44px;object-fit:cover;border-radius:6px;flex-shrink:0" onerror="this.style.display='none'">`:''}
+    <div style="font-size:12px;line-height:1.5;min-width:0">
+      <div style="font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${ev.nombre||'Evento'}</div>
+      <div style="color:var(--muted)">${ev.lugar||''}${ev.fecha?' · '+ev.fecha:''}</div>
+    </div>
+  </div>`;
+}
+
+let _rvUrlTimer=null;
+function rvPreviewUrl(val){
+  const el=document.getElementById('rv-url-preview');
+  if(!el)return;
+  if(_rvUrlTimer)clearTimeout(_rvUrlTimer);
+  if(!val||!val.startsWith('http')){el.innerHTML='';return;}
+  // Instagram — show pill only (can't fetch OG due to CORS)
+  if(val.includes('instagram.com')){
+    el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;background:var(--s2);border-radius:8px;padding:8px 10px;border:1px solid var(--border);font-size:12px">
+      <span style="font-size:18px">📷</span>
+      <div><div style="font-weight:600;color:var(--ink)">Post de Instagram</div>
+      <div style="color:var(--muted);font-size:11px;word-break:break-all">${val.slice(0,60)}…</div></div>
+    </div>`;
+    return;
+  }
+  // Other URLs — show a basic link card after short delay
+  _rvUrlTimer=setTimeout(()=>{
+    el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;background:var(--s2);border-radius:8px;padding:8px 10px;border:1px solid var(--border);font-size:12px">
+      <span style="font-size:18px">🔗</span>
+      <div style="min-width:0">
+        <div style="font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${new URL(val).hostname}</div>
+        <div style="color:var(--muted);font-size:11px;word-break:break-all">${val.slice(0,70)}${val.length>70?'…':''}</div>
+      </div>
+    </div>`;
+  },600);
 }
 
 async function submitReview(){
   const evId=document.getElementById('rv-evento')?.value;
+  const url=document.getElementById('rv-url')?.value.trim();
   const autor=document.getElementById('rv-autor')?.value.trim();
   const email=document.getElementById('rv-email')?.value.trim();
-  const url=document.getElementById('rv-url')?.value.trim();
-  const titulo=document.getElementById('rv-titulo')?.value.trim();
   const comentario=document.getElementById('rv-comentario')?.value.trim();
   const errEl=document.getElementById('rv-err');
   const emailRe=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if(!evId||!autor||!email||!url){errEl.textContent='Completá todos los campos obligatorios.';errEl.style.display='block';return;}
-  if(!emailRe.test(email)){errEl.textContent='Email inválido.';errEl.style.display='block';return;}
-  if(!url.startsWith('http')){errEl.textContent='El link debe empezar con http:// o https://';errEl.style.display='block';return;}
   errEl.style.display='none';
+  if(!evId){errEl.textContent='Seleccioná un evento.';errEl.style.display='block';return;}
+  if(!url||!url.startsWith('http')){errEl.textContent='Ingresá un link válido (http:// o https://).';errEl.style.display='block';return;}
+  if(!autor){errEl.textContent='Ingresá tu nombre o medio.';errEl.style.display='block';return;}
+  if(!email||!emailRe.test(email)){errEl.textContent='Ingresá un email válido.';errEl.style.display='block';return;}
   const ev=evs.find(e=>e.id===evId);
-  const btn=document.querySelector('#subForm .btn-next');
+  const btn=document.getElementById('rv-submit-btn');
   if(btn){btn.disabled=true;btn.textContent='Enviando…';}
   try{
-    await fetch('https://script.google.com/macros/s/AKfycbyq687XCjn2YbtAjLHvrWE0RZ5u-Tyijhoa_5nWHkJorE62_G1xYLEvEmx3dTA9Zs9k/exec',{
+    await fetch(AS_SUBMIT,{
       method:'POST',mode:'no-cors',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         source:'nota_periodistica',
         event_id:evId,
         event_nombre:ev?.nombre||'',
-        autor,email,url,titulo,comentario,
+        event_fecha:ev?.fecha||'',
+        event_lugar:ev?.lugar||'',
+        autor,email,url,comentario,
         fecha_envio:new Date().toLocaleDateString('es-AR'),
       }),
     });
     document.getElementById('subForm').innerHTML=`
       <div class="form-success">
         <div class="form-success-icon">📰</div>
-        <h3>¡Nota recibida!</h3>
-        <p>Revisamos el link y si todo está bien lo publicamos en la tarjeta del evento en menos de 24 horas.</p>
+        <h3>¡Gracias!</h3>
+        <p>Recibimos tu nota sobre <strong>${ev?.nombre||'el evento'}</strong>.<br>
+        La revisamos y si todo está bien la publicamos en la tarjeta del evento en menos de 24 horas.</p>
         <button class="form-submit" style="margin-top:16px;max-width:200px;margin-left:auto;margin-right:auto" onclick="closeSubModal()">Cerrar</button>
       </div>`;
   }catch(err){
-    if(btn){btn.disabled=false;btn.textContent='Enviar nota →';}
+    if(btn){btn.disabled=false;btn.textContent='Enviar →';}
     errEl.textContent='Error al enviar. Intentá de nuevo.';errEl.style.display='block';
   }
 }
