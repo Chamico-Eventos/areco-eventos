@@ -291,8 +291,8 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .past-div{opacity:.6}
 .past-tag{display:inline-block;margin-left:8px;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:rgba(107,97,80,0.2);border-radius:999px;padding:1px 6px;vertical-align:middle}
 .past-flyer{width:100%;border-radius:8px;margin-top:8px;max-height:140px;object-fit:cover;opacity:.8}
-.nota-link{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--ink2);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:3px 8px;text-decoration:none;white-space:nowrap}
-.nota-link:hover{background:rgba(226,185,79,0.1);border-color:rgba(226,185,79,0.3);color:var(--gold)}
+.nota-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--gold);background:rgba(226,185,79,0.1);border:1px solid rgba(226,185,79,0.35);border-radius:8px;padding:6px 12px;text-decoration:none;white-space:nowrap;letter-spacing:.01em}
+.nota-link:hover{background:rgba(226,185,79,0.2);border-color:rgba(226,185,79,0.6);color:var(--gold2)}
 /* ── MAP BRANDING ─────────────────────────────────── */
 .map-brand-wrapper{position:absolute;top:14px;right:14px;z-index:999;display:flex;flex-direction:column;gap:8px;min-width:200px}
 .map-brand{background:rgba(14,13,11,0.82);backdrop-filter:blur(10px);border:1px solid rgba(201,168,76,0.18);border-radius:12px;padding:10px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;width:100%}
@@ -1388,13 +1388,18 @@ function renderMap(list, future=[], past=[]){
     "><img src="${pastIcon}" style="width:9px;height:9px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply;filter:grayscale(0.6)" onerror="this.style.display='none'"></div>`;
     const li=L.divIcon({html:pastHtml,className:'',iconSize:[16,16],iconAnchor:[8,16],popupAnchor:[0,-18]});
     const d=parseD(ev.fecha);
-    const pop=`<div style="font-family:'Inter',sans-serif;font-size:11px;max-width:200px;color:var(--muted)">
-      <div style="font-family:'Playfair Display',serif;font-size:13px;color:var(--ink2);margin-bottom:4px">${ev.nombre||'Evento'}</div>
-      <div style="line-height:1.6">
+    const pastNotas=[ev.nota_periodistica_1,ev.nota_periodistica_2,ev.nota_periodistica_3,ev.nota_periodistica_4].filter(Boolean);
+    const pastFlyerSrc=ev.imagen_url?(ev.imagen_url.startsWith('/')?'https://raw.githubusercontent.com/Chamico-Eventos/areco-eventos/main'+ev.imagen_url:ev.imagen_url):'';
+    const pop=`<div style="font-family:'Inter',sans-serif;font-size:12px;max-width:220px">
+      ${pastFlyerSrc?`<img src="${pastFlyerSrc}" style="width:100%;border-radius:6px;margin-bottom:8px;max-height:100px;object-fit:cover" onerror="this.style.display='none'">`:''}
+      <div style="font-family:'Playfair Display',serif;font-size:14px;color:var(--ink);margin-bottom:4px;font-weight:600">${ev.nombre||'Evento'}</div>
+      <div style="color:var(--muted);line-height:1.6;font-size:11px">
         ${d?`📅 ${prettyD(d)}<br>`:''}
         ${ev.lugar?`📍 ${ev.lugar}`:''}
       </div>
-      <div style="margin-top:6px;font-size:10px;color:var(--muted);font-style:italic">Evento pasado</div>
+      ${pastNotas.length?`<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px">
+        ${pastNotas.map((url,i)=>`<a href="${url}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:rgba(226,185,79,0.12);border:1px solid rgba(226,185,79,0.35);border-radius:8px;font-size:12px;font-weight:600;color:var(--gold);text-decoration:none">📰 ${pastNotas.length>1?'Nota '+(i+1):'Leer nota'}</a>`).join('')}
+      </div>`:'<div style="margin-top:6px;font-size:10px;color:var(--muted);font-style:italic">Evento pasado</div>'}
     </div>`;
     const m=L.marker(c,{icon:li,opacity:0.45}).bindPopup(pop,{maxWidth:210}).addTo(map);
     ghostMkrs['past_'+ev.id]=m;
