@@ -1436,11 +1436,17 @@ function renderMap(list, future=[], past=[]){
         "><img src="${apIcon}" style="width:11px;height:11px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply;filter:grayscale(0.5)" onerror="this.style.display='none'"></div>`;
         li=L.divIcon({html:pastHtml,className:'',iconSize:[20,20],iconAnchor:[10,20],popupAnchor:[0,-22]});
         const d=parseD(ev.fecha);
-        const pop=`<div style="font-family:'Inter',sans-serif;font-size:11px;max-width:200px;color:var(--muted)">
-          <div style="font-family:'Playfair Display',serif;font-size:13px;color:var(--ink2);margin-bottom:4px">${ev.nombre||'Evento'}</div>
-          <div style="line-height:1.6">${d?`📅 ${prettyD(d)}<br>`:''}${ev.lugar?`📍 ${ev.lugar}`:''}
-          </div><div style="margin-top:6px;font-size:10px;font-style:italic">Evento pasado</div></div>`;
-        m=L.marker(off,{icon:li,opacity:0.5}).bindPopup(pop,{maxWidth:210}).addTo(map);
+        const apNotas=[ev.nota_periodistica_1,ev.nota_periodistica_2,ev.nota_periodistica_3,ev.nota_periodistica_4].filter(Boolean);
+        const apFlyerSrc=ev.imagen_url?(ev.imagen_url.startsWith('/')?'https://raw.githubusercontent.com/Chamico-Eventos/areco-eventos/main'+ev.imagen_url:ev.imagen_url):'';
+        const pop=`<div style="font-family:'Inter',sans-serif;font-size:12px;max-width:240px">
+          ${apFlyerSrc?`<img src="${apFlyerSrc}" style="width:100%;border-radius:6px;margin-bottom:8px;max-height:110px;object-fit:cover" onerror="this.style.display='none'">`:''}
+          <div style="font-family:'Playfair Display',serif;font-size:14px;color:var(--ink);margin-bottom:4px;font-weight:600">${ev.nombre||'Evento'}</div>
+          <div style="color:var(--muted);line-height:1.6;font-size:11px">${d?`📅 ${prettyD(d)}<br>`:''}${ev.lugar?`📍 ${ev.lugar}`:''}</div>
+          ${apNotas.length?`<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px">
+            ${apNotas.map((url,ni)=>{const isIg=url.includes('instagram.com');const igS=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><defs><linearGradient id="ign${ni}" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#f09433"/><stop offset="50%" stop-color="#dc2743"/><stop offset="100%" stop-color="#bc1888"/></linearGradient></defs><rect x="2" y="2" width="20" height="20" rx="5" stroke="url(#ign${ni})" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="url(#ign${ni})" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="url(#ign${ni})"/></svg>`;return`<a href="${url}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:rgba(226,185,79,0.12);border:1px solid rgba(226,185,79,0.4);border-radius:8px;font-size:12px;font-weight:700;color:#e2b94f;text-decoration:none">${isIg?igS:'📰'} ${apNotas.length>1?'Nota '+(ni+1):'Leer nota'}</a>`;}).join('')}
+          </div>`:`<div style="margin-top:6px;font-size:10px;color:var(--muted);font-style:italic">Evento pasado</div>`}
+        </div>`;
+        m=L.marker(off,{icon:li,opacity:0.5}).bindPopup(pop,{maxWidth:260}).addTo(map);
 
       } else {
         // All active events — pulsing glow marker
