@@ -1259,7 +1259,7 @@ function filtered(){
   const{start,end}=wRange(wOff);
   const today=new Date();today.setHours(0,0,0,0);
   const past30=new Date(today);past30.setDate(today.getDate()-30);
-  return evs.filter(ev=>{
+  const result=evs.filter(ev=>{
     if(String(ev.activo).toLowerCase()==='false')return false;
     const d=parseD(ev.fecha);if(!d)return false;
     // Current week: show all events in range
@@ -1275,7 +1275,9 @@ function filtered(){
     if(activeFilter==='DM')return String(ev.es_datamanIAcs).toLowerCase()==='true';
     if(activeFilter!=='all'&&ev.categoria!==activeFilter)return false;
     return true;
-  }).sort((a,b)=>{
+  });
+  console.log('[filtered] wOff='+wOff+' activeFilter='+activeFilter+' evs='+evs.length+' result='+result.length+' past30='+past30.toDateString());
+  return result.sort((a,b)=>{
     const today=new Date();today.setHours(0,0,0,0);
     const da=parseD(a.fecha)||new Date(0),db=parseD(b.fecha)||new Date(0);
     const aPast=da<today,bPast=db<today;
