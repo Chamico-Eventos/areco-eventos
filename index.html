@@ -1265,8 +1265,9 @@ function filtered(){
     // Current week: show all events in range
     // Past: show up to 30 days back (current week view only)
     if(wOff===0){
-      if(d<past30)return false; // older than 30 days ago — hide
-      if(d>end)return false;    // future — handled by other weeks
+      // Show: past 30 days + current week + all future events
+      if(d<past30)return false; // older than 30 days — hide
+      // No upper limit — show all future events in the Todos view
     } else {
       if(d<start||d>end)return false;
     }
@@ -1475,10 +1476,15 @@ function renderMap(list, future=[], past=[]){
         const isTicketEvent=String(ev.ticket_service).toLowerCase()==='true';
         const entradaUrl=`${TICKETS_URL}/?event=${eventParam}`;
         const igUrl=ev.fuente_url&&ev.fuente_url.includes('instagram.com')?ev.fuente_url:'';
-        const notasLinks=[ev.nota_periodistica_1,ev.nota_periodistica_2,ev.nota_periodistica_3,ev.nota_periodistica_4]
-          .filter(Boolean)
-          .map((url,i)=>`<a class="nota-link" href="${url}" target="_blank">📰 Nota${i>0?' '+(i+1):''}</a>`)
-          .join('');
+        const _notaUrls=[ev.nota_periodistica_1,ev.nota_periodistica_2,ev.nota_periodistica_3,ev.nota_periodistica_4];
+        const _notaLogos=[ev.nota_logo_1,ev.nota_logo_2,ev.nota_logo_3,ev.nota_logo_4];
+        const notasLinks=_notaUrls.map((url,i)=>{
+          if(!url)return'';
+          const logo=_notaLogos[i];
+          const isIg=url.includes('instagram.com');
+          const icon=logo?`<img src="${logo}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">`:isIg?`<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#e1306c" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#e1306c" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="#e1306c"/></svg>`:'📰';
+          return`<a class="nota-link" href="${url}" target="_blank" style="padding:6px 12px;font-size:12px">${icon} Leer nota${_notaUrls.filter(Boolean).length>1?' '+(i+1):''}</a>`;
+        }).join('');
         const linksHtml=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center">
           ${isTicketEvent&&hasPreventa?`<a class="plink" href="${entradaUrl}" target="_blank" style="background:rgba(226,185,79,0.15);border:1px solid rgba(226,185,79,0.35);border-radius:6px;padding:5px 12px;font-weight:600">🎟 Comprar entrada</a>`:''}
           ${!isTicketEvent&&isValidUrl(ev.link_accion)?`<a class="plink" href="${ev.link_accion}" target="_blank">Ver más →</a>`:''}
