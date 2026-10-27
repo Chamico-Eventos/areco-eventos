@@ -1328,7 +1328,13 @@ function renderList(list){
         else if(diffDays>7) daysLabel=`<span style="font-size:10px;color:var(--muted)">en ${diffDays} días</span>`;
         else if(isPast&&diffDays>=-30) daysLabel=`<span style="font-size:10px;color:var(--muted)">hace ${Math.abs(diffDays)} día${Math.abs(diffDays)!==1?'s':''}</span>`;
         const IG_SVG=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#e1306c" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#e1306c" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="#e1306c"/></svg>`;
-        if(isPast){const notas=[ev.nota_periodistica_1,ev.nota_periodistica_2,ev.nota_periodistica_3,ev.nota_periodistica_4].filter(Boolean);const notasHtml=notas.map((url,i)=>{const isIg=url.includes('instagram.com');return`<a class="nota-link" href="${url}" target="_blank" onclick="event.stopPropagation()" style="font-size:13px;padding:7px 14px">${isIg?IG_SVG:'📰'} ${notas.length>1?'Nota '+(i+1):'Leer nota'}</a>`;}).join("");const flyerSrc=ev.imagen_url?(ev.imagen_url.startsWith("/")?"https://raw.githubusercontent.com/Chamico-Eventos/areco-eventos/main"+ev.imagen_url:ev.imagen_url):"";const flyerHtml=flyerSrc?`<img class="past-flyer" src="${flyerSrc}" alt="${ev.nombre||""}" onerror="this.style.display=\"none\"">`:"";return flyerHtml+(daysLabel||notasHtml?`<div class="ecard-ft" style="flex-wrap:wrap;gap:5px;margin-top:${flyerHtml?"6px":"0"}">${daysLabel?`<span style="margin-right:auto">${daysLabel}</span>`:""}${notasHtml}</div>`:"");}
+        const notaUrls=[ev.nota_periodistica_1,ev.nota_periodistica_2,ev.nota_periodistica_3,ev.nota_periodistica_4];
+        const notaLogos=[ev.nota_logo_1,ev.nota_logo_2,ev.nota_logo_3,ev.nota_logo_4];
+        if(isPast){const notas=notaUrls.filter(Boolean);const notasHtml=notas.map((url,i)=>{
+          const isIg=url.includes('instagram.com');
+          const logo=notaLogos[i];
+          const icon=logo?`<img src="${logo}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">`:(isIg?IG_SVG:'📰');
+          return`<a class="nota-link" href="${url}" target="_blank" onclick="event.stopPropagation()" style="font-size:13px;padding:7px 14px">${icon} ${notas.length>1?'Nota '+(i+1):'Leer nota'}</a>`;}).join("");const flyerSrc=ev.imagen_url?(ev.imagen_url.startsWith("/")?"https://raw.githubusercontent.com/Chamico-Eventos/areco-eventos/main"+ev.imagen_url:ev.imagen_url):"";const flyerHtml=flyerSrc?`<img class="past-flyer" src="${flyerSrc}" alt="${ev.nombre||""}" onerror="this.style.display=\"none\"">`:"";return flyerHtml+(daysLabel||notasHtml?`<div class="ecard-ft" style="flex-wrap:wrap;gap:5px;margin-top:${flyerHtml?"6px":"0"}">${daysLabel?`<span style="margin-right:auto">${daysLabel}</span>`:""}${notasHtml}</div>`:"");}
         return `<div class="ecard-ft">
           <span class="ptag ${pc}">${pl}</span>
           ${ev.precio_puerta&&ev.precio_puerta!=='0'&&ev.precio_puerta!==''?`<span style="font-size:10px;color:var(--muted)">· En puerta $${parseFloat(ev.precio_puerta).toLocaleString('es-AR')}</span>`:''}
@@ -1389,18 +1395,17 @@ function renderMap(list, future=[], past=[]){
     "><img src="${pastIcon}" style="width:9px;height:9px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply;filter:grayscale(0.6)" onerror="this.style.display='none'"></div>`;
     const li=L.divIcon({html:pastHtml,className:'',iconSize:[16,16],iconAnchor:[8,16],popupAnchor:[0,-18]});
     const d=parseD(ev.fecha);
-    const pastNotas=[ev.nota_periodistica_1,ev.nota_periodistica_2,ev.nota_periodistica_3,ev.nota_periodistica_4].filter(Boolean);
+    const pastNotaUrls=[ev.nota_periodistica_1,ev.nota_periodistica_2,ev.nota_periodistica_3,ev.nota_periodistica_4];
+    const pastNotaLogos=[ev.nota_logo_1,ev.nota_logo_2,ev.nota_logo_3,ev.nota_logo_4];
+    const pastNotas=pastNotaUrls.filter(Boolean);
     const pastFlyerSrc=ev.imagen_url?(ev.imagen_url.startsWith('/')?'https://raw.githubusercontent.com/Chamico-Eventos/areco-eventos/main'+ev.imagen_url:ev.imagen_url):'';
-    const pop=`<div style="font-family:'Inter',sans-serif;font-size:12px;max-width:220px">
-      ${pastFlyerSrc?`<img src="${pastFlyerSrc}" style="width:100%;border-radius:6px;margin-bottom:8px;max-height:100px;object-fit:cover" onerror="this.style.display='none'">`:''}
+    const pop=`<div style="font-family:'Inter',sans-serif;font-size:12px;max-width:240px">
+      ${pastFlyerSrc?`<img src="${pastFlyerSrc}" style="width:100%;border-radius:6px;margin-bottom:8px;max-height:110px;object-fit:cover" onerror="this.style.display='none'">`:''}
       <div style="font-family:'Playfair Display',serif;font-size:14px;color:var(--ink);margin-bottom:4px;font-weight:600">${ev.nombre||'Evento'}</div>
-      <div style="color:var(--muted);line-height:1.6;font-size:11px">
-        ${d?`📅 ${prettyD(d)}<br>`:''}
-        ${ev.lugar?`📍 ${ev.lugar}`:''}
-      </div>
+      <div style="color:var(--muted);line-height:1.6;font-size:11px">${d?`📅 ${prettyD(d)}<br>`:''}${ev.lugar?`📍 ${ev.lugar}`:''}</div>
       ${pastNotas.length?`<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px">
-        ${pastNotas.map((url,i)=>{const isIg=url.includes('instagram.com');const igSvg=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#e1306c" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#e1306c" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="#e1306c"/></svg>`;return`<a href="${url}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:rgba(226,185,79,0.12);border:1px solid rgba(226,185,79,0.4);border-radius:9px;font-size:13px;font-weight:700;color:var(--gold);text-decoration:none">${isIg?igSvg:'📰'} ${pastNotas.length>1?'Nota '+(i+1):'Leer nota'}</a>`;}).join('')}
-      </div>`:'<div style="margin-top:6px;font-size:10px;color:var(--muted);font-style:italic">Evento pasado</div>'}
+        ${pastNotaUrls.map((url,i)=>{if(!url)return'';const logo=pastNotaLogos[i];const isIg=url.includes('instagram.com');const icon=logo?`<img src="${logo}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">`:isIg?`<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#e1306c" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#e1306c" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="#e1306c"/></svg>`:'📰';return`<a href="${url}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:rgba(226,185,79,0.12);border:1px solid rgba(226,185,79,0.4);border-radius:9px;font-size:13px;font-weight:700;color:#e2b94f;text-decoration:none">${icon} ${pastNotas.length>1?'Nota '+(i+1):'Leer nota'}</a>`;}).join('')}
+      </div>`:`<div style="margin-top:6px;font-size:10px;color:var(--muted);font-style:italic">Evento pasado</div>`}
     </div>`;
     const m=L.marker(c,{icon:li,opacity:0.45}).bindPopup(pop,{maxWidth:260}).addTo(map);
     ghostMkrs['past_'+ev.id]=m;
@@ -2008,12 +2013,28 @@ function openReviewModal(){
       <div id="rv-url-preview" style="margin-top:8px"></div>
     </div>
     <div class="form-group">
-      <label class="form-label">Tu nombre o medio <span>*</span></label>
-      <input class="form-input" id="rv-autor" type="text" placeholder="Ej: Juan Pérez · El Cronista de Areco">
+      <label class="form-label">Email de contacto <span>*</span></label>
+      <input class="form-input" id="rv-email" type="email" placeholder="tu@email.com"
+        onblur="rvCheckJournalist(this.value)">
+      <div id="rv-journalist-status" style="margin-top:8px"></div>
     </div>
     <div class="form-group">
-      <label class="form-label">Email de contacto <span>*</span></label>
-      <input class="form-input" id="rv-email" type="email" placeholder="tu@email.com">
+      <label class="form-label">Tu nombre o medio <span>*</span></label>
+      <input class="form-input" id="rv-autor" type="text" placeholder="Ej: Días de Areco · diasdeareco.com.ar">
+    </div>
+    <div id="rv-logo-section" style="margin-bottom:16px">
+      <label class="form-label" style="display:flex;align-items:center;gap:6px">
+        Logo de tu medio
+        <span style="font-size:10px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0">(opcional · JPG/PNG · se reutiliza en futuras notas)</span>
+      </label>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:6px">
+        <div id="rv-logo-preview" style="width:48px;height:48px;border-radius:50%;border:1.5px dashed var(--border);background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📰</div>
+        <div>
+          <input type="file" id="rv-logo-file" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="rvLogoPreview(this)">
+          <button type="button" onclick="document.getElementById('rv-logo-file').click()" class="addbtn" style="font-size:12px">Subir logo</button>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">Cuadrado · mín 100×100px</div>
+        </div>
+      </div>
     </div>
     <div class="form-group">
       <label class="form-label">Comentario (opcional)</label>
@@ -2024,6 +2045,61 @@ function openReviewModal(){
       <button class="btn-back" onclick="closeSubModal()">Cancelar</button>
       <button class="btn-next" id="rv-submit-btn" onclick="submitReview()">Enviar →</button>
     </div>`;
+}
+
+let _rvJournalistLogo=''; // stores existing logo_url if journalist found
+
+async function rvCheckJournalist(email){
+  const statusEl=document.getElementById('rv-journalist-status');
+  const logoSection=document.getElementById('rv-logo-section');
+  const autorEl=document.getElementById('rv-autor');
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    statusEl.innerHTML=''; _rvJournalistLogo='';
+    if(logoSection)logoSection.style.display='block';
+    return;
+  }
+  statusEl.innerHTML=`<span style="font-size:11px;color:var(--muted)">⏳ Verificando…</span>`;
+  try{
+    const r=await fetch(`${AS_SUBMIT}?action=check_journalist&email=${encodeURIComponent(email.toLowerCase())}`,{mode:'cors'});
+    if(!r.ok)throw new Error();
+    const data=await r.json();
+    if(data.found&&data.logo_url){
+      _rvJournalistLogo=data.logo_url;
+      if(autorEl&&!autorEl.value)autorEl.value=data.autor||'';
+      statusEl.innerHTML=`<div style="display:flex;align-items:center;gap:10px;background:rgba(42,122,80,0.1);border:1px solid rgba(42,122,80,0.25);border-radius:9px;padding:9px 12px">
+        <img src="${data.logo_url}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,0.1)">
+        <div>
+          <div style="font-size:12px;font-weight:600;color:#4ca87a">¡Bienvenido de nuevo, ${data.autor||''}!</div>
+          <div style="font-size:11px;color:var(--muted)">Tu logo se usará automáticamente — no hace falta subirlo de nuevo.</div>
+        </div>
+      </div>`;
+      if(logoSection)logoSection.style.display='none';
+    } else if(data.found&&!data.logo_url){
+      _rvJournalistLogo='';
+      if(autorEl&&!autorEl.value)autorEl.value=data.autor||'';
+      statusEl.innerHTML=`<div style="font-size:11px;color:#4ca87a;padding:6px 0">✓ Ya te conocemos, ${data.autor||''}. Podés subir un logo esta vez si querés.</div>`;
+      if(logoSection)logoSection.style.display='block';
+    } else {
+      _rvJournalistLogo='';
+      statusEl.innerHTML=`<div style="font-size:11px;color:var(--muted);padding:6px 0">Primera vez — tu logo quedará guardado para futuras notas.</div>`;
+      if(logoSection)logoSection.style.display='block';
+    }
+  }catch(e){
+    _rvJournalistLogo='';
+    statusEl.innerHTML='';
+    if(logoSection)logoSection.style.display='block';
+  }
+}
+
+function rvLogoPreview(input){
+  const file=input.files[0];if(!file)return;
+  if(file.size>3*1024*1024){alert('El logo debe pesar menos de 3MB');input.value='';return;}
+  const reader=new FileReader();
+  reader.onload=x=>{
+    const prev=document.getElementById('rv-logo-preview');
+    if(prev)prev.innerHTML=`<img src="${x.target.result}" style="width:48px;height:48px;border-radius:50%;object-fit:cover">`;
+  };
+  reader.readAsDataURL(file);
 }
 
 function rvPreviewEvent(evId){
@@ -2084,6 +2160,34 @@ async function submitReview(){
   const ev=evs.find(e=>e.id===evId);
   const btn=document.getElementById('rv-submit-btn');
   if(btn){btn.disabled=true;btn.textContent='Enviando…';}
+  // Compress logo if provided
+  let logoBase64='', logoMime='', logoNombre='';
+  const logoFile=document.getElementById('rv-logo-file')?.files?.[0];
+  if(logoFile&&!_rvJournalistLogo){
+    try{
+      const compressed=await new Promise(res=>{
+        const img=new Image();const reader=new FileReader();
+        reader.onload=x=>{img.src=x.target.result;};
+        img.onload=()=>{
+          const canvas=document.createElement('canvas');
+          const size=Math.min(img.width,img.height,400);
+          canvas.width=size;canvas.height=size;
+          const ctx=canvas.getContext('2d');
+          const sx=(img.width-size)/2,sy=(img.height-size)/2;
+          ctx.drawImage(img,sx,sy,size,size,0,0,size,size);
+          canvas.toBlob(b=>{
+            const r2=new FileReader();r2.onload=e2=>res(e2.target.result);r2.readAsDataURL(b);
+          },'image/jpeg',0.85);
+        };
+        reader.readAsDataURL(logoFile);
+      });
+      logoBase64=compressed.split(',')[1];
+      logoMime='image/jpeg';
+      const slug=autor.toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-').slice(0,30);
+      logoNombre=`periodista_${slug}.jpg`;
+    }catch(e){ console.error('Logo compress error',e); }
+  }
+
   try{
     await fetch(AS_SUBMIT,{
       method:'POST',mode:'no-cors',
@@ -2092,9 +2196,12 @@ async function submitReview(){
         source:'nota_periodistica',
         event_id:evId,
         event_nombre:ev?.nombre||'',
-        event_fecha:ev?.fecha||'',
         event_lugar:ev?.lugar||'',
         autor,email,url,comentario,
+        autor_logo_url:_rvJournalistLogo||'',
+        logo_base64:logoBase64,
+        logo_mime:logoMime,
+        logo_nombre:logoNombre,
         fecha_envio:new Date().toLocaleDateString('es-AR'),
       }),
     });
