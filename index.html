@@ -9,9 +9,9 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 :root{
-  --bg:#0d0c09;--s1:#14120e;--s2:#1b1812;--s3:#211d15;
+  --bg:#080706;--s1:#0f0d0a;--s2:#161310;--s3:#1d1a14;
   --gold:#e2b94f;--gold2:#f3d477;--ink:#f4f0e7;--ink2:#9c927d;
-  --muted:#6b6150;--border:rgba(226,185,79,0.14);--b2:rgba(255,255,255,0.05);
+  --muted:#6b6150;--border:rgba(226,185,79,0.2);--b2:rgba(255,255,255,0.07);
   --green:#2a7a50;--danger:#c05a4a;--r:15px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -19,15 +19,16 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 .shell{display:flex;height:100vh;width:100vw}
 
 /* ── SIDEBAR ─────────────────────────────────────── */
-.sidebar{width:340px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow:hidden;z-index:1000;box-shadow:4px 0 28px rgba(0,0,0,0.55),2px 0 8px rgba(0,0,0,0.3)}
+.sidebar{width:340px;flex-shrink:0;background:var(--s1);border-right:1px solid rgba(226,185,79,0.18);display:flex;flex-direction:column;height:100vh;overflow:hidden;z-index:1000;box-shadow:4px 0 40px rgba(0,0,0,0.8),2px 0 12px rgba(0,0,0,0.5)}
 .sb-head{padding:18px 18px 14px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(201,168,76,0.07) 0%,transparent 100%);flex-shrink:0}
 .brand-text h1{font-family:'Playfair Display',serif;font-size:19px;font-weight:900;letter-spacing:-.02em;color:var(--ink);line-height:1;margin-bottom:14px}
 .brand-text h1 em{color:var(--gold);font-style:normal}
 .brand-text small{font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;display:block;margin-top:3px}
 .week-nav{
   display:flex;align-items:center;gap:0;
-  background:var(--s2);border:1px solid var(--border);
+  background:var(--s1);border:1px solid rgba(226,185,79,0.22);
   border-radius:10px;overflow:hidden;
+  box-shadow:0 3px 14px rgba(0,0,0,0.55);
 }
 .wn-btn{
   background:none;border:none;color:var(--gold);
@@ -58,14 +59,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 .ev-count{font-size:10px;color:var(--muted);padding:2px 4px 8px}
 .date-div{font-size:10px;font-weight:600;color:var(--gold);letter-spacing:.08em;padding:10px 4px 5px;border-bottom:1px solid rgba(201,168,76,0.15);margin-bottom:5px;text-transform:capitalize}
 .ecard{
-  background:linear-gradient(160deg,var(--s2) 0%,rgba(20,17,12,0.85) 100%);
-  border:1px solid rgba(226,185,79,0.08);border-radius:15px;
+  background:linear-gradient(160deg,var(--s2) 0%,rgba(10,8,5,0.9) 100%);
+  border:1px solid rgba(226,185,79,0.12);border-radius:15px;
   padding:13px 14px;margin-bottom:8px;cursor:pointer;
-  box-shadow:0 2px 10px rgba(0,0,0,0.25);
+  box-shadow:0 3px 16px rgba(0,0,0,0.55),inset 0 1px 0 rgba(255,255,255,0.03);
   transition:transform .15s ease-out,box-shadow .15s,border-color .15s,background .15s
 }
-.ecard:hover{border-color:rgba(226,185,79,0.22);background:var(--s3);transform:translateY(-2px);box-shadow:0 6px 22px rgba(0,0,0,0.4)}
-.ecard.active{border-color:var(--gold);background:rgba(226,185,79,0.08);box-shadow:0 4px 18px rgba(226,185,79,0.12)}
+.ecard:hover{border-color:rgba(226,185,79,0.3);background:var(--s3);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,0.65),0 0 0 1px rgba(226,185,79,0.12)}
+.ecard.active{border-color:var(--gold);background:rgba(226,185,79,0.08);box-shadow:0 4px 24px rgba(226,185,79,0.18),0 0 0 1px rgba(226,185,79,0.2)}
 .ecard.dm{border-left:2px solid var(--gold)}
 .ecard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:5px}
 .ecard-name{font-family:'Playfair Display',serif;font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.3;flex:1}
@@ -85,8 +86,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 
 /* ── MAP ──────────────────────────────────────────── */
 #map{flex:1;height:100vh}
-.leaflet-popup-content-wrapper{background:var(--s3) !important;border:1px solid rgba(226,185,79,0.16) !important;border-radius:14px !important;color:var(--ink) !important;box-shadow:0 16px 48px rgba(0,0,0,.8),0 4px 12px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.04) !important}
-.leaflet-popup-tip{background:var(--s1) !important}
+.leaflet-popup-content-wrapper{background:var(--s1) !important;border:1px solid rgba(226,185,79,0.25) !important;border-radius:14px !important;color:var(--ink) !important;box-shadow:0 20px 60px rgba(0,0,0,.95),0 6px 18px rgba(0,0,0,0.7),inset 0 1px 0 rgba(255,255,255,0.05) !important}
+.leaflet-popup-tip{background:var(--s1) !important;box-shadow:0 4px 12px rgba(0,0,0,0.6) !important}
 .leaflet-popup-close-button{color:var(--muted) !important;top:8px !important;right:8px !important}
 /* All active-event popups — standard Leaflet popup, tip visible */
 .pname{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--ink);margin-bottom:8px;line-height:1.3}
@@ -469,11 +470,11 @@ input[type="date"].date-input-gold::-webkit-calendar-picker-indicator{
   width:660px;
   max-width:min(660px,calc(100% - 210px));
   z-index:900;
-  background:linear-gradient(160deg,#211d15 0%,#1a1712 100%);
-  border:1px solid rgba(226,185,79,0.18);
+  background:linear-gradient(160deg,#131009 0%,#0c0a07 100%);
+  border:1px solid rgba(226,185,79,0.28);
   border-radius:22px;
-  box-shadow:0 22px 60px rgba(0,0,0,0.52),0 8px 20px rgba(0,0,0,0.32),inset 0 1px 0 rgba(255,255,255,0.05);
-  backdrop-filter:blur(6px);
+  box-shadow:0 24px 70px rgba(0,0,0,0.85),0 8px 24px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.06),0 0 0 1px rgba(226,185,79,0.06);
+  backdrop-filter:blur(12px);
   overflow:hidden;
   user-select:none;
 }
@@ -1335,7 +1336,7 @@ function renderList(list){
         if(isPast){const notas=notaUrls.filter(Boolean);const notasHtml=notas.map((url,i)=>{
           const isIg=url.includes('instagram.com');
           const logo=notaLogos[i];
-          const icon=logo?`<img src="${logo}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">`:(isIg?IG_SVG:'📰');
+          const icon=logo?`<img src="${logo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid rgba(0,0,0,0.15)" onerror="this.style.display='none'">`:(isIg?IG_SVG:'📰');
           return`<a class="nota-link" href="${url}" target="_blank" onclick="event.stopPropagation()" style="font-size:13px;padding:7px 14px">${icon} ${notas.length>1?'Nota '+(i+1):'Leer nota'}</a>`;}).join("");const flyerSrc=ev.imagen_url?(ev.imagen_url.startsWith("/")?"https://raw.githubusercontent.com/Chamico-Eventos/areco-eventos/main"+ev.imagen_url:ev.imagen_url):"";const flyerHtml=flyerSrc?`<img class="past-flyer" src="${flyerSrc}" alt="${ev.nombre||""}" onerror="this.style.display=\"none\"">`:"";return flyerHtml+(daysLabel||notasHtml?`<div class="ecard-ft" style="flex-wrap:wrap;gap:5px;margin-top:${flyerHtml?"6px":"0"}">${daysLabel?`<span style="margin-right:auto">${daysLabel}</span>`:""}${notasHtml}</div>`:"");}
         return `<div class="ecard-ft">
           <span class="ptag ${pc}">${pl}</span>
@@ -1406,7 +1407,7 @@ function renderMap(list, future=[], past=[]){
       <div style="font-family:'Playfair Display',serif;font-size:14px;color:var(--ink);margin-bottom:4px;font-weight:600">${ev.nombre||'Evento'}</div>
       <div style="color:var(--muted);line-height:1.6;font-size:11px">${d?`📅 ${prettyD(d)}<br>`:''}${ev.lugar?`📍 ${ev.lugar}`:''}</div>
       ${pastNotas.length?`<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px">
-        ${pastNotaUrls.map((url,i)=>{if(!url)return'';const logo=pastNotaLogos[i];const isIg=url.includes('instagram.com');const icon=logo?`<img src="${logo}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">`:isIg?`<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#e1306c" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#e1306c" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="#e1306c"/></svg>`:'📰';return`<a href="${url}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px 14px;background:linear-gradient(135deg,#c9a84c,#e8c97a);border-radius:10px;font-size:14px;font-weight:700;color:#0e0d0b;text-decoration:none;box-sizing:border-box;margin-top:4px;box-shadow:0 2px 12px rgba(201,168,76,0.35)">${icon} ${pastNotas.length>1?'Nota '+(i+1):'Leer nota'}</a>`;}).join('')}
+        ${pastNotaUrls.map((url,i)=>{if(!url)return'';const logo=pastNotaLogos[i];const isIg=url.includes('instagram.com');const icon=logo?`<img src="${logo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid rgba(0,0,0,0.15)" onerror="this.style.display='none'">`:isIg?`<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#e1306c" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#e1306c" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="#e1306c"/></svg>`:'📰';return`<a href="${url}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px 14px;background:linear-gradient(135deg,#c9a84c,#e8c97a);border-radius:10px;font-size:14px;font-weight:700;color:#0e0d0b;text-decoration:none;box-sizing:border-box;margin-top:4px;box-shadow:0 2px 12px rgba(201,168,76,0.35)">${icon} ${pastNotas.length>1?'Nota '+(i+1):'Leer nota'}</a>`;}).join('')}
       </div>`:`<div style="margin-top:6px;font-size:10px;color:var(--muted);font-style:italic">Evento pasado</div>`}
     </div>`;
     const m=L.marker(c,{icon:li,opacity:0.45}).bindPopup(pop,{maxWidth:260}).addTo(map);
@@ -1456,7 +1457,7 @@ function renderMap(list, future=[], past=[]){
               if(!url)return'';
               const logo=apNotaLogos[i];
               const isIg=url.includes('instagram.com');
-              const icon=logo?`<img src="${logo}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid rgba(255,255,255,0.15)" onerror="this.style.display='none'">`:isIg?`<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#e1306c" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#e1306c" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="#e1306c"/></svg>`:'📰';
+              const icon=logo?`<img src="${logo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid rgba(0,0,0,0.15)" onerror="this.style.display='none'">`:isIg?`<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#e1306c" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#e1306c" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="#e1306c"/></svg>`:'📰';
               return`<a href="${url}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px 14px;background:linear-gradient(135deg,#c9a84c,#e8c97a);border-radius:10px;font-size:14px;font-weight:700;color:#0e0d0b;text-decoration:none;box-sizing:border-box;margin-top:4px;box-shadow:0 2px 12px rgba(201,168,76,0.35)">${icon}<span>${apNotas.length>1?'Nota '+(i+1):'Leer nota'}</span></a>`;
             }).join('')}
           </div>`:`<div style="margin-top:6px;font-size:10px;color:var(--muted);font-style:italic">Evento pasado</div>`}
@@ -1491,7 +1492,7 @@ function renderMap(list, future=[], past=[]){
           if(!url)return'';
           const logo=_notaLogos[i];
           const isIg=url.includes('instagram.com');
-          const icon=logo?`<img src="${logo}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">`:isIg?`<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#e1306c" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#e1306c" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="#e1306c"/></svg>`:'📰';
+          const icon=logo?`<img src="${logo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid rgba(0,0,0,0.15)" onerror="this.style.display='none'">`:isIg?`<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#e1306c" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#e1306c" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="#e1306c"/></svg>`:'📰';
           return`<a class="nota-link" href="${url}" target="_blank">${icon} Leer nota${_notaUrls.filter(Boolean).length>1?' '+(i+1):''}</a>`;
         }).join('');
         const linksHtml=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center">
