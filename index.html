@@ -291,8 +291,8 @@ img.leaflet-tile{border:none !important;outline:none !important}
 .past-div{opacity:.6}
 .past-tag{display:inline-block;margin-left:8px;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:rgba(107,97,80,0.2);border-radius:999px;padding:1px 6px;vertical-align:middle}
 .past-flyer{width:100%;border-radius:8px;margin-top:8px;max-height:140px;object-fit:cover;opacity:.8}
-.nota-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--gold);background:rgba(226,185,79,0.1);border:1px solid rgba(226,185,79,0.35);border-radius:8px;padding:6px 12px;text-decoration:none;white-space:nowrap;letter-spacing:.01em}
-.nota-link:hover{background:rgba(226,185,79,0.2);border-color:rgba(226,185,79,0.6);color:var(--gold2)}
+.nota-link{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-size:14px;font-weight:700;color:#0e0d0b;background:linear-gradient(135deg,var(--gold),#e8c97a);border:none;border-radius:10px;padding:11px 16px;text-decoration:none;letter-spacing:.02em;margin-top:8px;box-shadow:0 2px 12px rgba(201,168,76,0.35)}
+.nota-link:hover{background:linear-gradient(135deg,#b8963e,var(--gold));box-shadow:0 4px 18px rgba(201,168,76,0.5);transform:translateY(-1px)}
 /* ── MAP BRANDING ─────────────────────────────────── */
 .map-brand-wrapper{position:absolute;top:14px;right:14px;z-index:999;display:flex;flex-direction:column;gap:8px;min-width:200px}
 .map-brand{background:rgba(14,13,11,0.82);backdrop-filter:blur(10px);border:1px solid rgba(201,168,76,0.18);border-radius:12px;padding:10px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;width:100%}
@@ -1406,7 +1406,7 @@ function renderMap(list, future=[], past=[]){
       <div style="font-family:'Playfair Display',serif;font-size:14px;color:var(--ink);margin-bottom:4px;font-weight:600">${ev.nombre||'Evento'}</div>
       <div style="color:var(--muted);line-height:1.6;font-size:11px">${d?`📅 ${prettyD(d)}<br>`:''}${ev.lugar?`📍 ${ev.lugar}`:''}</div>
       ${pastNotas.length?`<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px">
-        ${pastNotaUrls.map((url,i)=>{if(!url)return'';const logo=pastNotaLogos[i];const isIg=url.includes('instagram.com');const icon=logo?`<img src="${logo}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">`:isIg?`<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#e1306c" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#e1306c" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="#e1306c"/></svg>`:'📰';return`<a href="${url}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:rgba(226,185,79,0.12);border:1px solid rgba(226,185,79,0.4);border-radius:9px;font-size:13px;font-weight:700;color:#e2b94f;text-decoration:none">${icon} ${pastNotas.length>1?'Nota '+(i+1):'Leer nota'}</a>`;}).join('')}
+        ${pastNotaUrls.map((url,i)=>{if(!url)return'';const logo=pastNotaLogos[i];const isIg=url.includes('instagram.com');const icon=logo?`<img src="${logo}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">`:isIg?`<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#e1306c" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#e1306c" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="#e1306c"/></svg>`:'📰';return`<a href="${url}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px 14px;background:linear-gradient(135deg,#c9a84c,#e8c97a);border-radius:10px;font-size:14px;font-weight:700;color:#0e0d0b;text-decoration:none;box-sizing:border-box;margin-top:4px;box-shadow:0 2px 12px rgba(201,168,76,0.35)">${icon} ${pastNotas.length>1?'Nota '+(i+1):'Leer nota'}</a>`;}).join('')}
       </div>`:`<div style="margin-top:6px;font-size:10px;color:var(--muted);font-style:italic">Evento pasado</div>`}
     </div>`;
     const m=L.marker(c,{icon:li,opacity:0.45}).bindPopup(pop,{maxWidth:260}).addTo(map);
@@ -1457,7 +1457,7 @@ function renderMap(list, future=[], past=[]){
               const logo=apNotaLogos[i];
               const isIg=url.includes('instagram.com');
               const icon=logo?`<img src="${logo}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid rgba(255,255,255,0.15)" onerror="this.style.display='none'">`:isIg?`<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#e1306c" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#e1306c" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="#e1306c"/></svg>`:'📰';
-              return`<a href="${url}" target="_blank" style="display:inline-flex;align-items:center;gap:7px;padding:9px 14px;background:rgba(226,185,79,0.15);border:1.5px solid rgba(226,185,79,0.5);border-radius:10px;font-size:13px;font-weight:700;color:#e2b94f;text-decoration:none;width:100%;box-sizing:border-box">${icon}<span>${apNotas.length>1?'Nota '+(i+1):'Leer nota →'}</span></a>`;
+              return`<a href="${url}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px 14px;background:linear-gradient(135deg,#c9a84c,#e8c97a);border-radius:10px;font-size:14px;font-weight:700;color:#0e0d0b;text-decoration:none;box-sizing:border-box;margin-top:4px;box-shadow:0 2px 12px rgba(201,168,76,0.35)">${icon}<span>${apNotas.length>1?'Nota '+(i+1):'Leer nota'}</span></a>`;
             }).join('')}
           </div>`:`<div style="margin-top:6px;font-size:10px;color:var(--muted);font-style:italic">Evento pasado</div>`}
         </div>`;
@@ -1492,7 +1492,7 @@ function renderMap(list, future=[], past=[]){
           const logo=_notaLogos[i];
           const isIg=url.includes('instagram.com');
           const icon=logo?`<img src="${logo}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">`:isIg?`<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#e1306c" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#e1306c" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="#e1306c"/></svg>`:'📰';
-          return`<a class="nota-link" href="${url}" target="_blank" style="padding:6px 12px;font-size:12px">${icon} Leer nota${_notaUrls.filter(Boolean).length>1?' '+(i+1):''}</a>`;
+          return`<a class="nota-link" href="${url}" target="_blank">${icon} Leer nota${_notaUrls.filter(Boolean).length>1?' '+(i+1):''}</a>`;
         }).join('');
         const linksHtml=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center">
           ${isTicketEvent&&hasPreventa?`<a class="plink" href="${entradaUrl}" target="_blank" style="background:rgba(226,185,79,0.15);border:1px solid rgba(226,185,79,0.35);border-radius:6px;padding:5px 12px;font-weight:600">🎟 Comprar entrada</a>`:''}
