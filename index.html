@@ -1443,14 +1443,22 @@ function renderMap(list, future=[], past=[]){
         "><img src="${apIcon}" style="width:11px;height:11px;object-fit:contain;transform:rotate(45deg);mix-blend-mode:multiply;filter:grayscale(0.5)" onerror="this.style.display='none'"></div>`;
         li=L.divIcon({html:pastHtml,className:'',iconSize:[20,20],iconAnchor:[10,20],popupAnchor:[0,-22]});
         const d=parseD(ev.fecha);
-        const apNotas=[ev.nota_periodistica_1,ev.nota_periodistica_2,ev.nota_periodistica_3,ev.nota_periodistica_4].filter(Boolean);
+        const apNotaUrls=[ev.nota_periodistica_1,ev.nota_periodistica_2,ev.nota_periodistica_3,ev.nota_periodistica_4];
+        const apNotaLogos=[ev.nota_logo_1,ev.nota_logo_2,ev.nota_logo_3,ev.nota_logo_4];
+        const apNotas=apNotaUrls.filter(Boolean);
         const apFlyerSrc=ev.imagen_url?(ev.imagen_url.startsWith('/')?'https://raw.githubusercontent.com/Chamico-Eventos/areco-eventos/main'+ev.imagen_url:ev.imagen_url):'';
-        const pop=`<div style="font-family:'Inter',sans-serif;font-size:12px;max-width:240px">
-          ${apFlyerSrc?`<img src="${apFlyerSrc}" style="width:100%;border-radius:6px;margin-bottom:8px;max-height:110px;object-fit:cover" onerror="this.style.display='none'">`:''}
+        const pop=`<div style="font-family:'Inter',sans-serif;font-size:12px;max-width:260px">
+          ${apFlyerSrc?`<img src="${apFlyerSrc}" style="width:100%;border-radius:6px;margin-bottom:8px;max-height:120px;object-fit:cover" onerror="this.style.display='none'">`:''}
           <div style="font-family:'Playfair Display',serif;font-size:14px;color:var(--ink);margin-bottom:4px;font-weight:600">${ev.nombre||'Evento'}</div>
           <div style="color:var(--muted);line-height:1.6;font-size:11px">${d?`📅 ${prettyD(d)}<br>`:''}${ev.lugar?`📍 ${ev.lugar}`:''}</div>
           ${apNotas.length?`<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px">
-            ${apNotas.map((url,ni)=>{const isIg=url.includes('instagram.com');const igS=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#e1306c" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#e1306c" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="#e1306c"/></svg>`;return`<a href="${url}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:rgba(226,185,79,0.12);border:1px solid rgba(226,185,79,0.4);border-radius:8px;font-size:12px;font-weight:700;color:#e2b94f;text-decoration:none">${isIg?igS:'📰'} ${apNotas.length>1?'Nota '+(ni+1):'Leer nota'}</a>`;}).join('')}
+            ${apNotaUrls.map((url,i)=>{
+              if(!url)return'';
+              const logo=apNotaLogos[i];
+              const isIg=url.includes('instagram.com');
+              const icon=logo?`<img src="${logo}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid rgba(255,255,255,0.15)" onerror="this.style.display='none'">`:isIg?`<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#e1306c" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#e1306c" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="#e1306c"/></svg>`:'📰';
+              return`<a href="${url}" target="_blank" style="display:inline-flex;align-items:center;gap:7px;padding:9px 14px;background:rgba(226,185,79,0.15);border:1.5px solid rgba(226,185,79,0.5);border-radius:10px;font-size:13px;font-weight:700;color:#e2b94f;text-decoration:none;width:100%;box-sizing:border-box">${icon}<span>${apNotas.length>1?'Nota '+(i+1):'Leer nota →'}</span></a>`;
+            }).join('')}
           </div>`:`<div style="margin-top:6px;font-size:10px;color:var(--muted);font-style:italic">Evento pasado</div>`}
         </div>`;
         m=L.marker(off,{icon:li,opacity:0.5}).bindPopup(pop,{maxWidth:260}).addTo(map);
@@ -1987,6 +1995,7 @@ function openReviewModal(){
   document.body.style.overflow='hidden';
   document.getElementById('stepBar').style.display='none';
   setModalTitle('📰 Contanos cómo fue','Notas y reseñas de eventos pasados');
+  rvLoadAutores(); // pre-load known journalists for autocomplete
   const f=document.getElementById('subForm');
   const today=new Date();today.setHours(0,0,0,0);
   const past30=new Date(today);past30.setDate(today.getDate()-30);
@@ -2027,7 +2036,9 @@ function openReviewModal(){
     </div>
     <div class="form-group">
       <label class="form-label">Tu nombre o medio <span>*</span></label>
-      <input class="form-input" id="rv-autor" type="text" placeholder="Ej: Días de Areco · diasdeareco.com.ar">
+      <input class="form-input" id="rv-autor" type="text" placeholder="Ej: Días de Areco · diasdeareco.com.ar"
+        oninput="rvFilterAutores(this.value)" autocomplete="off">
+      <div id="rv-autor-suggestions" style="display:none;position:absolute;z-index:999;background:var(--s2);border:1px solid var(--border);border-radius:8px;margin-top:2px;width:100%;max-height:160px;overflow-y:auto"></div>
     </div>
     <div id="rv-logo-section" style="margin-bottom:16px">
       <label class="form-label" style="display:flex;align-items:center;gap:6px">
@@ -2054,7 +2065,44 @@ function openReviewModal(){
     </div>`;
 }
 
-let _rvJournalistLogo=''; // stores existing logo_url if journalist found
+let _rvJournalistLogo='';
+let _rvKnownAutores=[]; // loaded from Periodistas tab
+
+async function rvLoadAutores(){
+  try{
+    const r=await fetch(`${AS_SUBMIT}?action=check_journalist&email=__list__`,{mode:'cors'});
+    if(!r.ok)return;
+    const data=await r.json();
+    if(data.autores)_rvKnownAutores=data.autores; // [{autor, logo_url, email}]
+  }catch(e){}
+}
+
+function rvFilterAutores(val){
+  const box=document.getElementById('rv-autor-suggestions');
+  if(!box)return;
+  if(!val||val.length<1){box.style.display='none';return;}
+  const matches=_rvKnownAutores.filter(a=>a.autor.toLowerCase().includes(val.toLowerCase()));
+  if(!matches.length){box.style.display='none';return;}
+  box.style.display='block';
+  box.innerHTML=matches.map(a=>`
+    <div onclick="rvSelectAutor(${JSON.stringify(a).replace(/"/g,'&quot;')})"
+      style="display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border2)"
+      onmouseover="this.style.background='var(--s3)'" onmouseout="this.style.background=''">
+      ${a.logo_url?`<img src="${a.logo_url}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0">`:'<div style="width:28px;height:28px;border-radius:50%;background:var(--s3);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px">📰</div>'}
+      <div><div style="font-size:13px;font-weight:600;color:var(--ink)">${a.autor}</div>
+      <div style="font-size:11px;color:var(--muted)">${a.email||''}</div></div>
+    </div>`).join('');
+}
+
+function rvSelectAutor(a){
+  const autorEl=document.getElementById('rv-autor');
+  const emailEl=document.getElementById('rv-email');
+  const box=document.getElementById('rv-autor-suggestions');
+  if(autorEl)autorEl.value=a.autor;
+  if(emailEl&&!emailEl.value)emailEl.value=a.email||'';
+  if(box)box.style.display='none';
+  if(a.email)rvCheckJournalist(a.email);
+}
 
 async function rvCheckJournalist(email){
   const statusEl=document.getElementById('rv-journalist-status');
