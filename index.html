@@ -3091,8 +3091,7 @@ async function checkVenueConnected(){
   if(!block||!status) return;
   const slug=getVenueSlug(wData.lugar||'');
   if(!slug){ block.style.display='block'; status.style.display='none'; return; }
-  // Show loading state
-  status.innerHTML='<span style="color:var(--muted);font-size:12px">⏳ Verificando estado de conexión…</span>';
+  status.innerHTML='<span style="color:var(--muted);font-size:12px">⏳ Verificando cuenta del venue…</span>';
   status.style.display='block';
   block.style.display='none';
   try{
@@ -3100,24 +3099,30 @@ async function checkVenueConnected(){
     if(!r.ok) throw new Error('API error');
     const data=await r.json();
     if(data.connected){
-      // Venue already has an OAuth token — show subtle info note, NOT a "done" banner.
-      // The artist still needs to fill in their own MP data for split records.
-      // The full success banner only shows after they personally go through OAuth.
-      status.innerHTML=`<div style="display:flex;align-items:center;gap:8px;padding:9px 12px;
-        background:rgba(42,122,80,0.07);border:1px solid rgba(42,122,80,0.18);border-radius:9px;
-        font-size:12px;color:var(--ink2)">
-        <span style="font-size:14px;flex-shrink:0">ℹ️</span>
-        <span>Este venue ya tiene una cuenta MP asociada. Completá tus datos para el registro y conectá tu cuenta para recibir el split directamente.</span>
+      const nick=data.mp_account?.nickname||data.mp_alias||'';
+      // Venue has a default MP account — inform artist, still show connect block
+      status.innerHTML=`<div style="padding:10px 12px;background:rgba(42,122,80,0.07);
+        border:1px solid rgba(42,122,80,0.2);border-radius:9px;font-size:12px;color:var(--ink2);line-height:1.6">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px">
+          <span style="font-size:14px">✅</span>
+          <strong style="color:var(--ink2)">El venue ya tiene cuenta MP${nick?' · @'+nick:''}</strong>
+        </div>
+        Si no conectás la tuya, los pagos irán a la cuenta del venue y el split se transfiere manualmente.
+        Para recibir el dinero directo en tu cuenta conectá la tuya abajo.
       </div>`;
       status.style.display='block';
-      block.style.display='block'; // still show the connect block
-    } else {
-      // Not connected — show connect block
       block.style.display='block';
-      status.style.display='none';
+    } else {
+      // No venue account — this venue uses per-artist or DM fallback
+      status.innerHTML=`<div style="padding:9px 12px;background:rgba(226,185,79,0.06);
+        border:1px solid rgba(226,185,79,0.2);border-radius:9px;font-size:12px;color:var(--ink2)">
+        <span style="font-size:14px">⚠️</span>
+        Este venue no tiene una cuenta MP predeterminada — necesitás conectar la tuya para recibir los pagos directamente.
+      </div>`;
+      status.style.display='block';
+      block.style.display='block';
     }
   } catch(e){
-    // API unreachable — show block as fallback, never block the user
     block.style.display='block';
     status.style.display='none';
   }
@@ -3690,14 +3695,18 @@ async function submitWizard(){
           ${mpSkipped?`
           <div style="font-size:13px;font-weight:700;color:var(--ink2);margin-bottom:8px">📧 Conexión de Mercado Pago — pendiente</div>
           <div style="font-size:12px;color:var(--ink2);line-height:1.7;margin-bottom:12px">
-            Cuando tu evento sea aprobado te enviamos el link de conexión a
-            <strong style="color:var(--ink)">${wData.contacto_email}</strong>.
-            Podés conectarlo en cualquier momento antes de que arranquen las ventas.
+            Cuando tu evento sea aprobado, te enviamos a
+            <strong style="color:var(--ink)">${wData.contacto_email}</strong>
+            un link personalizado para conectar tu cuenta MP a este evento específico.
+            Podés hacerlo en cualquier momento antes de que arranquen las ventas.
+          </div>
+          <div style="font-size:11px;color:var(--muted);padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:7px;line-height:1.6;margin-bottom:10px">
+            💡 Si el venue ya tiene una cuenta MP conectada, los pagos irán ahí hasta que conectes la tuya. Una vez que conectés, todas las ventas futuras de este evento van directo a vos.
           </div>
           <a href="${mpConnectUrl}" target="_blank" rel="noopener"
             style="display:block;text-align:center;padding:10px 16px;border:1px solid rgba(201,168,76,0.3);
                    background:transparent;color:var(--gold);font-size:12px;font-weight:600;border-radius:9px;text-decoration:none">
-            Conectar ahora de todas formas →
+            Conectar cuenta del venue ahora →
           </a>
           `:`
           <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:10px">🔐 Paso siguiente — Autorizá a DataManIAcs en MP</div>
