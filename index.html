@@ -3060,16 +3060,13 @@ function renderW4(f){
         3. MP te pregunta "¿Autorizar a DataManIAcs?" → hacés clic en <strong style="color:var(--ink)">Autorizar</strong><br>
         4. Cerrá esa pestaña y volvé acá — después tocá <strong style="color:var(--ink)">"Ya conecté mi cuenta"</strong>
       </div>
-      <a href="https://entradas.datamaniacs.com.ar/mp-connect?venue=${getVenueSlug(wData.lugar||'venue')}&return_to=${encodeURIComponent('https://areco-eventos.vercel.app')}&state=${encodeURIComponent(getVenueSlug(wData.lugar||'venue')+'||https://areco-eventos.vercel.app')}"
-        target="_blank" rel="noopener"
-        onclick="document.getElementById('w-mp-ya-conecte').style.display='block'"
+      <a id="mp-connect-link"
+        href="https://entradas.datamaniacs.com.ar/mp-connect?venue=${getVenueSlug(wData.lugar||'venue')}&return_to=${encodeURIComponent('https://areco-eventos.vercel.app')}&state=${encodeURIComponent(getVenueSlug(wData.lugar||'venue')+'||https://areco-eventos.vercel.app')}"
+        onclick="saveWizardState()"
         style="display:block;text-align:center;padding:11px 20px;background:linear-gradient(135deg,var(--gold),#e8c97a);
                color:#0e0d0b;font-weight:700;font-size:13px;border-radius:9px;text-decoration:none;margin-bottom:8px">
         🔗 Conectar mi Mercado Pago →
       </a>
-      <div style="font-size:11px;color:rgba(192,90,74,0.8);text-align:center;margin-bottom:10px">
-        ⚠ Abrí en Safari o Chrome — no desde WhatsApp
-      </div>
       <button id="w-mp-ya-conecte" onclick="mpYaConecte()" style="display:none;width:100%;padding:10px;border-radius:9px;
         border:1px solid rgba(42,122,80,0.4);background:rgba(42,122,80,0.1);color:#4ca87a;
         font-size:13px;font-weight:600;cursor:pointer;margin-bottom:8px">
@@ -3268,15 +3265,40 @@ async function updateMpConnectBlock(){
     status.style.display='block';
     block.style.display='block';
     // Update the connect link in the block
-    const link = block.querySelector('a[href*="mp-connect"]');
-    if(link) link.href = connectUrl;
-    // Update the step-4 visible link too
-    const blockLinks = block.querySelectorAll('a');
-    blockLinks.forEach(l=>{ if(l.href.includes('mp-connect')) l.href=connectUrl; });
+    const link = document.getElementById('mp-connect-link');
+    if(link){
+      link.href = connectUrl;
+      link.onclick = ()=>saveWizardState();
+    }
   } else {
     // Venue-level connect — existing flow
     await checkVenueConnected();
   }
+}
+
+// ── Wizard state persistence for OAuth redirect ───────────────
+function saveWizardState(){
+  try{
+    sessionStorage.setItem('wizardState', JSON.stringify({
+      mode: wizardMode,
+      step: wizardStep,
+      data: {...wData},
+    }));
+  }catch(e){}
+}
+
+function restoreWizardState(){
+  try{
+    const saved = sessionStorage.getItem('wizardState');
+    if(!saved) return false;
+    sessionStorage.removeItem('wizardState');
+    const s = JSON.parse(saved);
+    if(!s.mode) return false;
+    wizardMode = s.mode;
+    wizardStep = s.step || 4;
+    Object.assign(wData, s.data || {});
+    return true;
+  }catch(e){ return false; }
 }
 
 function mpSkipConnect(){
@@ -3846,58 +3868,66 @@ async function init(){
   document.getElementById('loading').style.display='none';
 
   // ── Handle MP OAuth return ─────────────────────────────
-  // Detects ?mp_connected=true&venue=SLUG&event=evId after OAuth redirect
+  // Detects ?mp_connected=true&venue=SLUG&event=evId after OAuth redirect (same tab)
   const params = new URLSearchParams(window.location.search);
   if(params.get('mp_connected')==='true'){
     const venueSlug = params.get('venue')||'';
     const eventId   = params.get('event')||'';
-    // Clean the URL without reloading
     window.history.replaceState({}, '', window.location.pathname);
-    // If event-level connect, show standalone confirmation (no wizard to restore)
-    if(eventId){
-      openSubModal();
+
+    // Try to restore wizard state saved before OAuth navigation
+    const restored = restoreWizardState();
+
+    if(restored){
+      // Wizard state restored — show step 4 with connected confirmation then continue
+      document.getElementById('subOverlay').classList.add('open');
+      document.body.style.overflow='hidden';
+      wData._mpConnected = true;
+      wizardStep = 4;
       setTimeout(()=>{
         const f=document.getElementById('subForm');
-        if(!f) return;
-        setModalTitle('Mercado Pago conectado','Configuración completa');
-        f.innerHTML=`
-          <div style="text-align:center;padding:20px 0">
-            <div style="font-size:48px;margin-bottom:16px">✅</div>
-            <div style="font-size:16px;font-weight:700;color:#4ca87a;margin-bottom:8px">¡Cuenta de Mercado Pago conectada!</div>
-            <div style="font-size:13px;color:var(--ink2);line-height:1.7;max-width:320px;margin:0 auto">
-              Las ventas de este evento irán directo a tu cuenta de MP.
-              ${venueSlug?`<br><br>Esta conexión también aplica a futuros eventos en <strong style="color:var(--ink)">${venueSlug}</strong>.`:''}
-            </div>
-            <button onclick="closeSubModal()" style="margin-top:24px;padding:12px 28px;border-radius:10px;
-              background:linear-gradient(135deg,var(--gold),#e8c97a);border:none;
-              font-size:14px;font-weight:700;color:#0e0d0b;cursor:pointer">
-              Listo →
-            </button>
-          </div>`;
-      }, 300);
-    } else {
-      // Venue-level connect — resume wizard at step 4
-      wizardMode='mp';
-      wizardStep=4;
-      wData.lugar = wData.lugar || venueSlug.replace(/-/g,' ');
-      openSubModal();
-      setTimeout(()=>{
-        const f=document.getElementById('subForm');
-        if(!f) return;
+        if(!f){ renderStep(); return; }
         setModalTitle('Paso 4 · Tickets y Mercado Pago','Configurá tus entradas');
         f.innerHTML=`
-          <div style="display:flex;align-items:center;gap:12px;background:rgba(42,122,80,0.12);border:1px solid rgba(42,122,80,0.35);border-radius:12px;padding:16px;margin-bottom:16px">
-            <span style="font-size:32px">✅</span>
+          <div style="display:flex;align-items:center;gap:14px;background:rgba(42,122,80,0.12);
+            border:1px solid rgba(42,122,80,0.35);border-radius:14px;padding:18px;margin-bottom:20px">
+            <span style="font-size:36px;flex-shrink:0">✅</span>
             <div>
-              <div style="font-size:14px;font-weight:700;color:#4ca87a;margin-bottom:4px">¡Cuenta de Mercado Pago conectada!</div>
-              <div style="font-size:12px;color:var(--ink2);line-height:1.6">El dinero de las entradas irá directo a tu cuenta. Esta conexión aplica a todos tus eventos futuros en este venue.</div>
+              <div style="font-size:15px;font-weight:700;color:#4ca87a;margin-bottom:5px">¡Cuenta de Mercado Pago conectada!</div>
+              <div style="font-size:12px;color:var(--ink2);line-height:1.6">El dinero de las entradas irá directo a tu cuenta automáticamente. Ya podés continuar al siguiente paso.</div>
             </div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:20px">
+            ${eventId ? 'Conexión para este evento específico.' : 'Esta conexión aplica a todos tus eventos futuros en este venue.'}
           </div>
           <div class="step-nav">
             <button class="btn-back" onclick="wizardStep=3;renderStep()">← Atrás</button>
             <button class="btn-next" onclick="wizardStep=5;renderStep()">Siguiente →</button>
           </div>`;
-      }, 300);
+        updateProgressBar();
+      }, 200);
+    } else {
+      // No wizard state — standalone confirmation (came from approval email link)
+      openSubModal();
+      setTimeout(()=>{
+        const f=document.getElementById('subForm');
+        if(!f) return;
+        setModalTitle('Mercado Pago conectado','');
+        f.innerHTML=`
+          <div style="text-align:center;padding:24px 0">
+            <div style="font-size:52px;margin-bottom:16px">✅</div>
+            <div style="font-size:17px;font-weight:700;color:#4ca87a;margin-bottom:10px">¡Cuenta conectada!</div>
+            <div style="font-size:13px;color:var(--ink2);line-height:1.7;max-width:300px;margin:0 auto 24px">
+              Las ventas de este evento irán directo a tu cuenta de Mercado Pago.
+            </div>
+            <button onclick="closeSubModal()" style="padding:13px 32px;border-radius:10px;
+              background:linear-gradient(135deg,var(--gold),#e8c97a);border:none;
+              font-size:14px;font-weight:700;color:#0e0d0b;cursor:pointer">
+              Listo →
+            </button>
+          </div>`;
+        document.getElementById('stepBar').style.display='none';
+      }, 200);
     }
   }
 }
