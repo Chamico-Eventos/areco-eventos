@@ -2280,6 +2280,8 @@ function openSubModal(){
   document.body.style.overflow='hidden';
   wizardMode=null; wizardStep=0;
   Object.keys(wData).forEach(k=>delete wData[k]);
+  // Pre-generate event ID so it can be used in OAuth URLs before submission
+  wData.evId = 'sub_' + Date.now().toString(36);
   renderStep();
 }
 function closeSubModal(){
@@ -2911,7 +2913,35 @@ function w3Next(){
 // Step 4 — Tickets + MP
 function renderW4(f){
   setModalTitle('Paso 4 · Tickets y Mercado Pago','Configurá tus entradas');
+  if(!wData.collector) wData.collector='venue'; // default
   f.innerHTML=`
+    <!-- ── Collector toggle ───────────────────────────────── -->
+    <div style="margin-bottom:20px">
+      <label class="form-label">¿Quién recibe los pagos de las entradas? <span>*</span></label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
+        <button type="button" id="col-venue" onclick="wCollector('venue')"
+          style="padding:14px 10px;border-radius:12px;border:2px solid ${wData.collector==='venue'?'var(--gold)':'rgba(255,255,255,0.1)'};
+                 background:${wData.collector==='venue'?'rgba(226,185,79,0.1)':'var(--s2)'};
+                 color:${wData.collector==='venue'?'var(--gold)':'var(--ink2)'};
+                 font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center">
+          🏠 El venue<br>
+          <span style="font-size:11px;font-weight:400;color:var(--muted)">Cuenta MP del lugar</span>
+        </button>
+        <button type="button" id="col-artist" onclick="wCollector('artist')"
+          style="padding:14px 10px;border-radius:12px;border:2px solid ${wData.collector==='artist'?'var(--gold)':'rgba(255,255,255,0.1)'};
+                 background:${wData.collector==='artist'?'rgba(226,185,79,0.1)':'var(--s2)'};
+                 color:${wData.collector==='artist'?'var(--gold)':'var(--ink2)'};
+                 font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center">
+          🎸 El artista<br>
+          <span style="font-size:11px;font-weight:400;color:var(--muted)">Mi propia cuenta MP</span>
+        </button>
+      </div>
+      <div id="collector-hint" style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:7px">
+        ${wData.collector==='venue'
+          ? '💡 Los pagos van a la cuenta MP del venue. El split del artista se transfiere manualmente según lo acordado.'
+          : '💡 Los pagos van directo a tu cuenta MP. Necesitás conectarla abajo. Se hace una sola vez por evento.'}
+      </div>
+    </div>
     <div class="fee-box">
       <strong>Cómo funciona el servicio</strong><br>
       Vos fijás el precio de la entrada. El comprador paga un 5% adicional de cargo por servicio
@@ -3061,8 +3091,8 @@ function renderW4(f){
   calcFee();
   showPrecioSugerido('precio-sugerido-mp');
   if(wData.precio_entrada&&!wData.precio_puerta) autoFillPuerta('mp');
-  // Check if venue already connected to MP
-  checkVenueConnected();
+  // Load the right connect block based on who collects
+  updateMpConnectBlock();
 }
 
 // Known venue slug overrides to match Supabase venue table
@@ -3196,6 +3226,59 @@ function autoFillPuerta(mode){
   const hint=document.getElementById(hintId);
   if(hint) hint.textContent=` · Sugerido: $${sugerido.toLocaleString('es-AR')} (preventa + $2.000) — podés editarlo.`;
 }
+function wCollector(choice){
+  wData.collector = choice;
+  const vBtn = document.getElementById('col-venue');
+  const aBtn = document.getElementById('col-artist');
+  const hint = document.getElementById('collector-hint');
+  if(vBtn) {
+    vBtn.style.borderColor = choice==='venue' ? 'var(--gold)' : 'rgba(255,255,255,0.1)';
+    vBtn.style.background  = choice==='venue' ? 'rgba(226,185,79,0.1)' : 'var(--s2)';
+    vBtn.style.color       = choice==='venue' ? 'var(--gold)' : 'var(--ink2)';
+  }
+  if(aBtn) {
+    aBtn.style.borderColor = choice==='artist' ? 'var(--gold)' : 'rgba(255,255,255,0.1)';
+    aBtn.style.background  = choice==='artist' ? 'rgba(226,185,79,0.1)' : 'var(--s2)';
+    aBtn.style.color       = choice==='artist' ? 'var(--gold)' : 'var(--ink2)';
+  }
+  if(hint) hint.textContent = choice==='venue'
+    ? '💡 Los pagos van a la cuenta MP del venue. El split del artista se transfiere manualmente según lo acordado.'
+    : '💡 Los pagos van directo a tu cuenta MP. Necesitás conectarla abajo. Se hace una sola vez por evento.';
+  // Reload the connect block for the chosen mode
+  updateMpConnectBlock();
+}
+
+async function updateMpConnectBlock(){
+  const block  = document.getElementById('mp-connect-block');
+  const status = document.getElementById('mp-connect-status');
+  if(!block||!status) return;
+  const slug   = getVenueSlug(wData.lugar||'');
+  const evId   = wData.evId || '';
+  const retUrl = encodeURIComponent('https://areco-eventos.vercel.app');
+
+  if(wData.collector === 'artist'){
+    // Artist-level connect — event-specific URL
+    const connectUrl = `https://entradas.datamaniacs.com.ar/mp-connect?venue=${slug}&event=${evId}&return_to=${retUrl}&state=${encodeURIComponent(slug+'|'+evId+'|https://areco-eventos.vercel.app')}`;
+    status.innerHTML=`<div style="display:flex;align-items:center;gap:8px;padding:9px 12px;
+      background:rgba(226,185,79,0.06);border:1px solid rgba(226,185,79,0.2);border-radius:9px;
+      font-size:12px;color:var(--ink2)">
+      <span style="font-size:14px">🎸</span>
+      Conectá tu propia cuenta de Mercado Pago — los pagos de este evento irán directo a vos.
+    </div>`;
+    status.style.display='block';
+    block.style.display='block';
+    // Update the connect link in the block
+    const link = block.querySelector('a[href*="mp-connect"]');
+    if(link) link.href = connectUrl;
+    // Update the step-4 visible link too
+    const blockLinks = block.querySelectorAll('a');
+    blockLinks.forEach(l=>{ if(l.href.includes('mp-connect')) l.href=connectUrl; });
+  } else {
+    // Venue-level connect — existing flow
+    await checkVenueConnected();
+  }
+}
+
 function mpSkipConnect(){
   // Mark as skipped — connect link will be sent by email on approval
   wData._mpConnectSkipped = true;
@@ -3671,6 +3754,8 @@ async function submitWizard(){
     flyer_base64:flyerBase64,
     flyer_mime:flyerMime,
     validacion:'Pendiente',activo:'FALSE',tipo_fuente:'Manual',
+    id:wData.evId||'',
+    collector:wData.collector||'venue',
   };
 
   try{
