@@ -2980,8 +2980,7 @@ function renderW4(f){
       <label class="form-label">Stock de entradas <span>*</span></label>
       <input class="form-input" id="w-stock" type="number" min="1" placeholder="200" value="${wData.stock_entradas||''}">
     </div>
-    <!-- MP data fields — shown for artist collector, hidden for venue (data already in Supabase) -->
-    <div id="mp-data-fields" style="display:${wData.collector==='artist'?'block':'none'}">
+    <!-- MP contact fields — always shown for split tracking -->
     <div class="form-section">Tus datos de Mercado Pago</div>
     <div class="form-row">
       <div class="form-group">
@@ -2990,6 +2989,15 @@ function renderW4(f){
           oninput="this.style.borderColor=''">
       </div>
     </div>
+    <div class="form-group">
+      <label class="form-label">Alias o CVU <span>*</span></label>
+      <div style="display:flex;align-items:center;background:var(--s2);border:1px solid var(--b2);border-radius:8px;overflow:hidden">
+        <input id="w-mp-alias" class="form-input" placeholder="juan.eventos.mp" style="border:none;background:none" value="${wData.mp_alias||''}">
+      </div>
+      <div class="form-hint">${wData.collector==='venue'?'Alias del artista — para el split se transfiere acá':'Acá es donde te llegan los pagos · Preferí el alias al CVU'}</div>
+    </div>
+    <!-- Extended MP fields — only required for artist collector -->
+    <div id="mp-data-fields" style="display:${wData.collector==='artist'?'block':'none'}">
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Usuario de Mercado Pago <span>*</span></label>
@@ -3002,13 +3010,6 @@ function renderW4(f){
           oninput="fmtCuit(this)" value="${wData.mp_cuit||''}">
         <div id="cuit-hint" style="font-size:10px;color:var(--muted);margin-top:3px;min-height:14px;font-style:italic"></div>
       </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Alias o CVU <span>*</span></label>
-      <div style="display:flex;align-items:center;background:var(--s2);border:1px solid var(--b2);border-radius:8px;overflow:hidden">
-        <input id="w-mp-alias" class="form-input" placeholder="juan.eventos.mp" style="border:none;background:none" value="${wData.mp_alias||''}">
-      </div>
-      <div class="form-hint">Acá es donde te llegan los pagos — 10 días hábiles después de cada compra, según política de Mercado Pago · Preferí el alias al CVU</div>
     </div>
     <div class="form-group">
       <label class="form-label">Teléfono de contacto MP <span>*</span></label>
@@ -3248,11 +3249,21 @@ function wCollector(choice){
   if(hint) hint.textContent = choice==='venue'
     ? '💡 Los pagos van a la cuenta MP del venue. El split del artista se transfiere manualmente según lo acordado.'
     : '💡 Los pagos van directo a tu cuenta MP. Necesitás conectarla abajo. Se hace una sola vez por evento.';
-  // Show/hide MP data fields based on who collects
+  // Show/hide extended MP fields (titular, CUIT, tel) — email+alias always visible
   const mpFields = document.getElementById('mp-data-fields');
   const mpNote   = document.getElementById('mp-venue-note');
   if(mpFields) mpFields.style.display = choice==='artist' ? 'block' : 'none';
   if(mpNote)   mpNote.style.display   = choice==='venue'  ? 'block' : 'none';
+  // Update alias hint to reflect collector context
+  const aliasHints = document.querySelectorAll('.form-hint');
+  // Find the alias form-hint (sibling of w-mp-alias wrapper)
+  const aliasInput = document.getElementById('w-mp-alias');
+  if(aliasInput){
+    const hint = aliasInput.closest('.form-group')?.querySelector('.form-hint');
+    if(hint) hint.textContent = choice==='venue'
+      ? 'Alias del artista — para el split se transfiere acá'
+      : 'Acá es donde te llegan los pagos · Preferí el alias al CVU';
+  }
   // Reload the connect block for the chosen mode
   updateMpConnectBlock();
 }
