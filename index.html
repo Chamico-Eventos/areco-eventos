@@ -3030,7 +3030,7 @@ function renderW4(f){
         3. MP te pregunta "¿Autorizar a DataManIAcs?" → hacés clic en <strong style="color:var(--ink)">Autorizar</strong><br>
         4. Cerrá esa pestaña y volvé acá — después tocá <strong style="color:var(--ink)">"Ya conecté mi cuenta"</strong>
       </div>
-      <a href="https://entradas.datamaniacs.com.ar/mp-connect?venue=${getVenueSlug(wData.lugar||'venue')}&return_to=${encodeURIComponent('https://areco-eventos.vercel.app')}"
+      <a href="https://entradas.datamaniacs.com.ar/mp-connect?venue=${getVenueSlug(wData.lugar||'venue')}&return_to=${encodeURIComponent('https://areco-eventos.vercel.app')}&state=${getVenueSlug(wData.lugar||'venue')}"
         target="_blank" rel="noopener"
         onclick="document.getElementById('w-mp-ya-conecte').style.display='block'"
         style="display:block;text-align:center;padding:11px 20px;background:linear-gradient(135deg,var(--gold),#e8c97a);
@@ -3045,8 +3045,12 @@ function renderW4(f){
         font-size:13px;font-weight:600;cursor:pointer;margin-bottom:8px">
         ✅ Ya conecté mi cuenta — continuar
       </button>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:6px;margin-top:8px">
-        ⚠ Si no completás este paso ahora, los pagos quedarán retenidos en la cuenta de DataManIAcs y hay que transferirlos manualmente. <strong style="color:var(--ink2)">Se hace una sola vez por venue.</strong>
+      <div style="border-top:1px solid rgba(255,255,255,0.06);margin-top:12px;padding-top:12px">
+        <button onclick="mpSkipConnect()" style="width:100%;padding:9px;border-radius:9px;
+          border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--muted);
+          font-size:12px;cursor:pointer">
+          Conectar después — me llega el link por email cuando aprueben el evento
+        </button>
       </div>
     </div>
     ${errDiv()}
@@ -3187,6 +3191,22 @@ function autoFillPuerta(mode){
   const hint=document.getElementById(hintId);
   if(hint) hint.textContent=` · Sugerido: $${sugerido.toLocaleString('es-AR')} (preventa + $2.000) — podés editarlo.`;
 }
+function mpSkipConnect(){
+  // Mark as skipped — connect link will be sent by email on approval
+  wData._mpConnectSkipped = true;
+  const block = document.getElementById('mp-connect-block');
+  if(block) block.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;
+      background:rgba(107,97,80,0.12);border:1px solid rgba(107,97,80,0.25);border-radius:10px">
+      <span style="font-size:18px">📧</span>
+      <div style="font-size:12px;color:var(--ink2);line-height:1.6">
+        OK — cuando tu evento sea aprobado, te enviamos el link de conexión por email a
+        <strong style="color:var(--ink)">${wData.contacto_email||'tu email'}</strong>.
+        Podés conectarlo en cualquier momento antes de que arranquen las ventas.
+      </div>
+    </div>`;
+}
+
 function startMpConnectWatch(){
   // Placeholder — once entradas adds return_to support this can auto-verify
 }
@@ -3651,8 +3671,9 @@ async function submitWizard(){
   try{
     await fetch(AS_SUBMIT,{method:'POST',body:JSON.stringify(payload),headers:{'Content-Type':'application/json'},mode:'no-cors'});
     const venueSlug=getVenueSlug(wData.lugar||'venue');
-    const mpConnectUrl=`https://entradas.datamaniacs.com.ar/mp-connect?venue=${venueSlug}&return_to=${encodeURIComponent('https://areco-eventos.vercel.app')}`;
+    const mpConnectUrl=`https://entradas.datamaniacs.com.ar/mp-connect?venue=${venueSlug}&return_to=${encodeURIComponent('https://areco-eventos.vercel.app')}&state=${venueSlug}`;
     const isMp=wizardMode==='mp';
+    const mpSkipped=!!wData._mpConnectSkipped;
     document.getElementById('subForm').innerHTML=`
       <div class="form-success">
         <div class="form-success-icon">🎉</div>
@@ -3666,15 +3687,28 @@ async function submitWizard(){
         ${flyerBase64?'<div style="background:rgba(42,122,80,0.12);border:1px solid rgba(42,122,80,0.3);border-radius:10px;padding:12px 14px;margin:14px 0;font-size:13px;color:#4ca87a">✅ Flyer subido correctamente.</div>':''}
         ${isMp?`
         <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.35);border-radius:12px;padding:16px;margin:16px 0;text-align:left">
+          ${mpSkipped?`
+          <div style="font-size:13px;font-weight:700;color:var(--ink2);margin-bottom:8px">📧 Conexión de Mercado Pago — pendiente</div>
+          <div style="font-size:12px;color:var(--ink2);line-height:1.7;margin-bottom:12px">
+            Cuando tu evento sea aprobado te enviamos el link de conexión a
+            <strong style="color:var(--ink)">${wData.contacto_email}</strong>.
+            Podés conectarlo en cualquier momento antes de que arranquen las ventas.
+          </div>
+          <a href="${mpConnectUrl}" target="_blank" rel="noopener"
+            style="display:block;text-align:center;padding:10px 16px;border:1px solid rgba(201,168,76,0.3);
+                   background:transparent;color:var(--gold);font-size:12px;font-weight:600;border-radius:9px;text-decoration:none">
+            Conectar ahora de todas formas →
+          </a>
+          `:`
           <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:10px">🔐 Paso siguiente — Autorizá a DataManIAcs en MP</div>
           <div style="font-size:12px;color:var(--ink2);line-height:1.7;margin-bottom:12px">
-            Para que el <strong style="color:var(--ink)">93% de cada entrada</strong> llegue directo a tu cuenta, necesitás autorizar a DataManIAcs en Mercado Pago. Es el sistema estándar de MP — <strong style="color:var(--ink)">no capturamos tu contraseña ni podemos retirar fondos</strong>, solo podemos depositarte dinero.
+            Para que el <strong style="color:var(--ink)">93% de cada entrada</strong> llegue directo a tu cuenta, necesitás autorizar a DataManIAcs en Mercado Pago — <strong style="color:var(--ink)">no capturamos tu contraseña ni podemos retirar fondos</strong>, solo podemos depositarte dinero.
           </div>
           <div style="font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:12px">
-            1. Abrí el link de abajo en tu celular o computadora<br>
+            1. Abrí el link en tu celular o computadora<br>
             2. Iniciá sesión con tu cuenta MP (alias: <strong style="color:var(--gold)">${wData.mp_alias||'tu alias'}</strong>)<br>
             3. MP te pregunta "¿Autorizar a DataManIAcs?" → hacé clic en <strong style="color:var(--ink)">Autorizar</strong><br>
-            4. Listo — se hace una sola vez y aplica a todos tus eventos futuros en este venue
+            4. Listo — se hace una sola vez, aplica a todos tus eventos futuros en este venue
           </div>
           <a href="${mpConnectUrl}" target="_blank" rel="noopener"
             style="display:block;text-align:center;padding:12px 20px;background:linear-gradient(135deg,var(--gold),#e8c97a);
@@ -3682,11 +3716,9 @@ async function submitWizard(){
             🔗 Conectar mi Mercado Pago →
           </a>
           <div style="font-size:11px;color:rgba(192,90,74,0.9);text-align:center;margin-bottom:6px">
-            ⚠ Abrí el link en Safari o Chrome — no funciona desde WhatsApp
+            ⚠ Abrí en Safari o Chrome — no funciona desde WhatsApp
           </div>
-          <div style="font-size:10px;color:var(--muted);text-align:center">
-            Solo necesitás hacer esto una vez — aplica a todos tus eventos futuros en este venue
-          </div>
+          `}
         </div>`:''}
         <button class="form-submit" style="margin-top:8px;max-width:200px;margin-left:auto;margin-right:auto" onclick="closeSubModal()">Cerrar</button>
       </div>`;
