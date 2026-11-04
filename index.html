@@ -3100,17 +3100,17 @@ async function checkVenueConnected(){
     if(!r.ok) throw new Error('API error');
     const data=await r.json();
     if(data.connected){
-      // Already connected — keep block hidden, show green confirmation
-      status.innerHTML=`<div style="background:rgba(42,122,80,0.08);border:1px solid rgba(42,122,80,0.2);border-radius:12px;padding:16px 20px">
-        <div style="display:flex;align-items:center;gap:10px">
-          <span style="font-size:20px">✅</span>
-          <div>
-            <div style="font-weight:600;color:#4ca87a">¡Cuenta de Mercado Pago conectada!</div>
-            <div style="font-size:12px;color:var(--muted);margin-top:2px">El dinero de las entradas irá directo a tu cuenta automáticamente. Ya podés continuar con el siguiente paso.</div>
-          </div>
-        </div>
-        <div style="font-size:11px;color:var(--muted);margin-top:10px;text-align:center">Esta conexión aplica a todos tus eventos futuros en este venue — no necesitás repetirla.</div>
+      // Venue already has an OAuth token — show subtle info note, NOT a "done" banner.
+      // The artist still needs to fill in their own MP data for split records.
+      // The full success banner only shows after they personally go through OAuth.
+      status.innerHTML=`<div style="display:flex;align-items:center;gap:8px;padding:9px 12px;
+        background:rgba(42,122,80,0.07);border:1px solid rgba(42,122,80,0.18);border-radius:9px;
+        font-size:12px;color:var(--ink2)">
+        <span style="font-size:14px;flex-shrink:0">ℹ️</span>
+        <span>Este venue ya tiene una cuenta MP asociada. Completá tus datos para el registro y conectá tu cuenta para recibir el split directamente.</span>
       </div>`;
+      status.style.display='block';
+      block.style.display='block'; // still show the connect block
     } else {
       // Not connected — show connect block
       block.style.display='block';
