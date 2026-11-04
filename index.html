@@ -2980,7 +2980,9 @@ function renderW4(f){
       <label class="form-label">Stock de entradas <span>*</span></label>
       <input class="form-input" id="w-stock" type="number" min="1" placeholder="200" value="${wData.stock_entradas||''}">
     </div>
-    <div class="form-section">Datos de Mercado Pago para el pago</div>
+    <!-- MP data fields — shown for artist collector, hidden for venue (data already in Supabase) -->
+    <div id="mp-data-fields" style="display:${wData.collector==='artist'?'block':'none'}">
+    <div class="form-section">Tus datos de Mercado Pago</div>
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Email de Mercado Pago <span>*</span></label>
@@ -3022,6 +3024,11 @@ function renderW4(f){
       <div id="mp-tel-hint" style="font-size:10px;color:var(--muted);margin-top:3px;min-height:14px;font-style:italic"></div>
     </div>
 
+    </div><!-- /mp-data-fields -->
+    <!-- Venue collector note — shown when venue is handling payments -->
+    <div id="mp-venue-note" style="display:${wData.collector==='venue'?'block':'none'};margin-bottom:14px;padding:12px 14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;font-size:12px;color:var(--ink2);line-height:1.6">
+      <span style="font-size:14px">🏠</span> Los datos de MP del venue están registrados en el sistema — no necesitás ingresarlos. El split acordado con el venue se gestiona por fuera de la plataforma.
+    </div>
     <!-- MP verification checkbox -->
     <div style="background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:12px 14px;margin-top:4px">
       <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:12px;color:var(--ink2)">
@@ -3241,6 +3248,11 @@ function wCollector(choice){
   if(hint) hint.textContent = choice==='venue'
     ? '💡 Los pagos van a la cuenta MP del venue. El split del artista se transfiere manualmente según lo acordado.'
     : '💡 Los pagos van directo a tu cuenta MP. Necesitás conectarla abajo. Se hace una sola vez por evento.';
+  // Show/hide MP data fields based on who collects
+  const mpFields = document.getElementById('mp-data-fields');
+  const mpNote   = document.getElementById('mp-venue-note');
+  if(mpFields) mpFields.style.display = choice==='artist' ? 'block' : 'none';
+  if(mpNote)   mpNote.style.display   = choice==='venue'  ? 'block' : 'none';
   // Reload the connect block for the chosen mode
   updateMpConnectBlock();
 }
