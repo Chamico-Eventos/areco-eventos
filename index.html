@@ -2488,6 +2488,22 @@ function renderSimpleStep(f, step){
         <div id="tel-hint" style="font-size:10px;color:var(--muted);margin-top:3px;min-height:14px;font-style:italic"></div>
       </div>
       <div id="subError" style="font-size:12px;color:#c05a4a;display:none;margin-top:8px"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;
+        background:var(--s2);border:1px solid var(--b2);border-radius:10px;margin-top:4px;cursor:pointer"
+        onclick="wToggleMesas()">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--ink)">🪑 ¿Hay mesas/reservas en el evento?</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">Activa el sistema de reserva de mesas en la puerta</div>
+        </div>
+        <div id="mesas-toggle" style="width:44px;height:24px;border-radius:12px;position:relative;flex-shrink:0;
+          background:${wData.mesas_habilitadas?'var(--gold)':'rgba(255,255,255,0.12)'};
+          border:1px solid ${wData.mesas_habilitadas?'var(--gold)':'rgba(255,255,255,0.15)'};
+          transition:all .2s">
+          <div style="width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;
+            top:2px;transition:left .2s;
+            left:${wData.mesas_habilitadas?'22px':'3px'}"></div>
+        </div>
+      </div>
       <div class="step-nav">
         <button class="btn-back" onclick="wizardStep=0;renderStep()">← Atrás</button>
         <button class="btn-next" onclick="simpleNext()">Siguiente →</button>
@@ -2635,6 +2651,7 @@ async function submitSimple(){
     mp_conectado:'FALSE',
     modelo_venta:'free',
     colaboracion:document.getElementById('w-colab')?.checked?'yes':'no',
+    mesas_habilitadas:wData.mesas_habilitadas?'TRUE':'FALSE',
     flyer_nombre_sugerido:flyerName,
     flyer_base64:flyerBase64,
     flyer_mime:flyerMime,
@@ -2771,6 +2788,23 @@ function renderW2(f){
       <label class="form-label">Link de más info</label>
       <input class="form-input" id="w-link" type="url" placeholder="Instagram, Facebook..." value="${wData.link_fuente||''}">
     </div>
+    <!-- Mesas toggle — applies to all payment modes, feeds door app -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;
+      background:var(--s2);border:1px solid var(--b2);border-radius:10px;margin-top:4px;cursor:pointer"
+      onclick="wToggleMesas()">
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--ink)">🪑 ¿Hay mesas/reservas en el evento?</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">Activa el sistema de reserva de mesas en la puerta</div>
+      </div>
+      <div id="mesas-toggle" style="width:44px;height:24px;border-radius:12px;position:relative;flex-shrink:0;
+        background:${wData.mesas_habilitadas?'var(--gold)':'rgba(255,255,255,0.12)'};
+        border:1px solid ${wData.mesas_habilitadas?'var(--gold)':'rgba(255,255,255,0.15)'};
+        transition:all .2s">
+        <div style="width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;
+          top:2px;transition:left .2s;
+          left:${wData.mesas_habilitadas?'22px':'3px'}"></div>
+      </div>
+    </div>
     ${errDiv()}
     <div class="step-nav">
       <button class="btn-back" onclick="wizardStep=1;renderStep()">← Atrás</button>
@@ -2788,6 +2822,15 @@ function renderW2(f){
     }
   },50);
 }
+function wToggleMesas(){
+  wData.mesas_habilitadas = !wData.mesas_habilitadas;
+  const tog = document.getElementById('mesas-toggle');
+  if(!tog) return;
+  tog.style.background     = wData.mesas_habilitadas ? 'var(--gold)' : 'rgba(255,255,255,0.12)';
+  tog.style.borderColor    = wData.mesas_habilitadas ? 'var(--gold)' : 'rgba(255,255,255,0.15)';
+  tog.children[0].style.left = wData.mesas_habilitadas ? '22px' : '3px';
+}
+
 function checkMultiFuncion(){
   const cat=document.getElementById('w-cat')?.value;
   wData._multiFuncion=(cat==='Teatro'||cat==='Stand Up');
@@ -2943,16 +2986,29 @@ function renderW4(f){
       </div>
     </div>
     <div class="fee-box">
-      <strong>Cómo funciona el servicio</strong><br>
-      Vos fijás el precio de la entrada. El comprador paga un 5% adicional de cargo por servicio
-      que cobra DataManIAcs directamente. Vos recibís el <strong>93% del precio que fijaste</strong>
-      directo en tu cuenta de Mercado Pago.<br>
-      Los 10 días de espera son la política de Mercado Pago — nosotros no retenemos nada.
+      <strong>El dinero llega directo a tu cuenta de Mercado Pago con cada venta</strong><br><br>
+      Garantizamos un <strong>mínimo del 93%</strong> del precio de tu entrada — y dependiendo de cómo pague el comprador, ese porcentaje puede ser mayor:<br><br>
+      <div style="display:flex;flex-direction:column;gap:5px;margin:4px 0 10px">
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+          <span style="font-size:14px">💳</span>
+          <span><strong>Dinero disponible</strong> → recibís <strong style="color:var(--gold2)">más del 93%</strong></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+          <span style="font-size:14px">🏦</span>
+          <span><strong>Débito</strong> → recibís cerca del <strong style="color:var(--gold2)">95–96%</strong></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+          <span style="font-size:14px">💎</span>
+          <span><strong>Crédito</strong> → recibís el <strong style="color:var(--gold)">93% garantizado</strong></span>
+        </div>
+      </div>
+      <div style="padding:8px 10px;background:rgba(226,185,79,0.08);border-radius:7px;font-size:12px;font-weight:600;color:var(--gold);text-align:center;margin-bottom:10px">
+        El 93% es el mínimo. Nunca recibís menos.
+      </div>
       <div class="fee-example">
         <strong style="color:var(--gold)">Ejemplo:</strong> Precio entrada $10.000<br>
-        🧾 El comprador paga <strong>$10.500</strong> (incluye 5% cargo por servicio)<br>
-        💰 Vos recibís <strong>$9.300</strong> (93% de $10.000) en tu cuenta MP<br>
-        <span style="color:var(--muted);font-size:11px">· $600 arancel MP (6%) + $100 comisión DataManIAcs (1%) = $700 cargo total al venue</span>
+        🧾 El comprador paga <strong>$10.500</strong> (+ 5% cargo por servicio DataManIAcs)<br>
+        💰 Vos recibís <strong>mín. $9.300</strong> directo en tu cuenta MP
       </div>
     </div>
     <div class="form-row">
@@ -3641,11 +3697,11 @@ function renderW6(f){
 
   const terminosText=isTrf
     ? `Entiendo que los compradores transfieren a DataManIAcs (+3% cargo al comprador). DM verifica cada comprobante y me acredita el ${(venuePct*100).toFixed(0)}% del precio por entrada vendida al día siguiente del evento.`
-    : `Acepto que DataManIAcs cobre el 5% al comprador. Recibiré el 93% del precio de cada entrada en mi cuenta de Mercado Pago según los tiempos de acreditación de MP.`;
+    : `Acepto que DataManIAcs cobre el 5% al comprador. Recibiré un mínimo del 93% del precio de cada entrada directo en mi cuenta de Mercado Pago — y potencialmente más según el medio de pago del comprador.`;
 
   const feeBoxText=isTrf
     ? `<strong>Publicación gratuita.</strong> El comprador paga el +3% de cargo por servicio. DataManIAcs descuenta el 4% de comisión del precio fijado y te transfiere el resto al día siguiente del evento. Sin sorpresas.`
-    : `<strong>Publicación gratuita.</strong> DataManIAcs cobra el 5% al comprador y el 7% del precio fijado al venue (6% arancel MP + 1% comisión DataManIAcs). El dinero llega a tu cuenta de MP en 10 días hábiles — política de MP, no retenemos nada.`;
+    : `<strong>Publicación gratuita.</strong> DataManIAcs cobra el 5% al comprador. Vos recibís mínimo el 93% del precio — puede ser más según cómo pague el comprador (débito/crédito/dinero disponible). El dinero llega directo a tu cuenta de MP — política de acreditación de MP, nosotros no retenemos nada.`;
 
   f.innerHTML=`
     <div style="background:var(--s2);border-radius:12px;padding:16px;margin-bottom:16px;font-size:13px;line-height:1.8">
@@ -3783,6 +3839,7 @@ async function submitWizard(){
     mp_conectado:isTrf?'FALSE':'TRUE',
     modelo_venta:wizardMode,
     colaboracion:colaboro,
+    mesas_habilitadas:wData.mesas_habilitadas?'TRUE':'FALSE',
     precio_entrada:wData.precio_entrada&&!isNaN(parseFloat(wData.precio_entrada))?String(Math.round(parseFloat(wData.precio_entrada))):'',
     precio_puerta:wData.precio_puerta&&!isNaN(parseFloat(wData.precio_puerta))?String(Math.round(parseFloat(wData.precio_puerta))):'',
     stock_entradas:wData.stock_entradas&&!isNaN(parseInt(wData.stock_entradas))?String(parseInt(wData.stock_entradas)):'',
