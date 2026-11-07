@@ -2354,6 +2354,32 @@ function renderChoice(f){
             <span style="color:var(--muted)">Mercado Pago cobra su comisión (4,60% + IVA) · DataManIAcs se queda con el resto</span>
           </div>
           <div style="margin-top:7px;font-size:11px;color:var(--muted);line-height:1.6">Requiere cuenta de Mercado Pago activa, configurada para cobrar a 10 días (te mostramos cómo). Si tu cuenta cobra al instante, MP aplica una comisión más alta y el 93% no se cumple.</div>
+
+          <!-- ── Simulator inside MP card ───────────── -->
+          <div style="margin-top:12px;border-top:1px solid rgba(255,255,255,0.07);padding-top:12px" onclick="event.stopPropagation()">
+            <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:9px;text-align:center;letter-spacing:.08em;text-transform:uppercase">Simulá tu entrada</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:8px">
+              ${[10000,15000,25000,40000].map(v=>`<button onclick="simCalc(${v},this)" style="padding:4px 11px;border-radius:999px;border:1px solid var(--b2);background:var(--s3);color:var(--ink2);font-size:10px;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor=''">\$${v.toLocaleString('es-AR')}</button>`).join('')}
+            </div>
+            <div style="display:flex;gap:7px;margin-bottom:9px">
+              <input id="sim-price" type="number" min="1000" step="500" placeholder="Otro precio..."
+                oninput="simCalc(parseInt(this.value)||0,null)"
+                style="flex:1;padding:7px 11px;border-radius:8px;border:1px solid var(--b2);background:var(--s3);color:var(--ink);font-size:12px">
+              <button onclick="simCalc(parseInt(document.getElementById('sim-price').value)||0,null)"
+                style="padding:7px 13px;border-radius:8px;border:none;background:var(--gold);color:#0e0d0b;font-size:11px;font-weight:700;cursor:pointer">Calcular</button>
+            </div>
+            <div id="sim-result" style="display:none;padding:11px 13px;background:var(--s3);border-radius:9px;border:1px solid var(--b2)">
+              <div style="text-align:center;margin-bottom:9px">
+                <div style="font-size:10px;color:var(--muted)">El comprador paga</div>
+                <div id="sim-total" style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--ink)"></div>
+              </div>
+              <div id="sim-bar" style="height:8px;border-radius:999px;overflow:hidden;display:flex;margin-bottom:10px;gap:1px"></div>
+              <div id="sim-rows" style="display:flex;flex-direction:column;gap:4px;font-size:11px"></div>
+              <div style="margin-top:8px;font-size:10px;color:var(--muted);line-height:1.5;border-top:1px solid rgba(255,255,255,0.06);padding-top:7px">
+                Tarifa Checkout MP a 10 días: 4,60% + IVA · MP puede modificar sus tarifas a su criterio — podés seleccionar más días de acreditación en tu cuenta MP para mitigar costos adicionales · No incluye retenciones
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2402,30 +2428,8 @@ function renderChoice(f){
 
     </div>
 
-    <!-- ── Fee simulator ───────────────────────────────────────── -->
-    <div style="margin-top:16px;border-top:1px solid var(--b2);padding-top:14px">
-      <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:10px;text-align:center;letter-spacing:.08em;text-transform:uppercase">¿Cuánto cobro por mi entrada?</div>
-      <div style="display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-bottom:9px">
-        ${[10000,15000,25000,40000].map(v=>`<button onclick="simCalc(${v},this)" style="padding:5px 14px;border-radius:999px;border:1px solid var(--b2);background:var(--s2);color:var(--ink2);font-size:11px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor=''">\$${v.toLocaleString('es-AR')}</button>`).join('')}
-      </div>
-      <div style="display:flex;gap:8px;margin-bottom:10px">
-        <input id="sim-price" type="number" min="1000" step="500" placeholder="Ingresá el precio..."
-          oninput="simCalc(parseInt(this.value)||0,null)"
-          style="flex:1;padding:8px 12px;border-radius:9px;border:1px solid var(--b2);background:var(--s2);color:var(--ink);font-size:13px">
-        <button onclick="simCalc(parseInt(document.getElementById('sim-price').value)||0,null)"
-          style="padding:8px 14px;border-radius:9px;border:none;background:var(--gold);color:#0e0d0b;font-size:12px;font-weight:700;cursor:pointer">Calcular</button>
-      </div>
-      <div id="sim-result" style="display:none;padding:12px 14px;background:var(--s2);border-radius:10px;border:1px solid var(--b2)">
-        <div style="text-align:center;margin-bottom:10px">
-          <div style="font-size:11px;color:var(--muted)">El comprador paga</div>
-          <div id="sim-total" style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--ink)"></div>
-        </div>
-        <div id="sim-bar" style="height:9px;border-radius:999px;overflow:hidden;display:flex;margin-bottom:12px;gap:1px"></div>
-        <div id="sim-rows" style="display:flex;flex-direction:column;gap:5px;font-size:12px"></div>
-        <div style="margin-top:9px;font-size:10px;color:var(--muted);line-height:1.5;border-top:1px solid var(--b2);padding-top:8px">
-          Aplica con cuenta MP configurada a 10 días · Comisión MP: 4,60% + IVA (tarifa Checkout vigente) · No incluye retenciones
-        </div>
-      </div>
+    <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--muted)">
+      Tu evento se revisa y se publica en el mapa en menos de 24 horas. El listado es siempre gratuito.
     </div>`;
 }
 
@@ -2448,18 +2452,19 @@ function simCalc(pesos, btn){
     `<div style="flex:${artist/total};background:#4ca87a;border-radius:999px 0 0 999px"></div>`+
     `<div style="flex:${mp/total};background:rgba(226,185,79,0.5)"></div>`+
     `<div style="flex:${dm/total};background:rgba(255,255,255,0.15);border-radius:0 999px 999px 0"></div>`;
+  const pctTicket=v=>((v/sub)*100).toFixed(0)+'%'; // % of ticket price
   document.getElementById('sim-rows').innerHTML =
     `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(76,168,122,0.08);border-radius:7px;border:1px solid rgba(76,168,122,0.2)">
       <span>💰 <strong style="color:#4ca87a">Vos cobrás</strong></span>
-      <span><strong style="color:#4ca87a">${fmt(artist)}</strong> <span style="color:var(--muted);font-size:11px">(${pct(artist)} de lo que pagó el comprador)</span></span>
+      <span><strong style="color:#4ca87a">${fmt(artist)}</strong> <span style="color:var(--muted);font-size:10px">(93% sobre el valor del ticket)</span></span>
     </div>`+
     `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--s3);border-radius:7px">
       <span style="color:var(--muted)">🏦 Mercado Pago</span>
-      <span style="color:var(--muted)">${fmt(mp)} <span style="font-size:11px">(${pct(mp)})</span></span>
+      <span style="color:var(--muted)">${fmt(mp)} <span style="font-size:10px">(${pct(mp)} sobre lo que pagó el comprador)</span></span>
     </div>`+
     `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--s3);border-radius:7px">
       <span style="color:var(--muted)">⚡ DataManIAcs</span>
-      <span style="color:var(--muted)">${fmt(dm)} <span style="font-size:11px">(${pct(dm)})</span></span>
+      <span style="color:var(--muted)">${fmt(dm)} <span style="font-size:10px">(${pct(dm)} sobre lo que pagó el comprador)</span></span>
     </div>`;
   document.getElementById('sim-result').style.display='block';
 }
