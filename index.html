@@ -2342,16 +2342,18 @@ function renderChoice(f){
         </div>
         <div class="choice-card-desc">
           <span style="display:inline-block;background:rgba(76,168,122,0.15);border:1px solid rgba(76,168,122,0.4);border-radius:999px;padding:2px 10px;font-size:10px;font-weight:700;color:#4ca87a;letter-spacing:.06em;margin-bottom:8px">⚡ SIN ESFUERZO</span><br>
-          ✅ Los compradores pagan online — vos no tocás nada<br>
+          ✅ Los compradores pagan online y cada venta va directo a tu cuenta de Mercado Pago<br>
+          ✅ Cobrás el <strong>93% del precio</strong> de tu entrada — el comprador paga un 5% de servicio aparte<br>
           ✅ Recibís la lista de asistentes antes del evento<br>
           ✅ DM provee un QR del evento para ventas en la puerta — el comprador paga desde su celular, sin efectivo, sin caja<br>
-          ✅ El dinero llega directo a tu cuenta MP en 10 días hábiles
-          <div style="margin-top:9px;padding:8px 10px;background:rgba(201,168,76,0.07);border-radius:7px;border:1px solid rgba(201,168,76,0.15);font-size:11px;line-height:1.7">
+          ✅ El dinero queda disponible a los 10 días de cada venta, <em>con tu cuenta configurada para cobrar a 10 días</em>
+          <div style="margin-top:9px;padding:9px 11px;background:rgba(201,168,76,0.07);border-radius:8px;border:1px solid rgba(201,168,76,0.18);font-size:11px;line-height:1.8">
             <strong style="color:var(--ink)">Ejemplo entrada $10.000:</strong><br>
-            🧾 Comprador paga <strong style="color:var(--ink)">$10.500</strong> <span style="color:var(--muted)">(+5% cargo por servicio al comprador)</span><br>
-            💰 Vos recibís <strong style="color:#4ca87a">$9.300</strong> <span style="color:var(--muted)">(−7% cargo DM: 6% arancel MP + 1% comisión DataManIAcs)</span>
+            🧾 Comprador paga <strong style="color:var(--ink)">$10.500</strong> <span style="color:var(--muted)">(+5% de servicio)</span><br>
+            💰 Vos cobrás <strong style="color:#4ca87a">$9.300</strong> <span style="color:var(--muted)">(el 93% del precio de tu entrada)</span><br>
+            <span style="color:var(--muted)">Mercado Pago cobra su comisión (4,60% + IVA) · DataManIAcs se queda con el resto</span>
           </div>
-          <div style="margin-top:7px;font-size:11px;color:var(--muted)">Requiere cuenta de Mercado Pago activa · Los 10 días son política de MP, no retenemos nada</div>
+          <div style="margin-top:7px;font-size:11px;color:var(--muted);line-height:1.6">Requiere cuenta de Mercado Pago activa, configurada para cobrar a 10 días (te mostramos cómo). Si tu cuenta cobra al instante, MP aplica una comisión más alta y el 93% no se cumple.</div>
         </div>
       </div>
 
@@ -2398,7 +2400,68 @@ function renderChoice(f){
         </div>
       </div>
 
+    </div>
+
+    <!-- ── Fee simulator ───────────────────────────────────────── -->
+    <div style="margin-top:16px;border-top:1px solid var(--b2);padding-top:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:10px;text-align:center;letter-spacing:.08em;text-transform:uppercase">¿Cuánto cobro por mi entrada?</div>
+      <div style="display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-bottom:9px">
+        ${[10000,15000,25000,40000].map(v=>`<button onclick="simCalc(${v},this)" style="padding:5px 14px;border-radius:999px;border:1px solid var(--b2);background:var(--s2);color:var(--ink2);font-size:11px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor=''">\$${v.toLocaleString('es-AR')}</button>`).join('')}
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input id="sim-price" type="number" min="1000" step="500" placeholder="Ingresá el precio..."
+          oninput="simCalc(parseInt(this.value)||0,null)"
+          style="flex:1;padding:8px 12px;border-radius:9px;border:1px solid var(--b2);background:var(--s2);color:var(--ink);font-size:13px">
+        <button onclick="simCalc(parseInt(document.getElementById('sim-price').value)||0,null)"
+          style="padding:8px 14px;border-radius:9px;border:none;background:var(--gold);color:#0e0d0b;font-size:12px;font-weight:700;cursor:pointer">Calcular</button>
+      </div>
+      <div id="sim-result" style="display:none;padding:12px 14px;background:var(--s2);border-radius:10px;border:1px solid var(--b2)">
+        <div style="text-align:center;margin-bottom:10px">
+          <div style="font-size:11px;color:var(--muted)">El comprador paga</div>
+          <div id="sim-total" style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--ink)"></div>
+        </div>
+        <div id="sim-bar" style="height:9px;border-radius:999px;overflow:hidden;display:flex;margin-bottom:12px;gap:1px"></div>
+        <div id="sim-rows" style="display:flex;flex-direction:column;gap:5px;font-size:12px"></div>
+        <div style="margin-top:9px;font-size:10px;color:var(--muted);line-height:1.5;border-top:1px solid var(--b2);padding-top:8px">
+          Aplica con cuenta MP configurada a 10 días · Comisión MP: 4,60% + IVA (tarifa Checkout vigente) · No incluye retenciones
+        </div>
+      </div>
     </div>`;
+}
+
+function simCalc(pesos, btn){
+  if(!pesos||pesos<1) return;
+  document.getElementById('sim-price').value = pesos;
+  // Constants — keep in sync with entradas database
+  const MP_BPS=557, NET_BPS=9300, SVC_BPS=500;
+  const sub    = pesos*100;
+  const svc    = Math.floor(sub*SVC_BPS/10000);
+  const total  = sub+svc;
+  const artist = Math.floor(sub*NET_BPS/10000);
+  const mp     = Math.floor(total*MP_BPS/10000);
+  const dm     = total-artist-mp;
+  const fmt=v=>'$'+Math.floor(v/100).toLocaleString('es-AR')+(v%100?','+(v%100<10?'0'+v%100:v%100):'');
+  const pct=v=>((v/total)*100).toFixed(1)+'%';
+  document.getElementById('sim-total').textContent = fmt(total);
+  // Proportional bar
+  document.getElementById('sim-bar').innerHTML =
+    `<div style="flex:${artist/total};background:#4ca87a;border-radius:999px 0 0 999px"></div>`+
+    `<div style="flex:${mp/total};background:rgba(226,185,79,0.5)"></div>`+
+    `<div style="flex:${dm/total};background:rgba(255,255,255,0.15);border-radius:0 999px 999px 0"></div>`;
+  document.getElementById('sim-rows').innerHTML =
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(76,168,122,0.08);border-radius:7px;border:1px solid rgba(76,168,122,0.2)">
+      <span>💰 <strong style="color:#4ca87a">Vos cobrás</strong></span>
+      <span><strong style="color:#4ca87a">${fmt(artist)}</strong> <span style="color:var(--muted);font-size:11px">(${pct(artist)} de lo que pagó el comprador)</span></span>
+    </div>`+
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--s3);border-radius:7px">
+      <span style="color:var(--muted)">🏦 Mercado Pago</span>
+      <span style="color:var(--muted)">${fmt(mp)} <span style="font-size:11px">(${pct(mp)})</span></span>
+    </div>`+
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--s3);border-radius:7px">
+      <span style="color:var(--muted)">⚡ DataManIAcs</span>
+      <span style="color:var(--muted)">${fmt(dm)} <span style="font-size:11px">(${pct(dm)})</span></span>
+    </div>`;
+  document.getElementById('sim-result').style.display='block';
 }
 
 function selectChoice(mode){
@@ -2822,6 +2885,34 @@ function renderW2(f){
     }
   },50);
 }
+function diez_dias_html(){
+  return `<div style="margin-top:12px;padding:12px 14px;background:rgba(232,156,45,0.1);
+    border:1.5px solid rgba(232,156,45,0.4);border-radius:11px">
+    <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:8px">
+      ⚠️ Falta un paso para cobrar el 93%: configurar el cobro a 10 días en tu Mercado Pago
+    </div>
+    <div style="font-size:12px;color:var(--ink2);line-height:1.75;margin-bottom:10px">
+      <strong style="color:var(--ink)">1.</strong> Entrá a tu Mercado Pago y buscá <strong style="color:var(--ink)">«Configurar costos por cobro»</strong><br>
+      <strong style="color:var(--ink)">2.</strong> Elegí la pestaña <strong style="color:var(--ink)">Checkout</strong><br>
+      <strong style="color:var(--ink)">3.</strong> Seleccioná <strong style="color:var(--ink)">10 días</strong> y tocá <strong style="color:var(--ink)">Guardar</strong><br>
+      <span style="font-size:11px;color:var(--muted)">Si tu cuenta cobra al instante, MP aplica una comisión mayor y el 93% no se cumple. Lleva un minuto y se hace una sola vez por cuenta MP.</span>
+    </div>
+    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:9px 12px;
+      background:rgba(255,255,255,0.04);border-radius:8px;border:1px solid rgba(255,255,255,0.08)">
+      <input type="checkbox" id="check-10dias" onchange="toggle10dias()"
+        style="width:16px;height:16px;accent-color:var(--gold);cursor:pointer">
+      <span style="font-size:12px;color:var(--ink);font-weight:500">Ya configuré el cobro a 10 días en mi Mercado Pago</span>
+    </label>
+  </div>`;
+}
+
+function toggle10dias(){
+  const cb  = document.getElementById('check-10dias');
+  const btn = document.querySelector('.btn-next');
+  if(btn) btn.disabled = !cb?.checked;
+  wData._10dias_ok = !!cb?.checked;
+}
+
 function wToggleMesas(){
   wData.mesas_habilitadas = !wData.mesas_habilitadas;
   const tog = document.getElementById('mesas-toggle');
@@ -2986,29 +3077,16 @@ function renderW4(f){
       </div>
     </div>
     <div class="fee-box">
-      <strong>El dinero llega directo a tu cuenta de Mercado Pago con cada venta</strong><br><br>
-      Garantizamos un <strong>mínimo del 93%</strong> del precio de tu entrada — y dependiendo de cómo pague el comprador, ese porcentaje puede ser mayor:<br><br>
-      <div style="display:flex;flex-direction:column;gap:5px;margin:4px 0 10px">
-        <div style="display:flex;align-items:center;gap:8px;font-size:12px">
-          <span style="font-size:14px">💳</span>
-          <span><strong>Dinero disponible</strong> → recibís <strong style="color:var(--gold2)">más del 93%</strong></span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:12px">
-          <span style="font-size:14px">🏦</span>
-          <span><strong>Débito</strong> → recibís cerca del <strong style="color:var(--gold2)">95–96%</strong></span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:12px">
-          <span style="font-size:14px">💎</span>
-          <span><strong>Crédito</strong> → recibís el <strong style="color:var(--gold)">93% garantizado</strong></span>
-        </div>
-      </div>
-      <div style="padding:8px 10px;background:rgba(226,185,79,0.08);border-radius:7px;font-size:12px;font-weight:600;color:var(--gold);text-align:center;margin-bottom:10px">
-        El 93% es el mínimo. Nunca recibís menos.
+      <strong>Cobrás el 93% del precio de tu entrada — directo en tu cuenta MP</strong><br><br>
+      Cada venta se acredita en tu cuenta. El comprador paga un 5% de servicio adicional. Mercado Pago descuenta su comisión (4,60% + IVA, tarifa Checkout a 10 días) y DataManIAcs se queda con el resto.<br><br>
+      <div style="padding:8px 10px;background:rgba(232,156,45,0.1);border:1px solid rgba(232,156,45,0.3);border-radius:8px;font-size:11px;color:var(--ink2);line-height:1.6;margin-bottom:10px">
+        ⚠️ <strong style="color:var(--gold)">Condición importante:</strong> el 93% se cumple solo si tu cuenta de Mercado Pago está configurada para cobrar a <strong>10 días</strong>. Si cobrás al instante, MP aplica una tarifa mayor y el porcentaje baja. <span style="color:var(--gold)">Te mostramos cómo configurarlo.</span>
       </div>
       <div class="fee-example">
-        <strong style="color:var(--gold)">Ejemplo:</strong> Precio entrada $10.000<br>
-        🧾 El comprador paga <strong>$10.500</strong> (+ 5% cargo por servicio DataManIAcs)<br>
-        💰 Vos recibís <strong>mín. $9.300</strong> directo en tu cuenta MP
+        <strong style="color:var(--gold)">Ejemplo entrada $10.000:</strong><br>
+        🧾 Comprador paga <strong>$10.500</strong> <span style="color:var(--muted)">(+5% de servicio)</span><br>
+        💰 Vos cobrás <strong style="color:#4ca87a">$9.300</strong> <span style="color:var(--muted)">(93% de $10.000)</span><br>
+        <span style="color:var(--muted);font-size:11px">MP cobra su comisión (4,60% + IVA) · DataManIAcs se queda con el resto</span>
       </div>
     </div>
     <div class="form-row">
@@ -3987,12 +4065,13 @@ async function init(){
               <div style="font-size:12px;color:var(--ink2);line-height:1.6">El dinero de las entradas irá directo a tu cuenta automáticamente. Ya podés continuar al siguiente paso.</div>
             </div>
           </div>
-          <div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:20px">
-            ${eventId ? 'Conexión para este evento específico.' : 'Esta conexión aplica a todos tus eventos futuros en este venue.'}
+          <div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:4px">
+            ${eventId ? 'Conexión para este evento específico.' : 'Esta conexión aplica a todos tus eventos futuros en este venue. El ajuste de 10 días es una sola vez por cuenta MP.'}
           </div>
-          <div class="step-nav">
+          ${diez_dias_html()}
+          <div class="step-nav" style="margin-top:16px">
             <button class="btn-back" onclick="wizardStep=3;renderStep()">← Atrás</button>
-            <button class="btn-next" onclick="wizardStep=5;renderStep()">Siguiente →</button>
+            <button class="btn-next" id="btn-next-4" disabled onclick="wizardStep=5;renderStep()">Siguiente →</button>
           </div>`;
         updateProgressBar();
       }, 200);
